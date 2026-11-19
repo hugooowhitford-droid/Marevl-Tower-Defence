@@ -3384,7 +3384,7 @@ const SHOP=[
  {i:'✨',n:'Hero Dust ×60',d:'Craft heroes you are missing.',c:250,f:()=>{SV.mats.dust=(SV.mats.dust||0)+60;}},
  {i:'🎪',n:'Event Currency ×60',d:'For this hour\'s event slots.',c:300,f:()=>{evData(curEv().k).c+=60;}},
  {i:'🎒',n:'Relic Chest',d:'A random relic you don\'t own yet.',c:1200,ok:()=>SV.relics.length<RELICS.length,f:()=>{const r=grantRelic();if(r)setTimeout(()=>toast(r.i+' '+r.n+'!'),200);}},
- {i:'🎟️',n:'Mythic Ticket',d:'One guaranteed Mythic hero.',c:3000,f:()=>{SV.tickets=(SV.tickets||0)+1;}},
+ {i:'🎟️',n:'Mythic Ticket',d:'One guaranteed Mythic hero.',c:10000,f:()=>{SV.tickets=(SV.tickets||0)+1;}},
 ];
 function showShop(){const day=Math.floor(Date.now()/864e5),deal=day%SHOP.length;
  modal(`<div class="L out" style="font-size:32px">🛒 HERO SHOP</div><div style="font-weight:800;opacity:.85">Spend gems 💎 here. One item is half price every day. You have <b style="color:#7df9ff">${SV.gems.toLocaleString()} 💎</b></div><div id="shg" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0"></div><button class="bb sm gray" id="shx">Done</button>`,b=>{
