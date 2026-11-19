@@ -2709,7 +2709,7 @@ function refreshTP(){
  G._tpSig=G.cash>=(uc||1e9);
 }
 function upgrade(){const t=G&&G.sel;if(!t||t.ally)return;ensurePa(t);const o=[0,1,2].sort((x,y)=>t.pa[y]-t.pa[x]);for(const i of o){const c=pathInfo(t,i).cost;if(c&&G.cash>=c){upgradeP(i);return;}}}
-function sell(){const t=G&&G.sel;if(!t)return;G.cash+=Math.floor(t.spent*.6);G.towers=G.towers.filter(x=>x!==t);G.sel=null;sfx(300,.08);refreshTP();}
+function sell(){const t=G&&G.sel;if(!t)return;G.cash+=Math.floor(t.spent*.6);G.towers.filter(x=>x.isClone&&x.cloneBy===t.uid).forEach(o=>{burst(o.x,o.y,'#3fb8ff',16);floatTxt(o.x,o.y-40,'POOF!','#3fb8ff');});G.towers=G.towers.filter(x=>x!==t&&!(x.isClone&&x.cloneBy===t.uid));if(G.cloneMode&&G.cloneMode.king===t)G.cloneMode=null;G.sel=null;sfx(300,.08);refreshTP();}
 document.addEventListener('keydown',e=>{
  if(screen!=='game'||!G)return;const k=e.key.toLowerCase();
  if(k>='1'&&k<='5'){const h=G.team[+k-1];if(h)choosePlace(h);}
