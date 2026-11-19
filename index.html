@@ -1464,15 +1464,15 @@ function drawBoss(c,f,t,col){
 
 // ================= TRAITS / EVOLUTION / QUESTS / MODES =================
 const TRAITS=[
- {k:'swift',n:'Swift',i:'💨',c:'#7df9ff',w:24,d:'+15% attack speed',f:{asp:.15}},
- {k:'sharp',n:'Sharpshooter',i:'🎯',c:'#9bf6ff',w:22,d:'+18% range',f:{rng:.18}},
- {k:'brute',n:'Brute',i:'💪',c:'#ffadad',w:20,d:'+20% damage',f:{dmg:.2}},
+ {k:'swift',n:'Swift',i:'💨',c:'#7df9ff',w:25,d:'+15% attack speed',f:{asp:.15}},
+ {k:'sharp',n:'Sharpshooter',i:'🎯',c:'#9bf6ff',w:23,d:'+18% range',f:{rng:.18}},
+ {k:'brute',n:'Brute',i:'💪',c:'#ffadad',w:21,d:'+20% damage',f:{dmg:.2}},
  {k:'thrift',n:'Thrifty',i:'🪙',c:'#fdffb6',w:14,d:'Costs 20% less to place and upgrade',f:{cost:.2}},
- {k:'scholar',n:'Scholar',i:'📘',c:'#bdb2ff',w:9,d:'+25% damage, +10% range',f:{dmg:.25,rng:.1}},
- {k:'blitz',n:'Blitz',i:'⚡',c:'#ffd60a',w:6,d:'+30% attack speed, +10% damage',f:{asp:.3,dmg:.1}},
- {k:'vampire',n:'Vampire',i:'🦇',c:'#ff4d6d',w:3,d:'+35% damage; kills sometimes repair City HP',f:{dmg:.35,vamp:1}},
- {k:'celestial',n:'Celestial',i:'🌟',c:'#ffe066',w:1.5,d:'+60% damage, +20% speed, +20% range',f:{dmg:.6,asp:.2,rng:.2}},
- {k:'monarch',n:'Monarch',i:'👑',c:'#ff006e',w:.5,d:'+120% damage, +15% speed, +15% range',f:{dmg:1.2,asp:.15,rng:.15}},
+ {k:'scholar',n:'Scholar',i:'📘',c:'#bdb2ff',w:8.75,d:'+25% damage, +10% range',f:{dmg:.25,rng:.1}},
+ {k:'blitz',n:'Blitz',i:'⚡',c:'#ffd60a',w:5,d:'+30% attack speed, +10% damage',f:{asp:.3,dmg:.1}},
+ {k:'vampire',n:'Vampire',i:'🦇',c:'#ff4d6d',w:2,d:'+35% damage; kills sometimes repair City HP',f:{dmg:.35,vamp:1}},
+ {k:'celestial',n:'Celestial',i:'🌟',c:'#ffe066',w:.75,d:'+60% damage, +20% speed, +20% range',f:{dmg:.6,asp:.2,rng:.2}},
+ {k:'monarch',n:'Monarch',i:'👑',c:'#ff006e',w:.25,d:'+120% damage, +15% speed, +15% range',f:{dmg:1.2,asp:.15,rng:.15}},
 ];
 const TW=TRAITS.reduce((s,t)=>s+t.w,0);
 const getTrait=id=>SV&&SV.traits&&SV.traits[id]?TRAITS.find(t=>t.k===SV.traits[id]):null;
@@ -3623,7 +3623,7 @@ HUB.push({k:'hq',x:872,y:190,w:104,h:74,n:'TEAMS',tip:'<b>Team HQ</b><br>See the
 HEROES.forEach(h=>{if((h.name==='Red Eye'||h.name==='Sir Stretch')&&h.rate&&h.r===4)h.dmg=+(h.rate*(h.name==='Red Eye'?89.5:88.2)).toFixed(1);});
 HEROES.forEach(h=>{if(h.name==='Doctor Mystic'){h.chain=6;h.rate=+(h.rate*.82).toFixed(2);h.range+=12;}});
 const SHEET_DMG={'Doctor Mystic':100,'Eclipse':30,'Black Fang':50};HEROES.forEach(h=>{if(SHEET_DMG[h.name]!=null)h.dmg=SHEET_DMG[h.name];});
-const TRAIT_LUCK=[1,1,1,2.4,4,6,8];
+const TRAIT_LUCK=[1,1,1,1.5,2,2.5,3];
 function traitW(i,r){const L=TRAIT_LUCK[r],w=TRAITS[i].w;return i>=4?w*L*(1+(i-4)*.2*(L-1)):(i<=2&&L>1?w/Math.sqrt(L):w);}
 function traitOdds(r){const ws=TRAITS.map((t,i)=>traitW(i,r)),tot=ws.reduce((a,b)=>a+b,0);return{ws,tot};}
 function traitTip(r){const{ws,tot}=traitOdds(r);return`<b>Trait odds for ${RAR[r].n} heroes</b><br>`+TRAITS.map((t,i)=>{const p=ws[i]/tot*100;return t.i+' '+t.n+' '+p.toFixed(p<3?1:0)+'%';}).join('<br>')+(r>=3?'<br><i>Legendary and Mythic heroes roll rare traits far more often.</i>':'<br><i>Legendary and Mythic heroes get better odds.</i>');}
