@@ -337,6 +337,7 @@ canvas{display:block}
   <div id="modal"><div class="box" id="mbox"></div></div>
 </div>
 
+<style>#evBanner,#tabEv,#evPill{display:none!important}</style>
 <script>
 // ================= ICONS: the game's own symbols instead of Apple emojis =================
 const ICO=(()=>{const O='#1b1f33';
@@ -1717,7 +1718,7 @@ function buildDetail(){
  const p=portrait(own?{...h,d:skinD(h0.d,SV.skin[h0.id])}:h,170,170,3.2,{sil:!own});p.style.borderRadius='14px';p.style.border='3px solid '+RAR[h.r].c;dv.appendChild(p);
  dv.appendChild(mk('div','L out',`<span style="font-size:24px">${own?(h.evo?'✦ ':'')+h.name:'??? '}</span>${own?`<div style="font-size:14px;color:#ffd23f">${h0.title}${h0.legend?' · ⚜ LEGEND':''}</div>`:''}`));
  dv.appendChild(mk('div','',`<span class="tag" style="color:${RAR[h.r].c}">${RAR[h.r].n}</span><span class="tag">${ELS[h.el].i} ${ELS[h.el].n}</span><span class="tag">${c.ic} ${c.n}</span>`));
- if(!own){const E=h.ev?EVENTS.find(e=>e.k===h.ev):null;dv.appendChild(mk('p','',E?`<b>${E.i} ${E.n} exclusive!</b><br>Pull the event slots with ${E.ci} ${E.cur} while ${E.n} is on. ${curEv().k===E.k?'<b style="color:#7dff8a">It\'s on right now!</b>':'Events rotate every hour.'}`:(h.r===6?`<b>EXCLUSIVE hero!</b><br>Reach Hero Pass tier 50 to unlock ${h.name}.`:`<b>Not unlocked yet.</b><br>Pull the Hero Slots for a chance to get this ${RAR[h.r].n} hero!`)));craftBtn(dv,h0);return;}
+ if(!own){const E=h.ev?EVENTS.find(e=>e.k===h.ev):null;dv.appendChild(mk('p','',E?`<b>${E.i} ${E.n} exclusive!</b><br>This event has ended, so this hero can no longer be unlocked.`:(h.r===6?`<b>EXCLUSIVE hero!</b><br>Reach Hero Pass tier 50 to unlock ${h.name}.`:`<b>Not unlocked yet.</b><br>Pull the Hero Slots for a chance to get this ${RAR[h.r].n} hero!`)));craftBtn(dv,h0);return;}
  dv.appendChild(mk('div','stars',`<span style="font-size:18px">${stars(own)}</span>`));
  const sg=mk('div','statgrid');
  const rows=h.cls==='farm'?[['Income/wave','$'+h.income],['Cost','$'+h.cost]]:h.cls==='support'?[['Boost','+'+Math.round(h.buff*100)+'%'],['Range',h.range],['Cost','$'+h.cost]]:[['Damage',(h.dmg*(1+.08*(own-1))).toFixed(1)],['Range',h.range],['Attack every',h.rate+'s'],['Cost','$'+h.cost]];
@@ -1781,7 +1782,7 @@ function buildModes(){
   if(!locked)c.onclick=fn;box.appendChild(c);};
  const done=dailyChallenges().filter(c=>SV.chalDone[c.key]).length;
  card('📖','STORY',SV.cleared.filter(Boolean).length+'/'+CH.length+' chapters','Stop the Gloom across '+CH.length+' chapters with a boss at the end of each.','linear-gradient(#38c95a,#1b7a35)',false,'',()=>go('story'));
- {const E=curEv(),S=EVSTAGE[E.k];card(E.i,'EVENT STAGE',S.n+' · '+fmtT(evMsLeft()),S.rd+' Earn lots of '+E.ci+' '+E.cur+'!',`linear-gradient(${E.cab[0]},${E.cab[1]})`,false,'',()=>{if(!needTeam())startGame(-1,'event');});}
+ if(0){const E=curEv(),S=EVSTAGE[E.k];card(E.i,'EVENT STAGE',S.n+' · '+fmtT(evMsLeft()),S.rd+' Earn lots of '+E.ci+' '+E.cur+'!',`linear-gradient(${E.cab[0]},${E.cab[1]})`,false,'',()=>{if(!needTeam())startGame(-1,'event');});}
  card('🏅','CHALLENGES',done+'/3 done today','3 new daily challenges with twisted rules. Rewards Trait Crystals 🔮','linear-gradient(#ff9f1c,#c2410c)',false,'',showChallenges);
  card('🌌','GALAXY TRIALS',galN()+'/6 crystals','6 extreme trials. Each win gives a Galaxy Crystal. Get all 6 to evolve Nebulos into LORD NEBULOS!','linear-gradient(#7b2cbf,#10002b)',!SV.owned[186],'Get Nebulos first',showGalaxy);
  card('🌀','RIFT RAID','Boss rush · 15 waves','Face every boss in a row. Rewards Evo Shards 💠 for evolutions.','linear-gradient(#a55cff,#4c1d95)',!SV.cleared[2],'Beat Chapter 3',raidIntro);
@@ -2876,7 +2877,7 @@ document.addEventListener('mousemove',e=>{let html=null;let el=e.target.closest&
  if(!html){tipEl.style.display='none';return;}
  if(html!==tipLast){tipEl.innerHTML=html;tipLast=html;}tipEl.style.display='block';
  const w=tipEl.offsetWidth,h=tipEl.offsetHeight;let x=e.clientX+16,y=e.clientY+16;if(x+w>innerWidth-6)x=e.clientX-w-12;if(y+h>innerHeight-6)y=e.clientY-h-12;tipEl.style.left=x+'px';tipEl.style.top=y+'px';});
-const STATIC_TIPS={goHeroes:'<b>Heroes</b><br>Pick your team of 5, roll traits, evolve, level up and buy skins.',goSummon:'<b>Summon</b><br>Pull the Hero Slots with gems 💎, or the event slots with event currency. Every pull is a hero!',goStory:'<b>Play</b><br>Story, Challenges, Rift Raid, Infinite Tower and Endless.',goQuests:'<b>Quests</b><br>Tiered goals with rewards. The red badge means something is ready to claim.',goPass:'<b>Hero Pass</b><br>Earn Pass XP in every battle to unlock 50 tiers of free rewards.',goDaily:'<b>Daily rewards</b><br>Log in every day for a 7-day streak. Day 7 gives a Mythic Ticket.',muteB:'Sound effects and music on/off.',spin1:'One pull on the slot machine.',spin10:'Ten pulls at once. On the standard slots, guarantees at least one Rare or better.',tabStd:'<b>Standard slots</b><br>Every standard hero.',tabEv:'<b>Event slots</b><br>This hour\'s 4 exclusive heroes. Mythic guaranteed within 40 pulls.',ticketB:'<b>Mythic Ticket</b><br>Guarantees a random standard Mythic hero.',skipB:'Start the next wave now for a little bonus cash.',spdB:'Game speed: 1×, 2× or 3×.',pauseB:'Pause, or quit to the lobby.',hEv:'Event currency earned this match.',evBanner:'<b>This hour\'s event</b><br>Tap to open the event slots.'};
+const STATIC_TIPS={goHeroes:'<b>Heroes</b><br>Pick your team of 5, roll traits, evolve, level up and buy skins.',goSummon:'<b>Summon</b><br>Pull the Hero Slots with gems 💎. Every pull is a hero!',goStory:'<b>Play</b><br>Story, Challenges, Rift Raid, Infinite Tower and Endless.',goQuests:'<b>Quests</b><br>Tiered goals with rewards. The red badge means something is ready to claim.',goPass:'<b>Hero Pass</b><br>Earn Pass XP in every battle to unlock 50 tiers of free rewards.',goDaily:'<b>Daily rewards</b><br>Log in every day for a 7-day streak. Day 7 gives a Mythic Ticket.',muteB:'Sound effects and music on/off.',spin1:'One pull on the slot machine.',spin10:'Ten pulls at once. On the standard slots, guarantees at least one Rare or better.',tabStd:'<b>Standard slots</b><br>Every standard hero.',tabEv:'<b>Event slots</b><br>This hour\'s 4 exclusive heroes. Mythic guaranteed within 40 pulls.',ticketB:'<b>Mythic Ticket</b><br>Guarantees a random standard Mythic hero.',skipB:'Start the next wave now for a little bonus cash.',spdB:'Game speed: 1×, 2× or 3×.',pauseB:'Pause, or quit to the lobby.',hEv:'Event currency earned this match.',evBanner:'<b>This hour\'s event</b><br>Tap to open the event slots.'};
 function applyTips(){for(const id in STATIC_TIPS){const e=document.getElementById(id);if(e)e.dataset.tip=STATIC_TIPS[id];}
  document.querySelectorAll('.gemTxt').forEach(e=>e.parentElement.dataset.tip='<b>Gems 💎</b><br>For summons, skins and evolutions. Earn them from battles, quests and daily rewards.');
  document.querySelectorAll('.cryTxt').forEach(e=>e.parentElement.dataset.tip='<b>Trait Crystals 🔮</b><br>Roll a trait on a hero. Earn them from challenges and quests.');
@@ -2894,7 +2895,7 @@ function evTick(){const now=Date.now();if(now-evT<500)return;evT=now;const idx=e
  const bn=$('#evBanner');bn.style.background=`linear-gradient(90deg,${ev.cab[0]},${ev.cab[1]})`;
  bn.innerHTML=`${ev.i} ${ev.n.toUpperCase()} EVENT <span style="font-size:15px;opacity:.9">· ${E.c} ${ev.ci} · ends ${fmtT(evMsLeft())}</span><div style="font-size:13px;font-family:Nunito;font-weight:900">Tap for the event slots: 4 exclusive heroes!</div>`;
  document.querySelectorAll('.evT').forEach(e=>e.textContent=fmtT(evMsLeft()));
- if(evLast!==-1&&evLast!==idx){if(screen==='summon'&&summonMode==='event'&&!spinning)setSummonMode('event');if(screen!=='game'){modal(`<div class="rays"></div><div style="position:relative"><div class="L out" style="font-size:22px">NEW EVENT!</div><div class="L out" style="font-size:44px;color:#ffd23f">${ev.i} ${ev.n}</div><p style="font-weight:800">4 exclusive heroes are in the event slots for the next hour. You got 100 ${ev.ci} ${ev.cur} to start!</p><button class="bb sm green" id="ok">Let's go!</button></div>`,b=>b.querySelector('#ok').onclick=()=>{closeModal();summonMode='event';go('summon');});}}
+ if(0&&evLast!==-1&&evLast!==idx){if(screen==='summon'&&summonMode==='event'&&!spinning)setSummonMode('event');if(screen!=='game'){modal(`<div class="rays"></div><div style="position:relative"><div class="L out" style="font-size:22px">NEW EVENT!</div><div class="L out" style="font-size:44px;color:#ffd23f">${ev.i} ${ev.n}</div><p style="font-weight:800">4 exclusive heroes are in the event slots for the next hour. You got 100 ${ev.ci} ${ev.cur} to start!</p><button class="bb sm green" id="ok">Let's go!</button></div>`,b=>b.querySelector('#ok').onclick=()=>{closeModal();summonMode='event';go('summon');});}}
  evLast=idx;}
 
 // ================= MAIN LOOP =================
@@ -3382,26 +3383,24 @@ const SHOP=[
  {i:'🔮',n:'Trait Crystal',d:'Roll a trait on a hero.',c:150,f:()=>{SV.mats.cry++;}},
  {i:'💠',n:'Evo Shard',d:'Needed to evolve heroes.',c:300,f:()=>{SV.mats.sh++;}},
  {i:'✨',n:'Hero Dust ×60',d:'Craft heroes you are missing.',c:250,f:()=>{SV.mats.dust=(SV.mats.dust||0)+60;}},
- {i:'🎪',n:'Event Currency ×60',d:'For this hour\'s event slots.',c:300,f:()=>{evData(curEv().k).c+=60;}},
  {i:'🎒',n:'Relic Chest',d:'A random relic you don\'t own yet.',c:1200,ok:()=>SV.relics.length<RELICS.length,f:()=>{const r=grantRelic();if(r)setTimeout(()=>toast(r.i+' '+r.n+'!'),200);}},
  {i:'🎟️',n:'Mythic Ticket',d:'One guaranteed Mythic hero.',c:10000,f:()=>{SV.tickets=(SV.tickets||0)+1;}},
 ];
 function showShop(){const day=Math.floor(Date.now()/864e5),deal=day%SHOP.length;
  modal(`<div class="L out" style="font-size:32px">🛒 HERO SHOP</div><div style="font-weight:800;opacity:.85">Spend gems 💎 here. One item is half price every day. You have <b style="color:#7df9ff">${SV.gems.toLocaleString()} 💎</b></div><div id="shg" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0"></div><button class="bb sm gray" id="shx">Done</button>`,b=>{
-  SHOP.forEach((it,ix)=>{const price=ix===deal?Math.round(it.c/2):it.c,ok=!it.ok||it.ok(),can=ok&&SV.gems>=price;const nm=ix===3?curEv().ci+' '+curEv().cur+' ×60':it.i+' '+it.n;
+  SHOP.forEach((it,ix)=>{const price=ix===deal?Math.round(it.c/2):it.c,ok=!it.ok||it.ok(),can=ok&&SV.gems>=price;const nm=it.i+' '+it.n;
    const c=mk('div','',`${ix===deal?'<div class="L" style="color:#ffd23f;font-size:12px">⭐ DAILY DEAL · 50% OFF</div>':''}<div class="L" style="font-size:16px">${nm}</div><div style="font-size:11.5px;font-weight:800;opacity:.85;min-height:30px">${ok?it.d:'You own every relic!'}</div>`);
    c.style.cssText=`border-radius:12px;padding:8px;background:rgba(0,0,0,.3);border:3px solid ${ix===deal?'#ffd23f':'rgba(255,255,255,.15)'}`;
    const bt=mk('button','bb sm '+(can?'green':'gray'),price.toLocaleString()+' 💎');bt.disabled=!can;bt.style.marginTop='4px';bt.onclick=()=>{if(SV.gems<price)return;SV.gems-=price;it.f();save();refreshGems();chime();showShop();};c.appendChild(bt);b.querySelector('#shg').appendChild(c);});
   b.querySelector('#shx').onclick=closeModal;});}
 const HUB=[
  {k:'hall',x:72,y:388,w:112,h:118,n:'HEROES',tip:'<b>Hero Hall</b><br>Pick your team of 5, roll traits, evolve, level up and craft heroes.',fn:()=>go('index')},
- {k:'arcade',x:204,y:388,w:108,h:112,n:'SUMMON',tip:'<b>Summon Arcade</b><br>Pull the Hero Slots with gems 💎, or the event slots with event currency.',fn:()=>go('summon')},
+ {k:'arcade',x:204,y:388,w:108,h:112,n:'SUMMON',tip:'<b>Summon Arcade</b><br>Pull the Hero Slots with gems 💎.',fn:()=>go('summon')},
  {k:'board',x:236,y:612,w:92,h:92,n:'QUESTS',tip:'<b>Quest Board</b><br>Goals with rewards. A red badge means something is ready to claim.',fn:()=>go('quests'),badge:()=>claimable()},
- {k:'gate',x:500,y:392,w:170,h:176,n:'PLAY',tip:'<b>Battle Gate</b><br>Story, Events, Challenges, Rift Raid, Tower, Endless, Ally Assault and Map Maker.',fn:()=>go('modes')},
+ {k:'gate',x:500,y:392,w:170,h:176,n:'PLAY',tip:'<b>Battle Gate</b><br>Story, Challenges, Rift Raid, Tower, Endless, Ally Assault and Map Maker.',fn:()=>go('modes')},
  {k:'station',x:764,y:612,w:92,h:96,n:'PASS',tip:'<b>Pass Station</b><br>Earn Pass XP in every battle to unlock 50 tiers of free rewards.',fn:()=>go('pass'),badge:()=>passReady()},
  {k:'vault',x:796,y:388,w:104,h:92,n:'RELICS',tip:'<b>Relic Vault</b><br>Equip up to 3 relics that power up every battle.',fn:()=>showRelics()},
  {k:'trophy',x:928,y:388,w:108,h:118,n:'PROFILE',tip:'<b>Trophy Hall</b><br>Your stats, favourite hero and achievements.',fn:()=>showProfile()},
- {k:'tent',x:84,y:612,w:136,h:106,n:'EVENT',tip:'',fn:()=>$('#evBanner').onclick()},
  {k:'shop',x:916,y:612,w:136,h:104,n:'SHOP',tip:'<b>Hero Shop</b><br>Spend gems on crystals, shards, dust, event currency, relics and tickets. One daily deal at half price.',fn:()=>showShop()},
 ];
 let hubHover=null;
@@ -3641,7 +3640,6 @@ const TOUR=[
  {b:'gate',t:'The <b>Battle Gate</b> takes you to every battle: Story chapters first, then Challenges, Raids, the Tower and more as you unlock them.'},
  {b:'board',t:'The <b>Quest Board</b> gives rewards for goals you finish. A red badge means a reward is waiting.'},
  {b:'station',t:'The <b>Pass Station</b> gives free rewards as you earn Pass XP. You earn it in every battle.'},
- {b:'tent',t:'The <b>Event Tent</b> changes every hour. Each event has its own heroes and its own currency, shown at the top of the screen next to your gems.'},
  {b:'hq',t:'<b>Team HQ</b> is up on the floating island. Every hero belongs to a team, and team-mates fighting together get bonuses.'},
  {b:'shop',t:'Spend gems at the <b>Shop</b>. The <b>Relic Vault</b> and <b>Trophy Hall</b> on the right hold your relics, stats and achievements.'},
  {b:null,t:'Your team stands on the stage. Click a hero to see them show off. Hover over anything in the game for a short explanation.',last:1},
