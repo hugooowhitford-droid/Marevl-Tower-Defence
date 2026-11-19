@@ -2142,7 +2142,7 @@ function startWave(){
    farm+=inc;floatTxt(t.x,t.y-30,'+$'+Math.round(inc),'#7dff8a');t.waves=(t.waves||0)+1;});
   G.towers.filter(t=>t.h.p.k==='heal').forEach(t=>{G.hp=Math.min(G.maxHp,G.hp+t.h.p.v.h);floatTxt(t.x,t.y-30,'+'+t.h.p.v.h+' ❤','#ff8fa3');});
   {let it=0;for(const o of G.towers)if(o.pa&&o.h.cls==='farm'&&o.pa[2])it+=Math.min(150*o.pa[2],G.cash*.02*o.pa[2]);if(it>=1){G.cash+=Math.round(it);setTimeout(()=>G&&floatTxt(W/2,90,'🏦 Interest +$'+Math.round(it),'#7dff8a'),600);}}
-  if(G.ally)G.ally.cash+=bonus+40;G.cash+=bonus+farm;G.gems+=G.endless?15:10;}
+  if(G.ally)G.ally.cash+=bonus+40;G.cash+=bonus+farm;G.gems+=G.endless?30:25;}
  G.wave++;G.queue=makeWave(G.wave);G.spawnT=.3;G.timer=Math.max(14,22-G.wave*.3);
  const boss=G.queue.find(q=>q.type==='boss');toast(boss?'⚠ BOSS WAVE ⚠':'WAVE '+G.wave);sfx(330,.25,'sawtooth',.04);
 }
@@ -2503,7 +2503,7 @@ function gUpdate(dt){
   if(f.slowT>0){f.slowT-=dt;if(f.slowT<=0)f.slowF=1;}
   if(f.stunT>0){f.stunT-=dt;if(!f.boss)continue;}
   if(f.boss){f.abT-=dt;if(f.abT<=0){bossAbility(f,f.ab[f.abI++%f.ab.length]);f.abT=f.cd;}if(f.shieldT>0)f.shieldT-=dt;if(f.dashT>0)f.dashT-=dt;}
-  const sp=f.spd*f.slowF*(f.dashT>0?3:1)*(f.stunT>0?.3:1);if(f.confT>0){f.confT-=dt;f.d=Math.max(0,f.d-sp*dt*.7);if(Math.random()<dt*6)burst(f.x,f.y-22,'#c77dff',1);}else{let blk=null;if(G.walls&&!f.fly)for(const w of G.walls){if(w.hp>0&&w.d>=f.d-1&&w.d<=f.d+sp*dt+12){blk=w;break;}}if(blk){f.d=Math.max(f.d,blk.d-12);blk.hp-=(10+f.dmg*5)*(f.boss?4:1)*dt;f.wallHit=(f.wallHit||0)+dt;if(f.wallHit>.5){f.wallHit=0;burst(blk.x,blk.y-10,'#a0703a',3);}if(blk.hp<=0){burst(blk.x,blk.y,'#7dff8a',20);burst(blk.x,blk.y,'#8d6e63',16);sfx(120,.2,'sawtooth',.05);floatTxt(blk.x,blk.y-30,'WALL BROKEN','#ffba08');}}else f.d+=sp*dt;}
+  const sp=f.spd*f.slowF*(f.dashT>0?3:1)*(f.stunT>0?.3:1);if(f.confT>0){f.confT-=dt;f.d=Math.max(0,f.d-sp*dt);}else{let blk=null;if(G.walls&&!f.fly)for(const w of G.walls){if(w.hp>0&&w.d>=f.d-1&&w.d<=f.d+sp*dt+12){blk=w;break;}}if(blk){f.d=Math.max(f.d,blk.d-12);blk.hp-=(10+f.dmg*5)*(f.boss?4:1)*dt;f.wallHit=(f.wallHit||0)+dt;if(f.wallHit>.5){f.wallHit=0;burst(blk.x,blk.y-10,'#a0703a',3);}if(blk.hp<=0){burst(blk.x,blk.y,'#7dff8a',20);burst(blk.x,blk.y,'#8d6e63',16);sfx(120,.2,'sawtooth',.05);floatTxt(blk.x,blk.y-30,'WALL BROKEN','#ffba08');}}else f.d+=sp*dt;}
   if(f.d>=G.map.len){f.dead=true;G.hp-=f.dmg;shake=10;sfx(90,.2,'sawtooth',.05);floatTxt(f.x,f.y-30,'-'+Math.min(f.dmg,G.hp+f.dmg),'#ff4d5e');if(G.hp<=0){G.hp=0;endGame(false);return;}continue;}
   const p=posAt(G.map,f.d);if(Math.abs(p.x-f.x)>.01)f.dir=p.x<f.x?-1:1;f.x=p.x;f.y=p.y;
  }
@@ -2591,6 +2591,7 @@ function gDraw(){g.setTransform(HDK,0,0,HDK,0,0);
   }else{const f=e.o;f.t=t;const s=f.boss?1.45:f.sz*1.02;if(f.p2){g.save();g.globalAlpha=.3+.2*Math.sin(t*10);g.fillStyle='#ff1e1e';g.beginPath();g.ellipse(f.x,f.y-22,48,54,0,0,7);g.fill();g.restore();}if(f.elite){const E=ELITES[f.elite];g.save();g.globalAlpha=.35+.2*Math.sin(t*6);g.fillStyle=E.c;g.shadowColor=E.c;g.shadowBlur=18;g.beginPath();g.ellipse(f.x,f.y+8,18*s,7*s,0,0,7);g.fill();g.restore();}drawFoeShape(g,f,f.x,f.y+10,s);if(f.elite){g.font='12px Nunito';g.textAlign='center';g.fillText(ELITES[f.elite].i,f.x+14,f.y-14-38*s);}
    if(f.shieldT>0){g.strokeStyle='rgba(255,209,102,.9)';g.fillStyle='rgba(255,209,102,.2)';g.lineWidth=3;g.beginPath();g.arc(f.x,f.y-18,40,0,7);g.fill();g.stroke();}
    if(f.slowT>0){g.fillStyle='rgba(189,224,254,.8)';g.fillRect(f.x-8,f.y+8,16,3);}
+   if(f.confT>0){g.save();g.fillStyle='#7fd4ff';g.strokeStyle='#0b2a4a';g.lineWidth=3;g.font='bold 15px Lilita One';g.textAlign='center';const qy=f.y-42+Math.sin(G.t*8)*2;g.strokeText('?',f.x,qy);g.fillText('?',f.x,qy);g.globalAlpha=.6;g.strokeStyle='#3fb8ff';g.lineWidth=1.5;g.beginPath();g.ellipse(f.x,f.y-34,9,3,0,G.t*6,G.t*6+4.4);g.stroke();g.restore();}
    if(f.stunT>0){if(f.frozen>0){g.fillStyle='rgba(189,224,254,.55)';g.strokeStyle='#fff';g.lineWidth=1.5;g.beginPath();g.roundRect(f.x-11,f.y-36,22,46,3);g.fill();g.stroke();}else{g.fillStyle='#ffd23f';g.font='12px Nunito';g.textAlign='center';g.fillText('★',f.x+Math.cos(G.t*9)*8,f.y-40);}}
    if(f.frozen>0)f.frozen=f.stunT;
    if(f.burnT>0){g.fillStyle='#ff9f1c';g.fillRect(f.x-11,f.y-8-Math.random()*6,3,3);}
@@ -2733,12 +2734,13 @@ function endGame(win,quit){
  if(G.state!=='play'&&!quit)return;G.state=win?'won':'lost';G.place=null;$('#coach').style.display='none';
  G.towers.forEach(t=>{const u=SV.us[t.h.id]=SV.us[t.h.id]||{k:0,d:0};u.d+=Math.round(t.dealt||0);});
  const rw={gems:G.gems,cry:0,sh:0};let first=false;
- if(win&&G.mode==='story'){first=!SV.cleared[G.ci];rw.gems+=first?600:150;SV.cleared[G.ci]=true;}
- if(win&&G.mode==='chal'&&G.extra.gal!=null&&!SV.gal[G.extra.gal]){SV.gal[G.extra.gal]=1;const C=GAL[G.extra.gal];setTimeout(()=>toast(C.i+' '+C.n.toUpperCase()+' CRYSTAL COLLECTED! ('+galN()+'/6)'),600);}if(win&&G.mode==='chal'){SV.st.chal++;if(!SV.chalDone[G.extra.key]){SV.chalDone[G.extra.key]=1;rw.cry+=G.extra.cry;rw.gems+=G.extra.gems;first=true;}else rw.gems+=50;}
+ if(win&&G.mode==='story'){first=!SV.cleared[G.ci];rw.gems+=first?600:300;SV.cleared[G.ci]=true;}
+ if(win&&G.mode==='chal'&&G.extra.gal!=null&&!SV.gal[G.extra.gal]){SV.gal[G.extra.gal]=1;const C=GAL[G.extra.gal];setTimeout(()=>toast(C.i+' '+C.n.toUpperCase()+' CRYSTAL COLLECTED! ('+galN()+'/6)'),600);}if(win&&G.mode==='chal'){SV.st.chal++;if(!SV.chalDone[G.extra.key]){SV.chalDone[G.extra.key]=1;rw.cry+=G.extra.cry;rw.gems+=G.extra.gems;first=true;}else rw.gems+=150;}
  if(win&&G.team&&G.team.some(h=>h.id===153)){const u=SV.us[153]=SV.us[153]||{k:0,d:0};if(G.mode==='chal'&&G.extra&&G.extra.gal!=null)u.gt=1;if(G.mode==='raid')u.rr=1;}
  if(win&&G.mode==='raid'){SV.st.raid++;first=!SV.raidClear;SV.raidClear=1;rw.sh+=first?6:3;rw.gems+=300;}
  if(win&&G.mode==='ally'){SV.st.ally++;rw.gems+=250;rw.sh+=2;}
  if(win&&G.mode==='story'){if(G.hp>=G.maxHp)SV.st.flawless++;if(G.ci===0)SV.tut=1;}
+ if(win&&G.mode!=='custom'&&SV.fwDay!==todayKey()){SV.fwDay=todayKey();rw.gems+=500;setTimeout(()=>toast('🌞 FIRST WIN OF THE DAY: +500 💎'),900);}
  if(G.mode==='custom')rw.gems=Math.min(rw.gems,40);
  let relic=null;if(win&&((G.mode==='story'&&first)||G.mode==='raid'||G.mode==='ally'||(G.mode==='chal'&&first&&Math.random()<.5)))relic=grantRelic();
  if(G.mode==='endless')SV.best=Math.max(SV.best||0,G.wave-1);
@@ -2986,7 +2988,7 @@ const affLv=id=>{const p=SV.aff[id]||0;return p>=30?3:p>=15?2:p>=5?1:0;};
 const AFF_POOL=[n=>`${n} still gets butterflies before every boss fight, but would never admit it.`,n=>`${n} keeps a lucky pebble from the very first battle in Brickvale.`,n=>`${n} once spent a whole night teaching a Gloomling to play cards. It lost every hand.`,n=>`${n} writes a letter home after every victory, even the small ones.`,n=>`${n} is secretly the best cook in the Watch and bakes for the whole team.`,n=>`${n} trains at dawn every morning, rain or shine.`,n=>`${n} names every weapon they own, and talks to them too.`,n=>`${n} dreams of opening a quiet tea shop once the Gloom is gone.`,n=>`${n} has a scar from saving Captain Pell, and never tells the story the same way twice.`,n=>`${n} hums the Brickvale anthem off-key during every wave.`,n=>`${n} counts every villain defeated, and is quietly competing with you.`,n=>`${n} trusts you completely now, Commander. That means a lot to them.`];
 function affLines(h){const rg=mulberry32(h.id*97+5),ix=new Set();while(ix.size<3)ix.add(Math.floor(rg()*AFF_POOL.length));return[...ix].map(i=>AFF_POOL[i](h.name.split(' ')[0]));}
 // ---------- CRAFTING ----------
-const DUST_GAIN=[5,10,25,60,150,300,500],DUST_COST=[60,120,300,800,2000,4000,9999];
+const DUST_GAIN=[5,10,25,60,150,300,500],DUST_COST=[60,120,300,800,2000,4000,6000];
 function craftHero(id){const h=HEROES[id],c=DUST_COST[h.r]*(SV.owned[id]?.5:1);if(h.ev||!SV.owned[id]||SV.mats.dust<c||(SV.owned[id]||0)>=5)return;SV.mats.dust-=c;SV.st.crafts++;if(!SV.owned[id])SV.owned[id]=1;else SV.owned[id]++;save();refreshGems();chime();buildIndex();}
 // ---------- ACHIEVEMENTS ----------
 const STD_MYTHS=HEROES.filter(h=>h.r===4&&!h.ev).map(h=>h.id),LEG_IDS=HEROES.filter(h=>h.legend).map(h=>h.id);
@@ -3107,7 +3109,7 @@ function drawEd(){const cv=$('#edCv'),c=cv.getContext('2d'),th=THEMES[ED.theme];
 function edClick(e){const r=e.target.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)*1000/r.width/T),y=Math.floor((e.clientY-r.top)*520/r.height/T)+1;if(x<0||x>=COLS||y<1||y>13)return;
  const p=ED.pts;if(p.length){const l=p[p.length-1];if(Math.abs(x-l[0])>=Math.abs(y-l[1]))p.push([x,l[1]]);else p.push([l[0],y]);const n=p[p.length-1];if(n[0]===l[0]&&n[1]===l[1])p.pop();}else p.push([x,y]);if(p.length>40)p.pop();drawEd();sfx(700,.03);}
 
-function craftBtn(dv,h0){if(h0.ev||h0.r===6)return;const own=SV.owned[h0.id]||0;if(!own||own>=5)return;const c=DUST_COST[h0.r]*(own?.5:1);const b=mk('button','bb sm gold',own?`✨ +1★ for ${c} Hero Dust`:`✨ Craft for ${c} Hero Dust`);b.style.cssText='width:100%;margin:5px 0;font-size:13px';b.disabled=(SV.mats.dust||0)<c;b.dataset.tip=`<b>Hero Dust ✨</b><br>You have ${SV.mats.dust||0}. Duplicate summons give Dust (more for rarer heroes). Dust can only add stars to heroes you already own.`;b.onclick=()=>{craftHero(h0.id);checkAch();};dv.appendChild(b);}
+function craftBtn(dv,h0){if(h0.ev)return;const own=SV.owned[h0.id]||0;if(!own||own>=5)return;const c=DUST_COST[h0.r]*(own?.5:1);const b=mk('button','bb sm gold',own?`✨ +1★ for ${c} Hero Dust`:`✨ Craft for ${c} Hero Dust`);b.style.cssText='width:100%;margin:5px 0;font-size:13px';b.disabled=(SV.mats.dust||0)<c;b.dataset.tip=`<b>Hero Dust ✨</b><br>You have ${SV.mats.dust||0}. Duplicate summons give Dust (more for rarer heroes). Dust can only add stars to heroes you already own.`;b.onclick=()=>{craftHero(h0.id);checkAch();};dv.appendChild(b);}
 function affSect(dv,h0){const p=SV.aff[h0.id]||0,L=affLv(h0.id),nx=AFF_T[L],lines=affLines(h0);
  dv.appendChild(mk('div','sect',`<div class="L" style="font-size:15px;color:#ff8fab">💖 AFFINITY ${'💖'.repeat(L)}${'🤍'.repeat(3-L)}</div><div>+${L*3}% damage. ${nx?`${p}/${nx} points to the next heart (+1 per battle, +2 per win).`:'Max affinity!'}</div>${lines.map((s,i)=>`<div style="font-size:11.5px;font-style:italic;margin-top:2px;${i<L?'':'opacity:.55'}">${i<L?'“'+s+'”':'🔒 Story unlocks at '+(i+1)+' 💖'}</div>`).join('')}`));}
 function duoSect(dv,h0){duoOf(h0.id).forEach(D=>{const pid=D.a===h0.id?D.b:D.a;dv.appendChild(mk('div','sect',`<div class="L" style="font-size:15px;color:#7df9ff">🤝 DUO: ${D.n}</div><div>Place <b>${heroName(pid)}</b> within 5 tiles. Either hero's Ultimate then triggers: ${D.d}${SV.owned[pid]?'':' <span style="opacity:.7">(partner not owned yet)</span>'}</div>`));});}
@@ -3799,13 +3801,13 @@ function mysRaise(f,t){if(!G||f.boss||f.mini)return;G.minions=G.minions||[];if(G
 (function(){const base=HEROES.find(x=>x.name==='Runesage');if(!base)return;const id=HEROES.length,h=JSON.parse(JSON.stringify({...base,_orig:undefined}));
  Object.assign(h,{id,name:'Mirage King',oname:'Mirage King',title:'Master of Illusions',el:'dark',r:6,cls:'support',dmg:0,range:160,rate:0,buff:.24,cost:1000,chain:0,legend:1,
   bio:'A sly sorcerer-king who sits on a throne between worlds. Nobody knows which of him is real, and the enemies are never sure which way the path goes.',
-  p:{k:'illusion',n:'Hall of Mirrors',v:{},d:'Royal support: boosts nearby heroes. Every 9 seconds he sends out illusions that confuse enemies in his range, making them walk BACKWARDS for 1.5s (2.2s evolved). Bosses are not fooled.'},
+  p:{k:'illusion',n:'Hall of Mirrors',v:{},d:'Royal support: boosts nearby heroes. Every 9 seconds he sends out illusions that confuse enemies in his range, making them walk BACKWARDS for 2.5s (3.5s evolved). Bosses are not fooled.'},
   ult:{n:'Mirror Copy',pow:1}});
  Object.assign(h.d,{hornHelm:true,bladeHelm:true,hornC:'#c3cad6',helmC:'gold',gemC:'#3fb8ff',furCollar:true,furC:'#e9e2d4',runes:false,tablets:false,noCrest:true,vestG:'#24553a',weapon:'kingStaff',orbC:'#ffd23f',cape:'#24553a',shirt:'#2d6b45',pants:'#2d6b45',sleeve:'#2d6b45',robeTrim:'#e9c46a',glove:'#d4a017',belt:'#ffd23f',boot:'#c9a227',accent:'#ffd23f',vest:'#d4a017',goldShoulders:true,goldCollar:true,hair:'#141018',beard:1,skin:'#e2b48c',hat:0,mask:0,outfit:'robe',tallBoot:true});
  if(h.d.suit)h.d.suit=Object.assign({},h.d.suit,{capeC:'#24553a',emC:'#ffd23f',backC:'#17121f'});delete h.hidden;delete h.retired;HEROES.push(h);
- SUPFX['Mirage King']=t=>{t._ill=(t._ill||0)+1;if(t._ill%4!==0)return;const st=tStats(t),RR=st.range||160,dur=t.h.evo?2.2:1.5;let n=0;G.foes.forEach(f=>{if(f.dead||f.boss||Math.hypot(f.x-t.x,f.y-t.y)>RR)return;f.confT=Math.max(f.confT||0,f.mini?dur/2:dur);n++;});
-  const ox=t.x+(Math.random()<.5?-26:26),oy=t.y+6;HX(.8,(g,e,p)=>{g.save();g.globalAlpha=(1-p)*.55;g.shadowColor='#3fb8ff';g.shadowBlur=14;drawAvatar(g,t.h,ox,oy,1.05,{t:G.t,still:true,noShadow:1});g.restore();g.save();g.globalAlpha=(1-p)*.8;g.strokeStyle='#3fb8ff';g.lineWidth=3;g.beginPath();g.arc(t.x,t.y,10+p*RR,0,7);g.stroke();g.restore();});
-  if(n)floatTxt(t.x,t.y-60,'ILLUSION! '+n+' confused','#3fb8ff');};
+ SUPFX['Mirage King']=t=>{t._ill=(t._ill||0)+1;if(t._ill%4!==0)return;const st=tStats(t),RR=st.range||160,dur=t.h.evo?3.5:2.5;let n=0;G.foes.forEach(f=>{if(f.dead||f.boss||Math.hypot(f.x-t.x,f.y-t.y)>RR)return;f.confT=Math.max(f.confT||0,f.mini?dur/2:dur);n++;});
+  HX(.8,(g,e,p)=>{g.save();g.globalAlpha=(1-p)*.8;g.strokeStyle='#3fb8ff';g.lineWidth=3;g.beginPath();g.arc(t.x,t.y,10+p*RR,0,7);g.stroke();g.globalAlpha=(1-p);for(let i=0;i<8;i++){const a=i*Math.PI/4+p*2,r=14+p*RR*.6;g.save();g.translate(t.x+Math.cos(a)*r,t.y+Math.sin(a)*r*.6);g.rotate(a);g.fillStyle='#bfe9ff';g.beginPath();g.moveTo(0,-4);g.lineTo(2.4,0);g.lineTo(0,4);g.lineTo(-2.4,0);g.closePath();g.fill();g.restore();}g.restore();});
+  if(n){floatTxt(t.x,t.y-60,'ILLUSION! '+n+' confused','#3fb8ff');sfx(660,.12,'triangle',.04);}};
  const T=TEAMS.find(x=>x.k==='eclipse');if(T){const old=teamOf;}
 })();
 migrate6();try{applyDesignEdits();}catch(e){}setTimeout(()=>{try{const before=(SV.team||[]).length;SV.team=(SV.team||[]).filter(id=>HEROES[id]&&!HEROES[id].hidden);if(SV.team.length<before){const own=Object.keys(SV.owned).map(Number).filter(id=>HEROES[id]&&!HEROES[id].hidden&&!SV.team.includes(id)).sort((a,b)=>((HEROES[a].cls==='farm')-(HEROES[b].cls==='farm'))||(HEROES[b].r-HEROES[a].r));while(SV.team.length<5&&own.length)SV.team.push(own.shift());save();}if(!SV.team.length){STARTERS.forEach(id=>{SV.owned[id]=SV.owned[id]||1;});SV.team=STARTERS.slice();save();}}catch(e){}},0);if(!SV.cos)SV.cos=1;if(!SV.ecl)SV.ecl=1;if(!SV.w7)SV.w7=1;if(!SV.zsq)SV.zsq=1;if(!SV.fsq)SV.fsq=1;save();setHD();
@@ -3893,7 +3895,7 @@ function showAccount(){
 {const _ss2=showSettings;showSettings=function(){_ss2();const st=$('#modal #stT');if(st&&!$('#modal #acctBtn')){const a=mk('button','bb sm green','👤 Sign in');a.id='acctBtn';a.onclick=()=>{closeModal();setTimeout(showAccount,60);};st.parentNode.insertBefore(a,st);refreshAcct();}};}
 $('#goAcct').onclick=showAccount;
 // ================= ONLINE: leaderboard + trading =================
-const canTrade=id=>{const h=HEROES[id];return h&&SV.owned[id]&&h.r!==6&&!STARTERS.includes(id);};
+const canTrade=id=>{const h=HEROES[id];return h&&SV.owned[id]&&!STARTERS.includes(id);};
 function pubProfile(){return{name:ON.name,nameLower:ON.name.toLowerCase(),heroes:Object.keys(SV.owned).length,best:SV.best||0,tower:SV.towerBest||0,
  tier:Math.min(PASS_MAX,Math.floor(((SV.pass||{}).xp||0)/PASS_XP)),tradeable:Object.keys(SV.owned).map(Number).filter(canTrade),t:Date.now()};}
 function addHeroCopy(id){if(!HEROES[id])return;if(!SV.owned[id])SV.owned[id]=1;else if(SV.owned[id]<5)SV.owned[id]++;else SV.gems+=40;}
@@ -3973,9 +3975,9 @@ function newTrade(B){
 function tradeForm(R,uid,p){const give=new Set(),want=new Set();
  R.innerHTML=`<div class="L" style="margin-top:8px">2. Pick what you give</div><div id="ntG"></div><div>Gems: <input id="ntGg" type="number" min="0" value="0" style="width:110px;font-size:16px;padding:4px;border-radius:8px"> <span style="opacity:.7">(you have ${SV.gems.toLocaleString()})</span></div>
   <div class="L" style="margin-top:10px">3. Pick what you want from ${esc(p.name)}</div><div id="ntW"></div><div>Gems: <input id="ntWg" type="number" min="0" value="0" style="width:110px;font-size:16px;padding:4px;border-radius:8px"></div>
-  <p style="font-size:12px;opacity:.8">Starter heroes and Exclusive heroes can't be traded. What you give is held until they answer.</p><button class="bb green" id="ntGo">📤 Send offer</button>`;
+  <p style="font-size:12px;opacity:.8">Starter heroes can't be traded. What you give is held until they answer.</p><button class="bb green" id="ntGo">📤 Send offer</button>`;
  const draw=(box,ids,set)=>{box.innerHTML='';if(!ids.length){box.innerHTML='<i style="opacity:.7">No tradeable heroes</i>';return;}ids.forEach(id=>{if(!HEROES[id])return;const c=heroChip(id,set.has(id),1);c.onclick=()=>{set.has(id)?set.delete(id):set.add(id);draw(box,ids,set);};box.appendChild(c);});};
- const mine=Object.keys(SV.owned).map(Number).filter(canTrade).sort((a,b)=>HEROES[b].r-HEROES[a].r),theirs=(p.tradeable||[]).filter(id=>HEROES[id]&&HEROES[id].r!==6).sort((a,b)=>HEROES[b].r-HEROES[a].r);
+ const mine=Object.keys(SV.owned).map(Number).filter(canTrade).sort((a,b)=>HEROES[b].r-HEROES[a].r),theirs=(p.tradeable||[]).filter(id=>HEROES[id]).sort((a,b)=>HEROES[b].r-HEROES[a].r);
  draw(R.querySelector('#ntG'),mine,give);draw(R.querySelector('#ntW'),theirs,want);
  R.querySelector('#ntGo').onclick=async()=>{const gg=Math.max(0,Math.floor(+R.querySelector('#ntGg').value||0)),wg=Math.max(0,Math.floor(+R.querySelector('#ntWg').value||0));
   if(!give.size&&!gg){toast('Pick something to give');return;}if(!want.size&&!wg){toast('Pick something you want');return;}
