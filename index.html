@@ -3837,7 +3837,6 @@ async function cloudUp(now){
  if(!now){ON.upT=setTimeout(()=>cloudUp(true),5000);return;}
  try{ON.err=null;const t=Date.now(),s=JSON.stringify(SV),uid=ON.user.uid;
   await ON.db.collection('users').doc(uid).set({name:ON.name,save:s,t});
-  await ON.db.collection('profiles').doc(uid).set({name:ON.name,nameLower:ON.name.toLowerCase(),heroes:Object.keys(SV.owned).length,t});
   localStorage.setItem(SYNC_KEY+'_'+uid,String(t));
  }catch(e){ON.err=e;}}
 {const _save=save;save=function(){_save();if(ON.user&&ON.name)cloudUp(false);};}
@@ -3857,6 +3856,106 @@ function showAccount(){
   b.querySelector('#acX').onclick=closeModal;});}
 {const _ss2=showSettings;showSettings=function(){_ss2();const st=$('#modal #stT');if(st&&!$('#modal #acctBtn')){const a=mk('button','bb sm green','👤 Sign in');a.id='acctBtn';a.onclick=()=>{closeModal();setTimeout(showAccount,60);};st.parentNode.insertBefore(a,st);refreshAcct();}};}
 $('#goAcct').onclick=showAccount;
+// ================= ONLINE: leaderboard + trading =================
+const canTrade=id=>{const h=HEROES[id];return h&&SV.owned[id]&&h.r!==6&&!STARTERS.includes(id);};
+function pubProfile(){return{name:ON.name,nameLower:ON.name.toLowerCase(),heroes:Object.keys(SV.owned).length,best:SV.best||0,tower:SV.towerBest||0,
+ tier:Math.min(PASS_MAX,Math.floor(((SV.pass||{}).xp||0)/PASS_XP)),tradeable:Object.keys(SV.owned).map(Number).filter(canTrade),t:Date.now()};}
+function addHeroCopy(id){if(!HEROES[id])return;if(!SV.owned[id])SV.owned[id]=1;else if(SV.owned[id]<5)SV.owned[id]++;else SV.gems+=40;}
+function takeHero(id){if(!SV.owned[id])return false;delete SV.owned[id];SV.team=(SV.team||[]).filter(x=>x!==id);if(!SV.team.length)SV.team=STARTERS.slice();return true;}
+const needSign=()=>{if(ON.user&&ON.name)return false;modal(`<div class="mt">☁️ SIGN IN FIRST</div><p style="font-weight:800">You need an online account for this.</p><button class="bb green" id="nsY">Sign in</button> <button class="bb gray" id="nsX">Close</button>`,b=>{b.querySelector('#nsY').onclick=()=>{closeModal();showAccount();};b.querySelector('#nsX').onclick=closeModal;});return true;};
+const heroChip=(id,on,sm)=>{const h=HEROES[id],c=mk('div','');c.style.cssText=`display:inline-flex;flex-direction:column;align-items:center;width:${sm?62:74}px;margin:3px;padding:3px;border-radius:10px;cursor:pointer;border:3px solid ${on?'#7dff8a':RAR[h.r].c};background:${on?'rgba(56,201,90,.35)':'rgba(0,0,0,.3)'}`;
+ const p=portrait(h,sm?52:62,sm?52:62,sm?1.05:1.25,{foot:3});p.style.borderRadius='8px';c.appendChild(p);c.appendChild(mk('div','',`<div style="font-size:10px;font-weight:900;line-height:1.05;text-align:center">${esc(h.name)}</div><div style="font-size:9px;font-weight:900;color:${RAR[h.r].c}">${RAR[h.r].n}</div>`));return c;};
+const tradeSummary=(heroes,gems)=>[...(heroes||[]).map(id=>HEROES[id]?`<span style="color:${RAR[HEROES[id].r].c}">${esc(HEROES[id].name)}</span>`:'?'),gems?`💎${(+gems).toLocaleString()}`:''].filter(Boolean).join(', ')||'<i>nothing</i>';
+
+// ---------- leaderboard ----------
+const LB=[['best','🌊 Endless','Best wave'],['tower','🗼 Tower','Best floor'],['heroes','🦸 Heroes','Heroes'],['tier','🎫 Pass','Pass tier']];
+async function showLeaderboard(k){k=k||'best';
+ modal(`<div class="L out" style="font-size:30px">🏆 LEADERBOARD</div><div id="lbT" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:8px 0"></div><div id="lbL" style="max-height:52vh;overflow:auto;text-align:left;font-weight:800">Loading…</div><button class="bb sm gray" id="lbX" style="margin-top:8px">Close</button>`,async b=>{
+  b.querySelector('#lbX').onclick=closeModal;LB.forEach(([kk,n])=>{const t=mk('button','bb sm '+(kk===k?'gold':'gray'),n);t.onclick=()=>showLeaderboard(kk);b.querySelector('#lbT').appendChild(t);});
+  const L=b.querySelector('#lbL');if(!ON.ready){L.textContent='Online services are not available right now.';return;}
+  if(ON.user&&ON.name)await cloudUp(true);
+  try{const q=await ON.db.collection('profiles').orderBy(k,'desc').limit(50).get();const lab=LB.find(x=>x[0]===k)[2];
+   if(q.empty){L.innerHTML='<p style="text-align:center">No players yet. Be the first!</p>';return;}
+   L.innerHTML='';let i=0;q.forEach(d=>{i++;const p=d.data(),me=ON.user&&d.id===ON.user.uid;const r=mk('div','',`<span class="L" style="display:inline-block;width:44px;color:${i===1?'#ffd23f':i===2?'#dfe4ec':i===3?'#e09f5a':'#fff'}">${i<=3?['🥇','🥈','🥉'][i-1]:'#'+i}</span><span style="flex:1">${esc(p.name)}${me?' <b style="color:#7dff8a">(you)</b>':''}</span><span class="L">${(+p[k]||0).toLocaleString()} <span style="font-size:11px;opacity:.7">${lab}</span></span>`);
+    r.style.cssText=`display:flex;align-items:center;gap:6px;padding:6px 10px;margin:3px 0;border-radius:10px;background:${me?'rgba(56,201,90,.3)':'rgba(0,0,0,.3)'}`;L.appendChild(r);});
+   if(!ON.user)L.appendChild(mk('p','','<span style="opacity:.8">Sign in to get on the leaderboard!</span>'));
+  }catch(e){L.textContent='Could not load the leaderboard. Try again soon.';}});}
+
+// ---------- trading ----------
+let tradeSubs=[],tradeIn=[],tradeOut=[];
+function tradeListen(){tradeSubs.forEach(u=>u());tradeSubs=[];tradeIn=[];tradeOut=[];if(!ON.user)return refreshTradeBadge();const uid=ON.user.uid,T=ON.db.collection('trades');
+ tradeSubs.push(T.where('to','==',uid).onSnapshot(s=>{tradeIn=s.docs.map(d=>({id:d.id,...d.data()}));refreshTradeBadge();},()=>{}));
+ tradeSubs.push(T.where('from','==',uid).onSnapshot(s=>{tradeOut=s.docs.map(d=>({id:d.id,...d.data()}));refreshTradeBadge();settleOut();},()=>{}));}
+function refreshTradeBadge(){const b=$('#goTrade');if(!b)return;const n=tradeIn.filter(t=>t.status==='pending').length;b.innerHTML='🤝 Trade'+(n?` <span style="background:#ff3b6b;border-radius:9px;padding:0 6px;font-size:12px">${n}</span>`:'');}
+let settling=false;
+async function settleOut(){if(settling)return;settling=true;
+ try{for(const t of tradeOut){if(t.claimed||!['accepted','declined'].includes(t.status))continue;
+   const ref=ON.db.collection('trades').doc(t.id);let ok=false;
+   await ON.db.runTransaction(async tx=>{const s=await tx.get(ref);if(!s.exists||s.data().claimed)return;tx.update(ref,{claimed:true});ok=true;});
+   if(!ok)continue;
+   if(t.status==='accepted'){(t.want.heroes||[]).forEach(addHeroCopy);SV.gems+=(+t.want.gems||0);toast('🤝 '+t.toName+' accepted your trade!');}
+   else{(t.give.heroes||[]).forEach(addHeroCopy);SV.gems+=(+t.give.gems||0);toast('↩️ '+t.toName+' declined your trade. Your items are back.');}
+   save();refreshGems();await cloudUp(true);}
+ }catch(e){}settling=false;}
+function showTrade(tab){if(needSign())return;tab=tab||'in';
+ modal(`<div class="L out" style="font-size:30px">🤝 TRADING</div><div id="trT" style="display:flex;gap:6px;justify-content:center;margin:8px 0"></div><div id="trB" style="max-height:58vh;overflow:auto;text-align:left;font-weight:800"></div><button class="bb sm gray" id="trX" style="margin-top:8px">Close</button>`,b=>{
+  b.querySelector('#trX').onclick=closeModal;
+  [['in','📥 Offers to you'],['out','📤 Your offers'],['new','➕ New trade']].forEach(([k,n])=>{const t=mk('button','bb sm '+(k===tab?'gold':'gray'),n);t.onclick=()=>showTrade(k);b.querySelector('#trT').appendChild(t);});
+  const B=b.querySelector('#trB');
+  if(tab==='new')return newTrade(B);
+  const list=(tab==='in'?tradeIn:tradeOut).slice().sort((a,b)=>(b.t||0)-(a.t||0)).filter(t=>tab==='in'?t.status==='pending':(t.status==='pending'||Date.now()-(t.t||0)<7*864e5));
+  if(!list.length){B.innerHTML=`<p style="text-align:center;opacity:.85">${tab==='in'?'No trade offers right now.':'You have no trade offers.'}</p>`;return;}
+  list.forEach(t=>{const r=mk('div','');r.style.cssText='background:rgba(0,0,0,.3);border-radius:12px;padding:8px 10px;margin:6px 0';
+   const st={pending:'⏳ Waiting',accepted:'✅ Accepted',declined:'❌ Declined',cancelled:'🚫 Cancelled'}[t.status]||t.status;
+   r.innerHTML=tab==='in'?`<div class="L">From ${esc(t.fromName)}</div><div>They give: ${tradeSummary(t.give.heroes,t.give.gems)}</div><div>They want: ${tradeSummary(t.want.heroes,t.want.gems)}</div>`
+    :`<div class="L">To ${esc(t.toName)} · <span style="font-size:13px">${st}</span></div><div>You give: ${tradeSummary(t.give.heroes,t.give.gems)}</div><div>You want: ${tradeSummary(t.want.heroes,t.want.gems)}</div>`;
+   const row=mk('div','');row.style.cssText='display:flex;gap:6px;margin-top:6px';
+   if(tab==='in'){const a=mk('button','bb sm green','Accept'),d=mk('button','bb sm red','Decline');a.onclick=()=>respondTrade(t,true);d.onclick=()=>respondTrade(t,false);row.append(a,d);}
+   else if(t.status==='pending'){const c=mk('button','bb sm red','Cancel');c.onclick=()=>cancelTrade(t);row.append(c);}
+   r.appendChild(row);B.appendChild(r);});});}
+async function respondTrade(t,yes){
+ if(yes){const miss=(t.want.heroes||[]).filter(id=>!SV.owned[id]);if(miss.length){toast('❌ You no longer have '+HEROES[miss[0]].name);return;}
+  if(SV.gems<(+t.want.gems||0)){toast('❌ You need 💎'+(+t.want.gems).toLocaleString());return;}}
+ const ref=ON.db.collection('trades').doc(t.id);
+ try{await ON.db.runTransaction(async tx=>{const s=await tx.get(ref);if(!s.exists||s.data().status!=='pending')throw new Error('gone');tx.update(ref,{status:yes?'accepted':'declined'});});}
+ catch(e){toast('❌ That trade is no longer available');return showTrade('in');}
+ if(yes){(t.want.heroes||[]).forEach(takeHero);SV.gems-=(+t.want.gems||0);(t.give.heroes||[]).forEach(addHeroCopy);SV.gems+=(+t.give.gems||0);
+  save();refreshGems();await cloudUp(true);chime();closeModal();
+  const got=(t.give.heroes||[]).map(id=>({h:HEROES[id],res:'TRADED!'}));if(got.length)reveal(got);else toast('🤝 Trade done!');}
+ else{toast('Trade declined');showTrade('in');}}
+async function cancelTrade(t){const ref=ON.db.collection('trades').doc(t.id);
+ try{await ON.db.runTransaction(async tx=>{const s=await tx.get(ref);if(!s.exists||s.data().status!=='pending')throw new Error('gone');tx.update(ref,{status:'cancelled',claimed:true});});}
+ catch(e){toast('❌ Too late, they already answered');return showTrade('out');}
+ (t.give.heroes||[]).forEach(addHeroCopy);SV.gems+=(+t.give.gems||0);save();refreshGems();await cloudUp(true);toast('Trade cancelled. Your items are back.');showTrade('out');}
+function newTrade(B){
+ B.innerHTML=`<div class="L">1. Who do you want to trade with?</div><div style="display:flex;gap:6px;margin:4px 0"><input id="ntU" placeholder="Their username" style="flex:1;font-size:18px;padding:6px;border-radius:10px;border:2px solid #556"><button class="bb sm blue" id="ntF">Find</button></div><div id="ntRest"></div>`;
+ const find=async()=>{const n=B.querySelector('#ntU').value.trim().toLowerCase(),R=B.querySelector('#ntRest');if(!n)return;R.textContent='Searching…';
+  try{const u=await ON.db.collection('usernames').doc(n).get();if(!u.exists){R.innerHTML='<p style="color:#ff6b6b">No player with that name.</p>';return;}
+   const uid=u.data().uid;if(uid===ON.user.uid){R.innerHTML='<p style="color:#ff6b6b">That\'s you!</p>';return;}
+   const p=(await ON.db.collection('profiles').doc(uid).get()).data()||{};tradeForm(R,uid,p);}catch(e){R.innerHTML='<p style="color:#ff6b6b">Could not search. Try again.</p>';}};
+ B.querySelector('#ntF').onclick=find;B.querySelector('#ntU').onkeydown=e=>{if(e.key==='Enter')find();};}
+function tradeForm(R,uid,p){const give=new Set(),want=new Set();
+ R.innerHTML=`<div class="L" style="margin-top:8px">2. Pick what you give</div><div id="ntG"></div><div>Gems: <input id="ntGg" type="number" min="0" value="0" style="width:110px;font-size:16px;padding:4px;border-radius:8px"> <span style="opacity:.7">(you have ${SV.gems.toLocaleString()})</span></div>
+  <div class="L" style="margin-top:10px">3. Pick what you want from ${esc(p.name)}</div><div id="ntW"></div><div>Gems: <input id="ntWg" type="number" min="0" value="0" style="width:110px;font-size:16px;padding:4px;border-radius:8px"></div>
+  <p style="font-size:12px;opacity:.8">Starter heroes and Exclusive heroes can't be traded. What you give is held until they answer.</p><button class="bb green" id="ntGo">📤 Send offer</button>`;
+ const draw=(box,ids,set)=>{box.innerHTML='';if(!ids.length){box.innerHTML='<i style="opacity:.7">No tradeable heroes</i>';return;}ids.forEach(id=>{if(!HEROES[id])return;const c=heroChip(id,set.has(id),1);c.onclick=()=>{set.has(id)?set.delete(id):set.add(id);draw(box,ids,set);};box.appendChild(c);});};
+ const mine=Object.keys(SV.owned).map(Number).filter(canTrade).sort((a,b)=>HEROES[b].r-HEROES[a].r),theirs=(p.tradeable||[]).filter(id=>HEROES[id]&&HEROES[id].r!==6).sort((a,b)=>HEROES[b].r-HEROES[a].r);
+ draw(R.querySelector('#ntG'),mine,give);draw(R.querySelector('#ntW'),theirs,want);
+ R.querySelector('#ntGo').onclick=async()=>{const gg=Math.max(0,Math.floor(+R.querySelector('#ntGg').value||0)),wg=Math.max(0,Math.floor(+R.querySelector('#ntWg').value||0));
+  if(!give.size&&!gg){toast('Pick something to give');return;}if(!want.size&&!wg){toast('Pick something you want');return;}
+  if(gg>SV.gems){toast('❌ You don\'t have that many gems');return;}if(gg>1e6||wg>1e6){toast('Max 1,000,000 gems');return;}
+  if([...give].some(id=>!SV.owned[id])){toast('❌ You no longer have one of those heroes');return;}
+  const btn=R.querySelector('#ntGo');btn.disabled=true;
+  try{const d={from:ON.user.uid,fromName:ON.name,to:uid,toName:p.name,give:{heroes:[...give],gems:gg},want:{heroes:[...want],gems:wg},status:'pending',claimed:false,t:Date.now()};
+   [...give].forEach(takeHero);SV.gems-=gg;save();refreshGems();await cloudUp(true);
+   try{await ON.db.collection('trades').add(d);}catch(e){[...give].forEach(addHeroCopy);SV.gems+=gg;save();refreshGems();await cloudUp(true);throw e;}
+   chime();toast('📤 Offer sent to '+p.name+'!');showTrade('out');
+  }catch(e){btn.disabled=false;toast('❌ Could not send the offer. Try again.');}};}
+// hook into sign-in, profile upload and lobby
+{const _osi=onSignedIn;onSignedIn=async function(u){await _osi(u);tradeListen();};}
+{const _ra=refreshAcct;refreshAcct=function(){_ra();if(!ON.user&&tradeSubs.length)tradeListen();};}
+cloudUp=(orig=>async function(now){if(!ON.user||!ON.name)return;if(!now)return orig(false);await orig(true);try{await ON.db.collection('profiles').doc(ON.user.uid).set(pubProfile());}catch(e){}})(cloudUp);
+{const bar=$('#goAcct');if(bar){const t=mk('button','bb sm gold','🤝 Trade');t.id='goTrade';t.onclick=()=>showTrade();const l=mk('button','bb sm purple','🏆');l.id='goLB';l.title='Leaderboard';l.onclick=()=>showLeaderboard();bar.parentNode.insertBefore(l,bar.nextSibling);bar.parentNode.insertBefore(t,bar.nextSibling);}}
 fbInit();
 })();
 </script>
