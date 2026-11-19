@@ -2480,7 +2480,7 @@ async function publishDesigns(){try{if(!LIVE_DB){toast('🌍 Publishing only wor
 function dzReset(h){if(!h._orig){if(h.retired)h.hidden=true;return;}h.name=h._orig.name;h.title=h._orig.title;for(const k of Object.keys(h.d))delete h.d[k];Object.assign(h.d,h._orig.d);h.hidden=!!h.retired;dzApplyOne(h,DESIGN_PATCH[h.id]);}
 function dzToHex(c){if(typeof c!=='string')return'#000000';if(/^#[0-9a-f]{6}$/i.test(c))return c;if(/^#[0-9a-f]{3}$/i.test(c))return'#'+c.slice(1).split('').map(x=>x+x).join('');return'#000000';}
 function askCode(){modal(`<div class="mt">🔑 ENTER CODE</div><input id="dzCode" style="width:100%;font-size:20px;padding:8px;border-radius:10px;border:2px solid #556;margin:10px 0" placeholder="Type a code"><div style="display:flex;gap:8px;justify-content:center"><button class="bb green" id="dzOk">OK</button><button class="bb gray" id="dzNo">Close</button></div>`,b=>{
- const go=()=>{const v=(b.querySelector('#dzCode').value||'').toLowerCase().replace(/\s+/g,'');if(v==='3212'){openDesigner();}else if(v==='release99'){SV.codes=SV.codes||{};if(SV.codes.release99){toast('❌ You already claimed RELEASE99');return;}SV.codes.release99=1;SV.tickets=(SV.tickets||0)+1;SV.gems+=10000;save();refreshGems();chime();closeModal();toast('🎉 RELEASE99: +10,000 💎 and 1 🎟️ Mythic Ticket!');}else{toast('❌ That code does not work');}};
+ const go=()=>{const v=(b.querySelector('#dzCode').value||'').toLowerCase().replace(/\s+/g,'');if(v==='3212'){if(!SV.dev){SV.dev=1;save();toast('🛠️ You now have the DEV title on the leaderboard');}openDesigner();}else if(v==='release99'){SV.codes=SV.codes||{};if(SV.codes.release99){toast('❌ You already claimed RELEASE99');return;}SV.codes.release99=1;SV.tickets=(SV.tickets||0)+1;SV.gems+=10000;save();refreshGems();chime();closeModal();toast('🎉 RELEASE99: +10,000 💎 and 1 🎟️ Mythic Ticket!');}else{toast('❌ That code does not work');}};
  b.querySelector('#dzOk').onclick=go;b.querySelector('#dzCode').onkeydown=e=>{if(e.key==='Enter')go();};b.querySelector('#dzNo').onclick=closeModal;setTimeout(()=>b.querySelector('#dzCode').focus(),50);});}
 
 function openDev(){const vis=()=>HEROES.filter(h=>!h.hidden&&!h.erased);
@@ -4066,7 +4066,7 @@ $('#goAcct').onclick=showAccount;
 // ================= ONLINE: leaderboard + trading =================
 const canTrade=id=>{const h=HEROES[id];return h&&SV.owned[id]&&!STARTERS.includes(id);};
 function pubProfile(){return{name:ON.name,nameLower:ON.name.toLowerCase(),heroes:Object.keys(SV.owned).length,best:SV.best||0,tower:SV.towerBest||0,
- tier:Math.min(PASS_MAX,Math.floor(((SV.pass||{}).xp||0)/PASS_XP)),tradeable:Object.keys(SV.owned).map(Number).filter(canTrade),t:Date.now()};}
+ tier:Math.min(PASS_MAX,Math.floor(((SV.pass||{}).xp||0)/PASS_XP)),tradeable:Object.keys(SV.owned).map(Number).filter(canTrade),dev:!!SV.dev,t:Date.now()};}
 function addHeroCopy(id){if(!HEROES[id])return;if(!SV.owned[id])SV.owned[id]=1;else if(SV.owned[id]<5)SV.owned[id]++;else SV.gems+=40;}
 function takeHero(id){if(!SV.owned[id])return false;delete SV.owned[id];SV.team=(SV.team||[]).filter(x=>x!==id);if(!SV.team.length)SV.team=STARTERS.slice();return true;}
 const needSign=()=>{if(ON.user&&ON.name)return false;modal(`<div class="mt">☁️ SIGN IN FIRST</div><p style="font-weight:800">You need an online account for this.</p><button class="bb green" id="nsY">Sign in</button> <button class="bb gray" id="nsX">Close</button>`,b=>{b.querySelector('#nsY').onclick=()=>{closeModal();showAccount();};b.querySelector('#nsX').onclick=closeModal;});return true;};
@@ -4083,7 +4083,7 @@ async function showLeaderboard(k){k=k||'best';
   if(ON.user&&ON.name)await cloudUp(true);
   try{const q=await ON.db.collection('profiles').orderBy(k,'desc').limit(50).get();const lab=LB.find(x=>x[0]===k)[2];
    if(q.empty){L.innerHTML='<p style="text-align:center">No players yet. Be the first!</p>';return;}
-   L.innerHTML='';let i=0;q.forEach(d=>{i++;const p=d.data(),me=ON.user&&d.id===ON.user.uid;const r=mk('div','',`<span class="L" style="display:inline-block;width:44px;color:${i===1?'#ffd23f':i===2?'#dfe4ec':i===3?'#e09f5a':'#fff'}">${i<=3?['🥇','🥈','🥉'][i-1]:'#'+i}</span><span style="flex:1">${esc(p.name)}${me?' <b style="color:#7dff8a">(you)</b>':''}</span><span class="L">${(+p[k]||0).toLocaleString()} <span style="font-size:11px;opacity:.7">${lab}</span></span>`);
+   L.innerHTML='';let i=0;q.forEach(d=>{i++;const p=d.data(),me=ON.user&&d.id===ON.user.uid;const r=mk('div','',`<span class="L" style="display:inline-block;width:44px;color:${i===1?'#ffd23f':i===2?'#dfe4ec':i===3?'#e09f5a':'#fff'}">${i<=3?['🥇','🥈','🥉'][i-1]:'#'+i}</span><span style="flex:1">${esc(p.name)}${p.dev?' <span style="background:linear-gradient(90deg,#ff3b6b,#ffb020);color:#fff;border-radius:6px;padding:0 6px;font-size:11px;font-family:Lilita One">🛠️ DEV</span>':''}${me?' <b style="color:#7dff8a">(you)</b>':''}</span><span class="L">${(+p[k]||0).toLocaleString()} <span style="font-size:11px;opacity:.7">${lab}</span></span>`);
     r.style.cssText=`display:flex;align-items:center;gap:6px;padding:6px 10px;margin:3px 0;border-radius:10px;background:${me?'rgba(56,201,90,.3)':'rgba(0,0,0,.3)'}`;L.appendChild(r);});
    if(!ON.user)L.appendChild(mk('p','','<span style="opacity:.8">Sign in to get on the leaderboard!</span>'));
   }catch(e){L.textContent='Could not load the leaderboard. Try again soon.';}});}
