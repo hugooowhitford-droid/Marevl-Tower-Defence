@@ -1226,6 +1226,7 @@ function drawAvatar(g,h,x,y,s,o={}){if(h.d&&h.d.building){drawBuilding(g,h,x,y,s
  g.translate(0,-lev);
  const ll=B.ll,hipY=-14*ll+crouch,lw=B.lw,legW=5.6*lw;
  g.save();g.translate(0,-14*(ll-1)+crouch+bounce);backAcc(g,h,b,t,o);
+ if(d.tesseract&&o.evo){const T=o.still?0:t,cy=-27+b+Math.sin(T*2.4)*1.5;g.save();g.translate(-15.5,cy);g.rotate(T*.9);g.shadowColor='#3fb8ff';g.shadowBlur=12;g.beginPath();g.roundRect(-4,-4,8,8,1.2);const cg=g.createLinearGradient(-4,-4,4,4);cg.addColorStop(0,'#e6fbff');cg.addColorStop(.5,'#3fb8ff');cg.addColorStop(1,'#0b3d91');g.fillStyle=cg;g.fill();g.shadowBlur=0;g.strokeStyle='#0b2a6b';g.lineWidth=.6;g.stroke();g.strokeStyle='rgba(255,255,255,.6)';g.lineWidth=.4;g.strokeRect(-2,-2,4,4);g.restore();}
  if(d.goldLegs){const T=o.still?0:t;g.lineCap='round';for(const sx of[-1,1])for(const[j,y0,kx,ky,fx,fy]of[[0,-30,15,-46,27,-52],[1,-24,19,-30,29,-16]]){const w=Math.sin(T*2.6+j*1.9+sx)*1.4,x0=sx*4,K=[sx*kx,ky+b+w],F=[sx*fx,fy+b+w*1.3];
   g.strokeStyle='#5a4310';g.lineWidth=3.4;g.beginPath();g.moveTo(x0,y0+b);g.lineTo(K[0],K[1]);g.lineTo(F[0],F[1]);g.stroke();g.strokeStyle=gold(g,-30,-50,30,0);g.lineWidth=2.2;g.stroke();
   g.save();g.translate(F[0],F[1]);g.rotate(Math.atan2(F[1]-K[1],F[0]-K[0]));g.beginPath();g.moveTo(0,-1.6);g.quadraticCurveTo(5,-2.2,6.4,0);g.quadraticCurveTo(4,.6,0,1.6);g.closePath();g.fillStyle=gold(g,0,-2,6,2);g.fill();outline(g,.5);g.restore();
@@ -1764,6 +1765,7 @@ function detailExtras(dv,h0,h){
  const rb=mk('button','bb sm purple',`🔮 Roll Trait (1 crystal) · you have ${SV.mats.cry}`);rb.style.cssText='width:100%;margin-top:5px;font-size:13px';rb.disabled=SV.mats.cry<1;rb.onclick=()=>rollTrait(id);rb.dataset.tip=traitTip(HEROES[id].r);ts.appendChild(rb);dv.appendChild(ts);
  teamSect(dv,h0);affSect(dv,h0);duoSect(dv,h0);craftBtn(dv,h0);
  if(h0.name==='Nebulos'&&!isEvo(id)){const n=galN(),ok=n>=6;const es=mk('div','sect',`<div class="L" style="font-size:15px;color:#c77dff">🌌 EVOLUTION → LORD NEBULOS</div><div>Win all 6 Galaxy Trials (Modes → Galaxy Trials) to collect the crystals for his glove.</div>${GAL.map((c,i)=>`<div>${SV.gal[i]?'✅':'⬜'} ${c.i} ${c.n} Crystal</div>`).join('')}<div class="qbar"><i style="width:${n/6*100}%"></i></div>`);const eb=mk('button','bb sm gold','🌌 EVOLVE');eb.style.cssText='width:100%;margin-top:5px';eb.disabled=!ok;eb.onclick=()=>evolve(id);eb.dataset.tip=ok?'All 6 crystals! Ready to evolve!':'Collect all 6 Galaxy Crystals first.';es.appendChild(eb);dv.appendChild(es);}
+ else if(h0.name==='Mirage King'&&!isEvo(id)){const n=tesN(),ok=n>=4;const es=mk('div','sect',`<div class="L" style="font-size:15px;color:#3fb8ff">🧊 EVOLUTION → TESSERACT MIRAGE KING</div><div>Win all 4 Tesseract Trials (Play → Tesseract Trials) to rebuild the Tesseract.</div>${TES.map((c,i)=>`<div>${SV.tes[i]?'✅':'⬜'} ${c.n} Piece</div>`).join('')}<div class="qbar"><i style="width:${n/4*100}%"></i></div><div style="font-size:12px;opacity:.85">Evolved: holds the blue Tesseract and can place 2 fighting illusions (200 splash damage every 2s).</div>`);const eb=mk('button','bb sm gold','🧊 EVOLVE');eb.style.cssText='width:100%;margin-top:5px';eb.disabled=!ok;eb.onclick=()=>evolve(id);es.appendChild(eb);dv.appendChild(es);}
  else if(h0.name==='Doctor Mystic'&&!isEvo(id)){const ok=mysDone(),n=MYS.filter(q=>mysHave(q.k)>=q.v).length;const es=mk('div','sect',`<div class="L" style="font-size:15px;color:#39ff8a">✨ EVOLUTION → ${EVO_T[h0.el]} Doctor Mystic</div><div>Finish all 6 Mystic Tasks:</div>${MYS.map(q=>{const hv=Math.min(mysHave(q.k),q.v);return `<div>${hv>=q.v?'✅':'⬜'} ${q.n} (${fmtQ(hv)}/${fmtQ(q.v)})</div>`}).join('')}<div class="qbar"><i style="width:${n/6*100}%"></i></div>`);const eb=mk('button','bb sm gold','✨ EVOLVE');eb.style.cssText='width:100%;margin-top:5px';eb.disabled=!ok;eb.onclick=()=>evolve(id);eb.dataset.tip=ok?'All tasks done! Ready to evolve!':'Finish all 6 Mystic Tasks first.';es.appendChild(eb);dv.appendChild(es);}
  else if(h0.r>=2){const q=evoQuest(id),need=q.v(h0.r),have=evoHave(id,q.k),pk=evoPerk(id),cost=EVO_COST(h0.r);
   if(isEvo(id))dv.appendChild(mk('div','sect',`<div class="L" style="font-size:15px;color:#ffd23f">🧬 EVOLVED: ${h.name}</div><div>+60% damage, +10% range, faster attacks, stronger passive, faster Ultimate, max level 5.</div><div style="color:#ffd23f">✦ ${pk.n}: ${pk.d}</div>`));
@@ -1781,7 +1783,7 @@ function rollTrait(id){if(SV.mats.cry<1)return;SV.mats.cry--;SV.st.traits++;
   let i=0;const el=b.querySelector('#trSpin');const iv=setInterval(()=>{const r=TRAITS[i++%TRAITS.length];el.textContent=r.i+' '+r.n;el.style.color=r.c;sfx(700+i*10,.02,'square',.02);},65);
   setTimeout(()=>{clearInterval(iv);el.textContent=tr.i+' '+tr.n;el.style.color=tr.c;el.classList.add('pop');b.querySelector('#trD').textContent=tr.d+(tr.w<=3?'  — SUPER RARE!':'');b.querySelector('#ok').style.visibility='visible';chime();},1400);
   b.querySelector('#ok').onclick=()=>{closeModal();buildIndex();};});}
-function evolve(id){const h=HEROES[id],q=evoQuest(id),c=EVO_COST(h.r),neb=h.name==='Nebulos'||h.name==='Doctor Mystic';if(neb?(h.name==='Nebulos'?galN()<6:!mysDone()):(evoHave(id,q.k)<q.v(h.r)||SV.mats.sh<c.sh||SV.gems<c.gems))return;
+function evolve(id){const h=HEROES[id],q=evoQuest(id),c=EVO_COST(h.r),neb=h.name==='Nebulos'||h.name==='Doctor Mystic'||h.name==='Mirage King';if(neb?(h.name==='Nebulos'?galN()<6:h.name==='Mirage King'?tesN()<4:!mysDone()):(evoHave(id,q.k)<q.v(h.r)||SV.mats.sh<c.sh||SV.gems<c.gems))return;
  if(!neb){SV.mats.sh-=c.sh;SV.gems-=c.gems;}SV.evo[id]=1;SV.st.evos++;save();refreshGems();
  modal(`<div class="rays"></div><div style="position:relative"><div class="L out" id="evT" style="font-size:26px">EVOLVING...</div><div id="evP" style="margin:10px auto;width:200px;height:230px;border-radius:18px;overflow:hidden;border:4px solid #ffd23f"></div><div class="L out" id="evN" style="font-size:30px;min-height:36px"></div><button class="bb sm green" id="ok" style="visibility:hidden">INCREDIBLE!</button></div>`,b=>{
   const box=b.querySelector('#evP');const before=portrait(h,200,230,4.2,{evo:false});box.appendChild(before);let k=0;
@@ -1802,6 +1804,7 @@ function buildModes(){
  if(0){const E=curEv(),S=EVSTAGE[E.k];card(E.i,'EVENT STAGE',S.n+' · '+fmtT(evMsLeft()),S.rd+' Earn lots of '+E.ci+' '+E.cur+'!',`linear-gradient(${E.cab[0]},${E.cab[1]})`,false,'',()=>{if(!needTeam())startGame(-1,'event');});}
  card('🏅','CHALLENGES',done+'/3 done today','3 new daily challenges with twisted rules. Rewards Trait Crystals 🔮','linear-gradient(#ff9f1c,#c2410c)',false,'',showChallenges);
  card('🌌','GALAXY TRIALS',galN()+'/6 crystals','6 extreme trials. Each win gives a Galaxy Crystal. Get all 6 to evolve Nebulos into LORD NEBULOS!','linear-gradient(#7b2cbf,#10002b)',!SV.owned[186],'Get Nebulos first',showGalaxy);
+ card('🧊','TESSERACT TRIALS',tesN()+'/4 pieces','4 very hard trials. Each win gives a piece of the Tesseract. Get all 4 to evolve Mirage King!','linear-gradient(#1d6fd8,#06173d)',!SV.owned[MIRAGE().id],'Get Mirage King first',showTesseract);
  card('🌀','RIFT RAID','Boss rush · 15 waves','Face every boss in a row. Rewards Evo Shards 💠 for evolutions.','linear-gradient(#a55cff,#4c1d95)',!SV.cleared[2],'Beat Chapter 3',raidIntro);
  card('🗼','INFINITE TOWER','Best: floor '+(SV.towerBest||0),'Climb floor after floor. Every 10 floors: big rewards and a new curse.','linear-gradient(#4cc9f0,#1d3557)',!SV.cleared[1],'Beat Chapter 2',()=>{if(!needTeam())startGame(-1,'tower');});
  card('♾️','ENDLESS','Best: wave '+(SV.best||0),'Waves never stop. Bosses every 10 waves. +15💎 per wave.','linear-gradient(#ff4d5e,#7a0f1e)',!SV.cleared[4],'Beat Chapter 5',()=>{if(!needTeam())startGame(-1,'endless');});
@@ -2107,7 +2110,7 @@ function buildHotbar(){
   s.dataset.tip=`<b>${h.name}</b> · $${h.cost}<br><i>${h.title}</i> · max ${capOf(h)} placed<br>${RAR[h.r].n} ${CLS[h.cls].n} · ${ELS[h.el].i} · Lv ${h.lv}<br>⚡ ${h.ult.n}<br>★ ${h.p.n}: ${h.p.d}${h.perk?'<br>✦ '+evoPerk(h.id).n:''}`;s.onclick=()=>choosePlace(h);h._slot=s;hb.appendChild(s);});
 }
 function choosePlace(h){if(!G||G.state!=='play')return;G.sel=null;G.place=G.place===h?null:h;sfx(600,.04);refreshTP();updHot();}
-function updHot(){G.team.forEach(h=>{const n=G.towers.filter(x=>x.h.id===h.id&&!x.ally).length,c=capOf(h);h._slot.classList.toggle('on',G.place===h);h._slot.classList.toggle('poor',G.cash<h.cost||n>=c);const ct=h._slot.querySelector('.capT');if(ct)ct.textContent=n+'/'+c;});}
+function updHot(){G.team.forEach(h=>{const n=G.towers.filter(x=>x.h.id===h.id&&!x.ally&&!x.illu&&!x.isClone).length,c=capOf(h);h._slot.classList.toggle('on',G.place===h);h._slot.classList.toggle('poor',G.cash<h.cost||n>=c);const ct=h._slot.querySelector('.capT');if(ct)ct.textContent=n+'/'+c;});}
 function makeWave(w){
  const ci=G.cdx,tk=G.mods.tanky?1.6:1,diff=(G.mode==='tower'?2.2+Math.ceil(w/3)*.38:G.mode==='endless'?2+w*.12:G.mode==='chal'?G.extra.diff:G.mode==='raid'?3.2:G.mode==='ally'?G.extra.diff:G.ch.diff)*tk,hpM=(1+.16*w+.011*w*w)*diff,q=[];
  const add=(type,n,gap)=>{for(let i=0;i<n;i++)q.push({type,gap,hpM});};
@@ -2577,6 +2580,7 @@ function gDraw(){g.setTransform(HDK,0,0,HDK,0,0);
    drawPedestal(g,tw.x,tw.y+14,tw.lvl,rc,ELS[tw.h.el].pal[0],t);g.strokeStyle=rc;g.lineWidth=1.6;g.beginPath();g.ellipse(tw.x,tw.y+14,tw.lvl>=2?20:17,tw.lvl>=2?7.4:6,0,0,7);g.stroke();
    if(tw.ally){g.strokeStyle='#4cc9f0';g.lineWidth=2.5;g.beginPath();g.ellipse(tw.x,tw.y+14,22,8,0,0,7);g.stroke();g.font='12px Nunito';g.textAlign='center';g.fillText('🤖',tw.x-18,tw.y+8);}
    if(tw.isClone){g.save();g.strokeStyle='#3fb8ff';g.lineWidth=2.4;g.setLineDash([4,3]);g.beginPath();g.ellipse(tw.x,tw.y+14,22,8,0,0,7);g.stroke();g.restore();}
+   if(tw.illu){g.save();g.globalAlpha=.55+.25*Math.sin(t*5);g.strokeStyle='#3fb8ff';g.lineWidth=2.5;g.shadowColor='#3fb8ff';g.shadowBlur=8;g.beginPath();g.ellipse(tw.x,tw.y+14,20,7,0,0,7);g.stroke();g.restore();}
    if(G.cloneMode&&!G.cloneMode.src&&!tw.ally&&(tw.h.oname||tw.h.name)!=='Mirage King'){g.save();g.globalAlpha=.5+.4*Math.sin(t*8);g.strokeStyle='#3fb8ff';g.lineWidth=3;g.beginPath();g.ellipse(tw.x,tw.y+14,24,9,0,0,7);g.stroke();g.restore();}
    if(tw===G.sel){g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.ellipse(tw.x,tw.y+13,18,7,0,0,7);g.stroke();}
    const sa=tw.spawnA>0?tw.spawnA/.45:0;
@@ -2647,17 +2651,20 @@ function ultBanner(h){const b=$('#ultB');b.innerHTML='';const p=portrait(h,100,1
  b.appendChild(mk('div','',`<div class="L out" style="font-size:20px;color:${RAR[h.r].c}">${h.name}</div><div class="L out" style="font-size:44px;color:#ffd23f;line-height:1">${ULTS[h.cls].n.toUpperCase()}!</div>`));
  b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('show'),1100);}
 function useUlt(){const t=G&&G.sel;if(!t||t.lvl<2||t.ultCd>0||t.stunT>0||G.state!=='play'||G.cine)return;const h=t.h,st=tStats(t),c=h.cls,list=targets(t,st);
- if(['ranged','sniper','splash','chain','melee','slow'].includes(c)&&!list.length){toast('No enemies in range!');return;}
+ const isSnap=(h.oname||h.name)==='Nebulos';if(isSnap&&!G.foes.some(f=>!f.dead)){toast('No enemies on the map!');return;}
+ if(!isSnap&&['ranged','sniper','splash','chain','melee','slow'].includes(c)&&!list.length){toast('No enemies in range!');return;}
  t.ultCd=(h.evo?30:40)*(h.perk==='ultcd'?.65:1)*(hasRel('hourglass')?.85:1)*(t.pa?(t.pa[2]>=4&&h.cls!=='farm'&&h.cls!=='support'?.7:1)*(h.cls==='support'?1-.1*t.pa[1]:1):1)*(G.tn&&G.tn.academy>=3&&teamOf(h.id).k==='academy'?.88:1);SV.st.ults++;const u=SV.us[h.id]=SV.us[h.id]||{k:0,d:0};u.u=(u.u||0)+1;sfx(180,.35,'sawtooth',.05);setTimeout(()=>sfx(360,.3,'square',.04),300);
- G.cine={t:0,dur:SV.set.cine?1.6:0,h,done:()=>{doUlt(t);tryDuo(t);if(h.perk==='ult2')G.pend.push({t:.7,fn:()=>{if(G&&G.towers.includes(t)){floatTxt(t.x,t.y-50,'ENCORE!','#ffd23f');doUlt(t);}}});}};refreshTP();}
+ G.cine={t:0,dur:SV.set.cine?(isSnap?4.6:1.6):0,h,snap:isSnap,vics:isSnap?G.foes.filter(f=>!f.dead&&!f.boss).slice(0,5):null,done:()=>{doUlt(t);tryDuo(t);if(h.perk==='ult2')G.pend.push({t:.7,fn:()=>{if(G&&G.towers.includes(t)){floatTxt(t.x,t.y-50,'ENCORE!','#ffd23f');doUlt(t);}}});}};refreshTP();}
 function doUlt(t){const h=t.h,st=tStats(t),c=h.cls,list=targets(t,st);t.atkT=.4;
  if((h.oname||h.name)==='Mirage King'&&!t.ally){G.cloneMode={king:t,src:null};G.wallMode=null;G.place=null;G.sel=null;refreshTP();updHot();toast('🪞 MIRROR COPY: click one of your heroes to copy it');floatTxt(t.x,t.y-70,'MIRROR COPY!','#3fb8ff');sfx(700,.3,'sine',.05);return;}
  if((h.oname||h.name)==='Bloomroot'&&!t.ally){G.wallMode={by:t,n:h.evo?3:2,hp:Math.round((350+90*G.wave)*(h.evo?1.5:1))};G.cloneMode=null;G.place=null;G.sel=null;refreshTP();updHot();toast('🌿 ROOT WALL: click the path to grow '+G.wallMode.n+' walls');floatTxt(t.x,t.y-70,'ROOT WALL!','#7dff8a');sfx(300,.3,'triangle',.05);return;}
  if((h.oname||h.name)==='Nebulos'){const RR=(st.range||150)*(h.evo?2:1.6),GC=['#9d4edd','#3fd8ff','#ff2a2a','#2ee6a6','#ff2a4a','#ffffff'];t._crit=1;let n=0;
-  G.foes.forEach(f=>{if(f.dead||Math.hypot(f.x-t.x,f.y-t.y)>RR)return;if(f.boss||f.mini){hurt(f,Math.max(st.dmg*14,f.maxHp*(h.evo?.3:.2)),t);f.stunT=Math.max(f.stunT,1);}else{hurt(f,f.hp+f.maxHp*9,t);n++;}burst(f.x,f.y-12,GC[n%6],8);});
+  const norm=G.foes.filter(f=>!f.dead&&!f.boss&&!f.mini);for(let i=norm.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[norm[i],norm[j]]=[norm[j],norm[i]];}
+  norm.slice(0,Math.ceil(norm.length/2)).forEach(f=>{hurt(f,f.hp+f.maxHp*9,t);n++;burst(f.x,f.y-12,GC[n%6],8);burst(f.x,f.y-12,'#8d6e63',6);});
+  G.foes.forEach(f=>{if(f.dead||!(f.boss||f.mini))return;hurt(f,f.maxHp*.2,t);f.stunT=Math.max(f.stunT,1);burst(f.x,f.y-12,'#ffd60a',12);});
   for(let i=0;i<6;i++)G.fx.push({k:'ring',x:t.x,y:t.y,r:6+i*4,max:RR*(1-i*.07),c:GC[i],l:.5+i*.08,t:.5+i*.08,w:12-i});
   G.fx.push({k:'boom',x:t.x,y:t.y-10,r:10,max:90,c:'#ffd60a',l:.45,t:.45});shake=22;sfx(55,.6,'sawtooth',.08);setTimeout(()=>sfx(110,.4,'square',.05),120);
-  floatTxt(t.x,t.y-70,'GALAXY PUNCH!','#ffd60a');if(n)setTimeout(()=>{if(G)floatTxt(t.x,t.y-50,n+' WIPED OUT!','#c77dff');},300);refreshTP();return;}
+  floatTxt(t.x,t.y-70,'SNAP!','#ffd60a');if(n)setTimeout(()=>{if(G)floatTxt(t.x,t.y-50,n+' TURNED TO DUST!','#c77dff');},300);refreshTP();return;}
  if(c==='ranged'){t.barrage=14;t.barT=0;}
  else if(c==='sniper'){const tg=list.reduce((a,b)=>b.hp>a.hp?b:a);G.fx.push({k:'beam',x1:t.x,y1:t.y-24,x2:tg.x,y2:tg.y-14,l:.5,t:.5,c:'#fff',w:16});t._crit=1;hurt(tg,st.dmg*10,t);shake=10;burst(tg.x,tg.y-14,'#fff',30);}
  else if(c==='splash'){let best=list[0],bc=0;list.forEach(f=>{const n=list.filter(o=>Math.hypot(o.x-f.x,o.y-f.y)<120).length;if(n>bc){bc=n;best=f;}});const x=best.x,y=best.y;G.fx.push({k:'meteor',x,y,l:.6,t:.6});
@@ -2677,6 +2684,10 @@ gc.addEventListener('click',e=>{
  if(!G||G.state!=='play'||G.cine)return;const c=cellOf(e);
  {const ln=(G.lants||[]).find(L=>Math.hypot(L.x-c.x,L.y+Math.sin(L.t*2)*8-c.y)<18);if(ln){G.lants=G.lants.filter(L=>L!==ln);G.evGain+=3;G.cash+=20;floatTxt(ln.x,ln.y-16,'+3 🏮 +$20','#ffba08');burst(ln.x,ln.y,'#ffba08',14);sfx(900,.1,'triangle',.04);return;}}
  {const cr=G.crys.find(k=>Math.hypot(k.x-c.x,k.y-c.y)<20);if(cr){G.crys=G.crys.filter(k=>k!==cr);const v=40+12*G.wave;G.cash+=v;floatTxt(cr.x,cr.y-20,'+$'+v,'#7df9ff');if(Math.random()<.15){G.gems+=5;floatTxt(cr.x,cr.y-40,'+5 💎','#7df9ff');}burst(cr.x,cr.y,'#7df9ff',16);sfx(1200,.08,'triangle',.04);return;}}
+ if(G.illuMode){const IM=G.illuMode;if(!G.towers.includes(IM.king)){G.illuMode=null;return;}if(!canPlace(c.cx,c.cy)){sfx(150,.06);return;}
+  if(IM.n===2){G.towers.filter(x=>x.illu&&x.illuBy===IM.king.uid).forEach(o=>burst(o.x,o.y,'#3fb8ff',14));G.towers=G.towers.filter(x=>!(x.illu&&x.illuBy===IM.king.uid));IM.king.illuAt=G.t;}
+  const nt={uid:++UID,h:illuUnit(IM.king),stars:1,cx:c.cx,cy:c.cy,x:c.cx*T+T/2,y:c.cy*T+T/2-6,lvl:0,pa:[0,0,0],cd:0,atkT:0,face:1,mode:'First',spent:0,stunT:0,buff:0,dealt:0,spawnA:.45,ultCd:0,illu:true,illuBy:IM.king.uid};
+  G.towers.push(nt);burst(nt.x,nt.y,'#3fb8ff',22);G.fx.push({k:'ring',x:nt.x,y:nt.y+14,r:6,max:44,c:'#3fb8ff',l:.4,t:.4,w:3});floatTxt(nt.x,nt.y-50,'ILLUSION!','#3fb8ff');sfx(900,.1,'triangle',.05);IM.n--;if(IM.n<=0)G.illuMode=null;refreshTP();updHot();return;}
  if(G.cloneMode){const CM=G.cloneMode;if(!G.towers.includes(CM.king)){G.cloneMode=null;return;}
   if(!CM.src){const s0=G.towers.find(t=>t.cx===c.cx&&t.cy===c.cy&&!t.ally);if(!s0){sfx(150,.06);return;}if((s0.h.oname||s0.h.name)==='Mirage King'){toast('The Mirage King cannot copy himself!');return;}CM.src=s0;toast('Now click an empty tile to place the copy of '+s0.h.name);sfx(800,.06,'triangle',.04);return;}
   if(!canPlace(c.cx,c.cy)){sfx(150,.06);return;}
@@ -2688,7 +2699,7 @@ gc.addEventListener('click',e=>{
   G.walls=G.walls||[];const q=posAt(G.map,bd);G.walls.push({d:bd,x:q.x,y:q.y,hp:WM.hp,max:WM.hp});burst(q.x,q.y,'#7dff8a',14);sfx(260,.1,'triangle',.05);WM.n--;if(WM.n<=0)G.wallMode=null;else toast('🌿 '+WM.n+' more wall'+(WM.n>1?'s':''));return;}
  if(G.place){const h=G.place;
   if(canPlace(c.cx,c.cy)&&G.cash>=h.cost){
-   if(G.towers.filter(x=>x.h.id===h.id&&!x.ally).length>=capOf(h)){toast('Max '+capOf(h)+' '+h.name+' placed');return;}
+   if(G.towers.filter(x=>x.h.id===h.id&&!x.ally&&!x.illu&&!x.isClone).length>=capOf(h)){toast('Max '+capOf(h)+' '+h.name+' placed');return;}
    if(h.cls==='farm'&&G.mods.nofarm){toast('🚫 No Farms in this challenge!');return;}
    if(h.cls==='farm'&&G.towers.filter(t=>t.h.cls==='farm').length>=8){toast('Max 8 farms');return;}
    G.cash-=h.cost;const t={uid:++UID,h,stars:SV.owned[h.id]||1,cx:c.cx,cy:c.cy,x:c.cx*T+T/2,y:c.cy*T+T/2-6,lvl:0,cd:0,atkT:0,face:1,mode:'First',spent:h.cost,stunT:0,buff:0,dealt:0,spawnA:.45,ultCd:0};
@@ -2700,6 +2711,7 @@ gc.addEventListener('click',e=>{
 function refreshTP(){
  const p=$('#tpanel');if(!G||!G.sel){p.style.display='none';return;}
  const t=G.sel,h=t.h,st=tStats(t),uc=upCost(t);p.style.display='block';p.style.borderColor=RAR[h.r].c;
+ if(t.illu){p.innerHTML='';const por=portrait(h,90,90,1.8,{foot:4});por.style.borderRadius='12px';por.style.margin='0 auto';por.style.opacity=.75;p.appendChild(por);p.appendChild(mk('div','L out','<span style="font-size:19px;color:#3fb8ff">Mirage Illusion</span>'));p.appendChild(mk('div','',`<div style="font-size:13px;font-weight:800;margin:6px 0;line-height:1.4">DMG <b>200</b> · splash · every <b>2s</b><br>Damage dealt: ${Math.round(t.dealt)}<br><span style="opacity:.75">Illusions can't be upgraded.</span></div>`));const rb=mk('button','bb sm red','Remove');rb.style.width='100%';rb.onclick=sell;p.appendChild(rb);return;}
  p.innerHTML='';const por=portrait(h,90,90,1.8,{foot:4});por.style.borderRadius='12px';por.style.margin='0 auto';p.appendChild(por);
  p.appendChild(mk('div','L out',`<span style="font-size:19px">${h.name}</span>`));
  p.appendChild(mk('div','',`<span class="tag" style="color:${RAR[h.r].c}">${RAR[h.r].n}</span><span class="tag">${ELS[h.el].i}</span><span class="tag">${ensurePa(t).join('-')}</span>${h.trait?`<span class="tag" style="color:${h.trait.c}">${h.trait.i} ${h.trait.n}</span>`:''}`));
@@ -2709,6 +2721,7 @@ function refreshTP(){
  else info=`DMG <b>${st.dmg.toFixed(1)}</b> · RNG <b>${Math.round(st.range)}</b> · every <b>${st.rate.toFixed(2)}s</b>${h.splash?'<br>Splash '+Math.round(st.splash):''}${h.chain?'<br>Chains '+st.chain:''}${h.slow?'<br>Slows '+Math.round((1-st.slow)*100)+'%':''}<br>${st.det?'👁 Sees hidden':'<span style="opacity:.6">Can\'t see hidden (🎯 tier 2)</span>'}<br>Damage dealt: ${Math.round(t.dealt)}`;
  p.appendChild(mk('div','',`<div style="font-size:13px;font-weight:800;margin:6px 0;line-height:1.4">${info}</div><div style="background:rgba(255,210,63,.12);border-radius:8px;padding:4px 6px;font-size:11.5px;font-weight:800;margin-bottom:6px;text-align:left"><span style="color:#ffd23f">★ ${h.p.n}:</span> ${h.p.d}${h.p.k==='growth'?' ('+(t.kills||0)+' kills)':''}</div>`));
  {const U={n:h.ult.n,d:ultDesc(h)},ub2=mk('button','bb sm purple',t.lvl<2?'🔒 Ultimate: buy 2 upgrades':t.ultCd>0?`⚡ ${U.n} (${Math.ceil(t.ultCd)}s)`:`⚡ ${U.n}! (Q)`);ub2.style.width='100%';ub2.style.marginBottom='6px';ub2.style.fontSize='14px';ub2.disabled=t.lvl<2||t.ultCd>0;ub2.dataset.tip=`<b>${U.n}</b><br>${U.d}`;ub2.onclick=useUlt;p.appendChild(ub2);G._ultSig=t.lvl<2?-1:Math.ceil(Math.max(0,t.ultCd||0));}
+ if((h.oname||h.name)==='Mirage King'&&h.evo&&!t.ally){const left=Math.max(0,Math.ceil((t.illuAt||-1e9)+ILLU_CD-G.t)),ib=mk('button','bb sm blue',left?`🧊 Tesseract Illusions (${left}s)`:'🧊 Tesseract Illusions: place 2');ib.style.width='100%';ib.style.marginBottom='6px';ib.disabled=left>0;ib.dataset.tip='<b>Tesseract Illusions</b><br>Place 2 illusions of Mirage King. Each deals 200 splash damage every 2 seconds. Using it again replaces the old ones.';ib.onclick=()=>{G.illuMode={king:t,n:2};G.place=null;G.cloneMode=null;G.sel=null;refreshTP();toast('🧊 Click 2 empty tiles to place the illusions');};p.appendChild(ib);}
  if(h.cls!=='farm'&&h.cls!=='support'){const tb=mk('button','bb sm blue','Target: '+t.mode);tb.style.width='100%';tb.style.marginBottom='6px';tb.onclick=()=>{const M=['First','Last','Strongest','Closest'];t.mode=M[(M.indexOf(t.mode)+1)%4];refreshTP();};p.appendChild(tb);}
  p.appendChild(mk('div','L',`<span style="font-size:12px;color:#ffd23f">UPGRADE PATHS · pick 2 of 3</span>`));
  [0,1,2].forEach(i=>{const inf=pathInfo(t,i),n=t.pa[i],max=h.evo?5:4,nm=PATH_NAMES[h.cls][i],pips='●'.repeat(n)+'○'.repeat(max-n);
@@ -2720,7 +2733,7 @@ function refreshTP(){
  G._tpSig=G.cash>=(uc||1e9);
 }
 function upgrade(){const t=G&&G.sel;if(!t||t.ally)return;ensurePa(t);const o=[0,1,2].sort((x,y)=>t.pa[y]-t.pa[x]);for(const i of o){const c=pathInfo(t,i).cost;if(c&&G.cash>=c){upgradeP(i);return;}}}
-function sell(){const t=G&&G.sel;if(!t)return;G.cash+=Math.floor(t.spent*.6);G.towers.filter(x=>x.isClone&&x.cloneBy===t.uid).forEach(o=>{burst(o.x,o.y,'#3fb8ff',16);floatTxt(o.x,o.y-40,'POOF!','#3fb8ff');});G.towers=G.towers.filter(x=>x!==t&&!(x.isClone&&x.cloneBy===t.uid));if(G.cloneMode&&G.cloneMode.king===t)G.cloneMode=null;G.sel=null;sfx(300,.08);refreshTP();}
+function sell(){const t=G&&G.sel;if(!t)return;G.cash+=Math.floor(t.spent*.6);G.towers.filter(x=>x.isClone&&x.cloneBy===t.uid).forEach(o=>{burst(o.x,o.y,'#3fb8ff',16);floatTxt(o.x,o.y-40,'POOF!','#3fb8ff');});G.towers.filter(x=>x.illu&&x.illuBy===t.uid).forEach(o=>{burst(o.x,o.y,'#3fb8ff',16);floatTxt(o.x,o.y-40,'POOF!','#3fb8ff');});G.towers=G.towers.filter(x=>x!==t&&!(x.isClone&&x.cloneBy===t.uid)&&!(x.illu&&x.illuBy===t.uid));if(G.cloneMode&&G.cloneMode.king===t)G.cloneMode=null;if(G.illuMode&&G.illuMode.king===t)G.illuMode=null;G.sel=null;sfx(300,.08);refreshTP();}
 document.addEventListener('keydown',e=>{
  if(screen!=='game'||!G)return;const k=e.key.toLowerCase();
  if(k>='1'&&k<='5'){const h=G.team[+k-1];if(h)choosePlace(h);}
@@ -2735,6 +2748,7 @@ function endGame(win,quit){
  G.towers.forEach(t=>{const u=SV.us[t.h.id]=SV.us[t.h.id]||{k:0,d:0};u.d+=Math.round(t.dealt||0);});
  const rw={gems:G.gems,cry:0,sh:0};let first=false;
  if(win&&G.mode==='story'){first=!SV.cleared[G.ci];rw.gems+=first?600:300;SV.cleared[G.ci]=true;}
+ if(win&&G.mode==='chal'&&G.extra.tes!=null&&!SV.tes[G.extra.tes]){SV.tes[G.extra.tes]=1;const C=TES[G.extra.tes];setTimeout(()=>toast('🧊 '+C.n.toUpperCase()+' PIECE OF THE TESSERACT COLLECTED! ('+tesN()+'/4)'),600);}
  if(win&&G.mode==='chal'&&G.extra.gal!=null&&!SV.gal[G.extra.gal]){SV.gal[G.extra.gal]=1;const C=GAL[G.extra.gal];setTimeout(()=>toast(C.i+' '+C.n.toUpperCase()+' CRYSTAL COLLECTED! ('+galN()+'/6)'),600);}if(win&&G.mode==='chal'){SV.st.chal++;if(!SV.chalDone[G.extra.key]){SV.chalDone[G.extra.key]=1;rw.cry+=G.extra.cry;rw.gems+=G.extra.gems;first=true;}else rw.gems+=150;}
  if(win&&G.team&&G.team.some(h=>h.id===153)){const u=SV.us[153]=SV.us[153]||{k:0,d:0};if(G.mode==='chal'&&G.extra&&G.extra.gal!=null)u.gt=1;if(G.mode==='raid')u.rr=1;}
  if(win&&G.mode==='raid'){SV.st.raid++;first=!SV.raidClear;SV.raidClear=1;rw.sh+=first?6:3;rw.gems+=300;}
@@ -2788,7 +2802,7 @@ const ULT_ADJ={fire:['Inferno','Blazing','Molten','Scorched','Wildfire','Phoenix
 const ULT_NOUN={ranged:['Barrage','Volley','Salvo','Rapid Fire','Bullet Rain','Spray'],sniper:['Final Shot','Deadshot','Piercer','Headhunter','Longshot','Execution'],splash:['Meteor','Cataclysm','Bombardment','Detonation','Impact','Eruption'],chain:['Tempest','Cascade','Storm Chain','Torrent','Maelstrom','Nexus'],melee:['Earthshatter','Onslaught','Whirlwind','Haymaker','Rampage','Cleave'],slow:['Time Lock','Stasis','Gridlock','Bulwark','Lockdown','Standstill'],farm:['Cash Out','Jackpot','Gold Rush','Windfall','Payday','Big Deal'],support:['Overdrive','Rally','Anthem','Battle Hymn','Uplink','Inspire']};
 (()=>{const used=new Set();HEROES.forEach(h=>{const rg=mulberry32(h.id*131+7),A=ULT_ADJ[h.el],N=ULT_NOUN[h.cls];let nm,k=0;do{nm=A[Math.floor(rg()*A.length)]+' '+N[Math.floor(rg()*N.length)];k++;}while(used.has(nm)&&k<300);used.add(nm);h.ult={n:nm,pow:+(1+rg()*.3).toFixed(2)};});})();
 const TWIST={fire:'leaves the ground burning for 4s',ice:'freezes everything it hit',lightning:'lightning strikes 5 more enemies anywhere on the map',dark:'drags the enemies it hit back along the path',nature:'roots the enemies it hit and poisons them',light:'repairs 5 City HP and strips shields and stealth nearby',tech:'an orbital laser hits the strongest enemy on the map'};
-const ultDesc=h=>(h.oname||h.name)==='Mirage King'?'Pick any hero you have placed (not himself) and place an exact copy of it anywhere, with all the same upgrades. Even ULTRAs can be copied! Using it again makes the old copy vanish.':(h.oname||h.name)==='Bloomroot'?'Grow root walls on the path (2, or 3 evolved). Enemies have to stop and smash through each wall before they can pass. Flying enemies go over them.':(h.oname||h.name)==='Nebulos'?'Punches the ground with the Galaxy Glove. A crystal shockwave instantly wipes out every normal enemy in a huge area. Bosses and mini-bosses take massive damage (20% of their max HP, 30% when evolved) and get stunned.':ULTS[h.cls].d+' Then '+TWIST[h.el]+'.';
+const ultDesc=h=>(h.oname||h.name)==='Mirage King'?'Pick any hero you have placed (not himself) and place an exact copy of it anywhere, with all the same upgrades. Even ULTRAs can be copied! Using it again makes the old copy vanish.':(h.oname||h.name)==='Bloomroot'?'Grow root walls on the path (2, or 3 evolved). Enemies have to stop and smash through each wall before they can pass. Flying enemies go over them.':(h.oname||h.name)==='Nebulos'?'SNAP! Wipes out HALF of all normal enemies on the whole map. Every boss and mini-boss takes 20% of its max HP and gets stunned.':ULTS[h.cls].d+' Then '+TWIST[h.el]+'.';
 // evolution challenges & perks
 const EVO_Q=[{k:'k',n:n=>`Defeat ${n} enemies with this hero`,v:r=>[0,0,250,500,800,1200,1600][r]},{k:'d',n:n=>`Deal ${fmtN(n)} damage with this hero`,v:r=>[0,0,25000,80000,200000,300000,400000][r]},{k:'u',n:n=>`Use this hero's Ultimate ${n} times`,v:r=>[0,0,10,25,50,75,100][r]},{k:'sc',n:n=>`Win ${n} battles in any mode with this hero on your team`,v:r=>[0,0,3,6,10,15,20][r]},{k:'cw',n:n=>`Win ${n} challenges, raids or Ally Assaults with this hero on your team`,v:r=>[0,0,1,3,6,9,12][r]},{k:'tf',n:n=>`Reach tower floor ${n} with this hero on your team`,v:r=>[0,0,5,10,20,30,40][r]}];
 const EVO_PERKS=[{k:'ultcd',n:'Quick Charge',d:'Ultimate recharges 35% faster'},{k:'aoe',n:'Wider Reach',d:'+30% splash, +2 chains, +20% melee and pulse range'},{k:'elem',n:'Elemental Overload',d:'Burn, chill, zap and poison effects are twice as strong'},{k:'range',n:'Long Arm',d:'+25% range'},{k:'crit3',n:'Triple Threat',d:'Every 3rd attack is a 2× critical hit'},{k:'ult2',n:'Encore',d:'Ultimate fires twice'},{k:'bounty',n:'Prize Hunter',d:'Kills give +$5'},{k:'unfreeze',n:'Unshakable',d:'Immune to boss freezes'},{k:'speed',n:'Hyperdrive',d:'+40% attack speed'},{k:'passive2',n:'Mastery',d:'Passive is doubled instead of ×1.5'}];
@@ -2827,7 +2841,38 @@ function ultTwist(t,list,st){const h=t.h,el=h.el,ec=ELS[el].pal[0],pw=h.ult.pow,
 function drawCine(c){
  const p=Math.min(1,c.t/c.dur),inA=Math.min(1,c.t/.22),outA=p>.85?Math.max(0,(1-p)/.15):1,a=inA*outA;
  g.save();g.globalAlpha=a*.78;g.fillStyle='#05030f';g.fillRect(0,0,W,H);
- if(c.boss){const f=c.boss;g.globalAlpha=a*.5;g.fillStyle='#c9184a';g.fillRect(0,0,W,H);g.globalAlpha=a;
+ if(c.snap){const h=c.h,T=c.t,GC=['#9d4edd','#3fd8ff','#ff2a2a','#2ee6a6','#ffb020','#ffffff'];g.globalAlpha=a;
+  const sg=g.createRadialGradient(W/2,H*.45,40,W/2,H*.45,W*.8);sg.addColorStop(0,'#3c1a5b');sg.addColorStop(1,'#05030f');g.fillStyle=sg;g.fillRect(0,0,W,H);
+  for(let i=0;i<90;i++){const x=(i*137.5)%W,y=(i*71.3)%H,tw=.4+.6*Math.abs(Math.sin(T*2+i));g.globalAlpha=a*tw*.8;g.fillStyle=i%7?'#fff':'#c77dff';g.fillRect(x,y,i%5?1.5:2.5,i%5?1.5:2.5);}
+  g.globalAlpha=a;const SNAP=2.15;
+  // Lord Nebulos slides in on the left
+  const nx=-200+Math.min(1,T/.5)*420;drawAvatar(g,h,nx,H*.92,6.2,{t:G.t+T,evo:h.evo,noShadow:1,still:T>SNAP});
+  // the gauntlet on the right
+  const gx=W*.7,gy=H*.5+Math.sin(T*3)*4,gs=1+Math.max(0,1-(T-.6)/.4)*-.6,raise=Math.min(1,Math.max(0,(T-.5)/.5));
+  if(T>.5){g.save();g.translate(gx,gy+(1-raise)*220);g.scale(1.6,1.6);g.rotate(-.12);
+   const gold=(y0,y1)=>{const q=g.createLinearGradient(0,y0,0,y1);q.addColorStop(0,'#ffe27a');q.addColorStop(.5,'#e0a91c');q.addColorStop(1,'#8a5a00');return q;};
+   g.lineWidth=3;g.strokeStyle='#3a2400';
+   g.beginPath();g.roundRect(-40,10,80,70,16);g.fillStyle=gold(10,80);g.fill();g.stroke();
+   const snapped=T>SNAP,fing=[[-34,-1],[-14,0],[6,0],[26,-1]];
+   fing.forEach(([fx],i)=>{const len=snapped&&i<2?18:[46,56,54,44][i];g.beginPath();g.roundRect(fx,12-len,16,len+6,7);g.fillStyle=gold(12-len,18);g.fill();g.stroke();});
+   g.beginPath();g.roundRect(snapped?-30:-60,snapped?-8:24,snapped?22:34,16,8);g.fillStyle=gold(0,40);g.fill();g.stroke();
+   GC.forEach((c,i)=>{const lit=T>.9+i*.18;const px=i<4?fing[i][0]+8:i===4?-44+(snapped?20:0):0,py=i<4?(snapped&&i<2?6:-4-[34,44,42,32][i]+30):i===4?32:46;
+    g.save();if(lit){g.shadowColor=c;g.shadowBlur=18+Math.sin(T*12+i)*6;}g.beginPath();g.arc(px,py,i===5?9:6,0,7);g.fillStyle=lit?c:'#5a4310';g.fill();g.lineWidth=1.5;g.stroke();g.restore();});
+   g.restore();}
+  // SNAP flash + text
+  if(T>SNAP&&T<SNAP+.35){g.globalAlpha=a*(1-(T-SNAP)/.35);g.fillStyle='#fff';g.fillRect(0,0,W,H);g.globalAlpha=a;}
+  g.textAlign='center';g.lineWidth=9;g.strokeStyle='#000';
+  if(T<SNAP){const tA=Math.min(1,Math.max(0,(T-.3)/.3));g.globalAlpha=a*tA;g.font='22px Lilita One';g.strokeText('LORD NEBULOS',W*.3,H*.16);g.fillStyle='#c77dff';g.fillText('LORD NEBULOS',W*.3,H*.16);
+   if(T>1.1){g.globalAlpha=a*Math.min(1,(T-1.1)/.3);g.font='34px Lilita One';const q='"HALF OF YOU WILL VANISH."';g.strokeText(q,W*.32,H*.16+44);g.fillStyle='#fff';g.fillText(q,W*.32,H*.16+44);}}
+  else{const k=Math.min(1,(T-SNAP)/.18),fs=60+k*60;g.globalAlpha=a;g.font=fs+'px Lilita One';g.lineWidth=12;g.strokeText('SNAP!',W/2+(Math.random()-.5)*(T<SNAP+.4?14:0),H*.24);const tg=g.createLinearGradient(0,H*.24-fs,0,H*.24);tg.addColorStop(0,'#fff3a0');tg.addColorStop(1,'#ffb020');g.fillStyle=tg;g.fillText('SNAP!',W/2,H*.24);}
+  // enemies at the bottom turn to dust
+  const V=c.vics||[];V.forEach((f,i)=>{const ex=W*.42+i*(W*.5/Math.max(1,V.length)),ey=H*.86,dust=i%2===0;
+   if(!(T>SNAP&&dust)){g.globalAlpha=a;drawFoeShape(g,{...f,t:G.t+T,flash:0,dir:-1,d:0},ex,ey,1.9);}
+   else{const fade=Math.max(0,1-(T-SNAP)/.9);g.globalAlpha=a*fade;drawFoeShape(g,{...f,t:G.t,flash:0,dir:-1,d:0},ex,ey,1.9);
+    for(let j=0;j<40;j++){const s0=((j*53+i*17)%100)/100,dly=s0*.6,u=Math.max(0,T-SNAP-dly);if(!u)continue;g.globalAlpha=a*Math.max(0,1-u/1.4);g.fillStyle=j%3?'#8d6e63':'#5d4037';g.fillRect(ex-14+((j*37)%28)+u*90*(.6+s0),ey-40+((j*23)%40)-u*40*(.4+s0)+u*u*10,3,3);}}});
+  if(T>SNAP+.6){g.globalAlpha=a*Math.min(1,(T-SNAP-.6)/.3);g.font='26px Lilita One';g.lineWidth=7;g.strokeText('Half of all enemies turn to dust...',W/2,H*.24+50);g.fillStyle='#e0d6ff';g.fillText('Half of all enemies turn to dust...',W/2,H*.24+50);}
+  if(T>SNAP&&T<SNAP+.5)shake=Math.max(shake,14);}
+ else if(c.boss){const f=c.boss;g.globalAlpha=a*.5;g.fillStyle='#c9184a';g.fillRect(0,0,W,H);g.globalAlpha=a;
   for(let i=0;i<36;i++){const ang=i/36*Math.PI*2+c.t;g.strokeStyle='rgba(255,60,60,.35)';g.lineWidth=6;g.beginPath();g.moveTo(W/2,H*.55);g.lineTo(W/2+Math.cos(ang)*900,H*.55+Math.sin(ang)*900);g.stroke();}
   const sc=4.2+Math.sin(c.t*30)*.08;drawFoeShape(g,{...f,t:G.t+c.t,flash:0,dir:1,d:0},W/2+(Math.random()-.5)*8,H*.82,sc);
   g.textAlign='center';g.font='60px Lilita One';g.lineWidth=8;g.strokeStyle='#000';g.strokeText(f.n+' IS ENRAGED!',W/2,H*.2);g.fillStyle='#ff4d6d';g.fillText(f.n+' IS ENRAGED!',W/2,H*.2);
@@ -3804,7 +3849,7 @@ function mysRaise(f,t){if(!G||f.boss||f.mini)return;G.minions=G.minions||[];if(G
   bio:'A sly sorcerer-king who sits on a throne between worlds. Nobody knows which of him is real, and the enemies are never sure which way the path goes.',
   p:{k:'illusion',n:'Hall of Mirrors',v:{},d:'Royal support: boosts nearby heroes. Every 9 seconds he sends out illusions that confuse enemies in his range, making them walk BACKWARDS for 2.5s (3.5s evolved). Bosses are not fooled.'},
   ult:{n:'Mirror Copy',pow:1}});
- Object.assign(h.d,{hornHelm:true,bladeHelm:true,hornC:'#c3cad6',helmC:'gold',gemC:'#3fb8ff',furCollar:true,furC:'#e9e2d4',runes:false,tablets:false,noCrest:true,vestG:'#24553a',weapon:'kingStaff',orbC:'#ffd23f',cape:'#24553a',shirt:'#2d6b45',pants:'#2d6b45',sleeve:'#2d6b45',robeTrim:'#e9c46a',glove:'#d4a017',belt:'#ffd23f',boot:'#c9a227',accent:'#ffd23f',vest:'#d4a017',goldShoulders:true,goldCollar:true,hair:'#141018',beard:1,skin:'#e2b48c',hat:0,mask:0,outfit:'robe',tallBoot:true});
+ Object.assign(h.d,{tesseract:true,hornHelm:true,bladeHelm:true,hornC:'#c3cad6',helmC:'gold',gemC:'#3fb8ff',furCollar:true,furC:'#e9e2d4',runes:false,tablets:false,noCrest:true,vestG:'#24553a',weapon:'kingStaff',orbC:'#ffd23f',cape:'#24553a',shirt:'#2d6b45',pants:'#2d6b45',sleeve:'#2d6b45',robeTrim:'#e9c46a',glove:'#d4a017',belt:'#ffd23f',boot:'#c9a227',accent:'#ffd23f',vest:'#d4a017',goldShoulders:true,goldCollar:true,hair:'#141018',beard:1,skin:'#e2b48c',hat:0,mask:0,outfit:'robe',tallBoot:true});
  if(h.d.suit)h.d.suit=Object.assign({},h.d.suit,{capeC:'#24553a',emC:'#ffd23f',backC:'#17121f'});delete h.hidden;delete h.retired;HEROES.push(h);
  SUPFX['Mirage King']=t=>{t._ill=(t._ill||0)+1;if(t._ill%4!==0)return;const st=tStats(t),RR=st.range||160,dur=t.h.evo?3.5:2.5;let n=0;G.foes.forEach(f=>{if(f.dead||f.boss||Math.hypot(f.x-t.x,f.y-t.y)>RR)return;f.confT=Math.max(f.confT||0,f.mini?dur/2:dur);n++;});
   HX(.8,(g,e,p)=>{g.save();g.globalAlpha=(1-p)*.8;g.strokeStyle='#3fb8ff';g.lineWidth=3;g.beginPath();g.arc(t.x,t.y,10+p*RR,0,7);g.stroke();g.globalAlpha=(1-p);for(let i=0;i<8;i++){const a=i*Math.PI/4+p*2,r=14+p*RR*.6;g.save();g.translate(t.x+Math.cos(a)*r,t.y+Math.sin(a)*r*.6);g.rotate(a);g.fillStyle='#bfe9ff';g.beginPath();g.moveTo(0,-4);g.lineTo(2.4,0);g.lineTo(0,4);g.lineTo(-2.4,0);g.closePath();g.fill();g.restore();}g.restore();});
@@ -3820,6 +3865,26 @@ window.__BH6={RELICS,DUOS,ACH,ELITES,allyIntro,buildEditor,edParse,edCode,custom
 applyTips();refreshGems();requestAnimationFrame(loop);setTimeout(()=>{showLogin(false);setTimeout(checkAch,1500);},600);
 window.drawAvatar=drawAvatar;window.drawPedestal=drawPedestal;window.lmAnim=lmAnim;window.drawWeather=drawWeather;window.__BH={HEROES,startGame,go,get G(){return G},SV:()=>SV,useUlt,selHero:id=>{selHero=id;buildIndex();},setSummonMode,EVENTS,evData,CH,EVSTAGE,renderBg,buildMap,evStageCh,startChal:()=>{const c=dailyChallenges()[0];startGame(c.map,'chal',c);}};
 try{Object.assign(window.__BH,{showGalaxy,evolve,endGame,closeModal,heroName});}catch(e){}
+// ---- Tesseract Trials: evolve Mirage King ----
+const TES=[
+ {n:'Space',c:'#3fb8ff',map:2,mods:['fast','ghosts'],diff:7.2,d:'Enemies blink through space. Fast and hidden.'},
+ {n:'Mind',c:'#ffd23f',map:3,mods:['tanky','armored'],diff:7.8,d:'Strong-willed enemies with thick armour.'},
+ {n:'Reality',c:'#ff3b5c',map:1,mods:['fragile','fast','armored'],diff:8.4,d:'Nothing is what it seems. Your city is fragile.'},
+ {n:'Time',c:'#2ee6a6',map:4,mods:['broke','tanky','ghosts'],diff:9.2,d:'The final trial. Little money, tough and hidden foes.'}];
+const tesN=()=>(SV&&SV.tes)?SV.tes.filter(Boolean).length:0;
+SV.tes=SV.tes||[0,0,0,0];
+function cubeIcon(c,sz){return `<span style="display:inline-block;width:${sz}px;height:${sz}px;border-radius:5px;background:linear-gradient(135deg,#e6fbff,${c} 55%,#0b2a6b);box-shadow:0 0 10px ${c};transform:rotate(45deg) scale(.8)"></span>`;}
+function showTesseract(){
+ modal(`<div class="L out" style="font-size:30px">🧊 TESSERACT TRIALS</div><div style="font-weight:800;opacity:.85;margin-bottom:10px">4 very hard trials. Win each one to collect a piece of the Tesseract. Collect all 4 to evolve Mirage King! (${tesN()}/4)</div><div id="tsl" style="display:flex;flex-direction:column;gap:8px;text-align:left"></div><button class="bb sm gray" id="tsx" style="margin-top:12px">Close</button>`,b=>{
+  b.querySelector('#tsx').onclick=closeModal;const mk0=MIRAGE();
+  TES.forEach((c,i)=>{const dn=SV.tes[i];const r=mk('div','qrow'+(dn?'':' ready'));
+   r.innerHTML=`<div style="width:44px;text-align:center">${cubeIcon(c.c,26)}</div><div style="flex:1"><div class="L" style="font-size:18px">${c.n} Piece · ${CH[c.map].n} · 20 waves</div><div style="font-size:13px;font-weight:800">${c.d}<br>${c.mods.map(m=>MODS[m].i+' <b>'+MODS[m].n+'</b>').join(' · ')}</div></div><div class="tag" style="color:${dn?'#7dff8a':'#ff6b6b'}">${dn?'✓ COLLECTED':'VERY HARD'}</div>`;
+   const pb=mk('button','bb sm '+(dn?'gray':'green'),dn?'REPLAY':'PLAY');pb.onclick=()=>{if(!SV.owned[mk0.id]){toast('You need Mirage King to begin the Tesseract Trials!');return;}if(!needTeam())startGame(c.map,'chal',{key:'tes'+i,tes:i,idx:2,lvl:c.n.toUpperCase()+' TRIAL',map:c.map,mods:c.mods,diff:c.diff,waves:20,cry:3,gems:500});};r.appendChild(pb);b.querySelector('#tsl').appendChild(r);});});}
+// evolved Mirage King: place 2 illusions that fight
+const ILLU_CD=45;
+function illuUnit(king){const h=king.h;return Object.assign({},h,{name:'Mirage Illusion',oname:'Mirage Illusion',cls:'splash',dmg:200,rate:2,range:150,splash:45,chain:0,slow:0,buff:0,income:0,cost:0,evo:0,trait:null,perk:null,
+ p:{k:'illu',n:'Illusion',v:{},d:'Deals 200 splash damage every 2 seconds. Cannot be upgraded. Vanishes if Mirage King is sold.'},ult:{n:'None',pow:0}});}
+{const _ts=tStats;tStats=function(t){const s=_ts(t);if(t.illu){s.dmg=200;s.rate=2;s.range=150;s.splash=45;s.chain=0;s.slow=0;s.det=true;}return s;};}
 // ---- redesigns from reference pictures ----
 (function(){const RD={
  'Iron Guardian':{d:{goldChest:false,veins:false,legVeins:false,acc:'',mask:7,helmC:'#b0151c',shirt:'#b0151c',sleeve:'#b0151c',pants:'#b0151c',chin:'#e8b94a',accent:'#e8b94a',boot:'#b0151c',glove:'#b0151c',belt:'#e8b94a',eyeC:'#e0fbfc',cape:null},suit:{back:1,backC:'#d8fbff',em:6,emC:'#3fd0ff',capeC:null}},
