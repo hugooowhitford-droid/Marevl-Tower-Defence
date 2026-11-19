@@ -231,7 +231,7 @@ canvas{display:block}
     <div id="lobbyUI">
       <div class="logo L out">BRICK HEROES<small>TOWER DEFENCE</small></div>
       <div class="tr"><span class="pill">💎 <b class="gemTxt">0</b></span><span class="pill" title="Trait Crystals">🔮 <b class="cryTxt">0</b></span><span class="pill" title="Evo Shards">💠 <b class="shTxt">0</b></span><span class="pill" id="evPill"></span><button class="bb sm purple" id="goDaily" style="position:relative">📅<span class="badge L" id="dBadge" style="font-size:11px;min-width:18px;height:18px;line-height:14px">!</span></button><button class="bb sm gray" id="muteB">🔊</button></div>
-      <div style="position:absolute;right:18px;top:68px;display:flex;gap:8px"><button class="bb sm gray" id="goRelic">🎒</button><button class="bb sm gray" id="goProf">👤</button><button class="bb sm gray" id="goSet">⚙️</button></div>
+      <div style="position:absolute;right:18px;top:68px;display:flex;gap:8px"><button class="bb sm green" id="goAcct">☁️ Sign in</button><button class="bb sm gray" id="goRelic">🎒</button><button class="bb sm gray" id="goProf">👤</button><button class="bb sm gray" id="goSet">⚙️</button></div>
       <div class="teamlbl L out">YOUR TEAM</div>
       <div id="evBanner" class="L out" style="position:absolute;left:50%;top:84px;transform:translateX(-50%);cursor:pointer;padding:8px 18px;border-radius:16px;border:3px solid rgba(255,255,255,.6);font-size:20px;text-align:center;box-shadow:0 5px 0 rgba(0,0,0,.3);white-space:nowrap"></div>
       <div class="btns">
@@ -3848,7 +3848,7 @@ async function signIn(){
  try{await ON.auth.signInWithPopup(p);}catch(e){
   if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/cancelled-popup-request'].includes(e.code))ON.auth.signInWithRedirect(p);
   else if(e.code!=='auth/popup-closed-by-user')toast('❌ Sign-in failed: '+(e.code||e.message));}}
-function refreshAcct(){const b=$('#acctBtn');if(b)b.innerHTML=ON.user&&ON.name?'👤 '+esc(ON.name):'👤 Sign in';}
+function refreshAcct(){const b=$('#acctBtn');if(b)b.innerHTML=ON.user&&ON.name?'👤 '+esc(ON.name):'👤 Sign in';const g=$('#goAcct');if(g){g.innerHTML=ON.user&&ON.name?'☁️ '+esc(ON.name):'☁️ Sign in';g.className='bb sm '+(ON.user&&ON.name?'gray':'green');}}
 function showAccount(){
  if(!ON.user){modal(`<div class="mt">☁️ ONLINE ACCOUNT</div><p style="font-weight:800">Sign in to save your progress online and play on any device. Friends, trading and playing together are coming soon!</p><button class="bb green" id="acIn">Sign in with Google</button> <button class="bb gray" id="acX">Close</button>`,b=>{b.querySelector('#acIn').onclick=()=>{closeModal();signIn();};b.querySelector('#acX').onclick=closeModal;});return;}
  modal(`<div class="mt">☁️ ONLINE ACCOUNT</div><p style="font-weight:800">Signed in as <b style="color:#7df9ff">${esc(ON.name||'(no username yet)')}</b><br><span style="opacity:.7;font-size:13px">${esc(ON.user.email||'')}</span></p><p style="font-weight:800;font-size:13px;opacity:.85">Your progress saves online automatically.</p><button class="bb blue" id="acSync">☁️ Save now</button> <button class="bb red" id="acOut">Sign out</button> <button class="bb gray" id="acX">Close</button>`,b=>{
@@ -3856,6 +3856,7 @@ function showAccount(){
   b.querySelector('#acOut').onclick=async()=>{await cloudUp(true);await ON.auth.signOut();closeModal();toast('Signed out. Progress on this device stays.');};
   b.querySelector('#acX').onclick=closeModal;});}
 {const _ss2=showSettings;showSettings=function(){_ss2();const st=$('#modal #stT');if(st&&!$('#modal #acctBtn')){const a=mk('button','bb sm green','👤 Sign in');a.id='acctBtn';a.onclick=()=>{closeModal();setTimeout(showAccount,60);};st.parentNode.insertBefore(a,st);refreshAcct();}};}
+$('#goAcct').onclick=showAccount;
 fbInit();
 })();
 </script>
