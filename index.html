@@ -1188,7 +1188,7 @@ function hoodFront(g,d,b){if(d.fringe){g.beginPath();g.moveTo(-8.4,-36+b);g.quad
  g.strokeStyle='rgba(255,255,255,.22)';g.lineWidth=.8;g.beginPath();g.moveTo(-9.6,-36+b);g.quadraticCurveTo(-10.6,-48.6+b,-2,-50.8+b);g.stroke();}
 function towerShield(g,h,b,t,atk,tier){const d=h.d,x=9+Math.sin(atk*Math.PI)*3,y=-17.8+b,W2=8.6,H1=12.6,H2=15.4,ec=ELS[h.el].pal[0];g.save();g.translate(x,y);g.rotate(-.04);
  if(d.starShield){const R0=12;g.beginPath();g.arc(1.4,1.4,R0,0,7);g.fillStyle='rgba(0,0,0,.28)';g.fill();
-  [[R0,'#c8102e'],[R0*.78,'#e9edf2'],[R0*.56,'#c8102e'],[R0*.36,'#1f3a7a']].forEach(([r,c],i)=>{g.beginPath();g.arc(0,0,r,0,7);const gr=g.createRadialGradient(-r*.35,-r*.35,r*.1,0,0,r);gr.addColorStop(0,shade(c,.3));gr.addColorStop(1,shade(c,-.25));g.fillStyle=gr;g.fill();outline(g,i?.5:1.2);});
+  [[R0,d.shieldRed||'#c8102e'],[R0*.78,d.shieldMid||'#e9edf2'],[R0*.56,d.shieldRed||'#c8102e'],[R0*.36,d.shieldBlue||'#1f3a7a']].forEach(([r,c],i)=>{g.beginPath();g.arc(0,0,r,0,7);const gr=g.createRadialGradient(-r*.35,-r*.35,r*.1,0,0,r);gr.addColorStop(0,shade(c,.3));gr.addColorStop(1,shade(c,-.25));g.fillStyle=gr;g.fill();outline(g,i?.5:1.2);});
   g.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=(i%2?.42:1)*R0*.33;g.lineTo(Math.cos(a)*q,Math.sin(a)*q);}g.closePath();g.fillStyle='#ffffff';g.fill();g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=.4;g.stroke();
   g.strokeStyle='rgba(255,255,255,.45)';g.lineWidth=1;g.beginPath();g.arc(0,0,R0*.9,3.6,4.6);g.stroke();
   if(tier>=3){g.save();g.globalAlpha=.45+.25*Math.sin(t*4);g.strokeStyle=ec;g.lineWidth=1.4;g.shadowColor=ec;g.shadowBlur=8;g.beginPath();g.arc(0,0,R0,0,7);g.stroke();g.restore();}
@@ -2217,7 +2217,7 @@ function spawnFoe(e,d=0){
 function tStats(t){const s=tStats0(t),h=t.h,pk=h.perk;
  if(G&&G.syn){s.dmg*=1+(G.syn[h.el]||0);if(h.ev)s.rate/=1+(G.synEv[h.ev]||0);}
  if(G&&G.dropOn)s.rate/=1.6;if(G&&G.bloom&&G.bloom.has(t.cx+','+t.cy))s.dmg*=1.25;
- if(!t.ally&&G){if(G.rel&&G.rel.size){if(hasRel('lens'))s.range*=1.06;if(hasRel('coin'))s.income*=1.15;if(hasRel('powder'))s.splash*=1.15;if(hasRel('feather'))s.rate/=1.06;if(hasRel('lamp')&&t.lvl>=2)s.det=true;}s.dmg*=1+.03*affLv(h.id);const tm=teamOf(h.id).k,tc=(G.tn&&G.tn[tm])||0;if(tc>=2)s.dmg*=1+TEAM_DMG[Math.min(tc,5)];if(tc>=3){if(tm==='circle')s.range*=1.08;if(tm==='zsquad'){s.range*=1.12;s.det=true;}if(tm==='bureau')s.rate/=1.08;if(tm==='eclipse')s.rate/=1.1;}}
+ if(!t.ally&&G){if(G.rel&&G.rel.size){if(hasRel('lens'))s.range*=1.06;if(hasRel('coin'))s.income*=1.15;if(hasRel('powder'))s.splash*=1.15;if(hasRel('feather'))s.rate/=1.06;if(hasRel('lamp')&&t.lvl>=2)s.det=true;}s.dmg*=1+.03*affLv(h.id);const tm=teamOf(h.id).k,tc=(G.tn&&G.tn[tm])||0;if(tc>=2)s.dmg*=1+TEAM_DMG[Math.min(tc,5)];if(tc>=3){if(tm==='circle')s.range*=1.08;if(tm==='zsquad'){s.range*=1.12;s.det=true;}if(tm==='bureau')s.rate/=1.08;if(tm==='eclipse')s.rate/=1.1;if(tm==='bolts')s.dmg*=1.12;}}
  if(pk==='range')s.range*=1.25;if(pk==='speed')s.rate/=1.4;if(pk==='aoe'){s.splash*=1.3;s.chain+=2;if(h.cls==='melee'||h.cls==='slow')s.range*=1.2;}
  return s;}
 function tStats0(t){
@@ -3729,7 +3729,8 @@ TEAMS.push({k:'eclipse',n:'The Eclipse Order',i:'🌗',c:'#e9c46a',c2:'#1b1f3a',
 const ECL_IDS=HEROES.filter(h=>h.id>=155&&h.id<=160).map(h=>h.id);
 TEAMS.push({k:'cosmic',n:'The Cosmic Crew',i:'🚀',c:'#ff7a1a',c2:'#141b3a',pat:0,perk:'Members deal +15% damage to flying enemies',d:'A ragtag starship crew who crash-landed in Brickvale and stayed to protect it.'});
 const COS_IDS=HEROES.filter(h=>h.id>=181&&h.id<=186).map(h=>h.id);
-const teamOf=id=>id===212?TEAMS.find(x=>x.k==='eclipse'):(id>=161&&id<=180)||(id>=187&&id<=211)?TEAMS[0]:id>=181&&id<=186?TEAMS[9]:id>=155&&id<=160?TEAMS[8]:id>=148&&id<=154?TEAMS[7]:id>=142&&id<=147?TEAMS[6]:id>=136&&id<=141?TEAMS[5]:TEAMS[(id*7+3)%5];
+var TB_SET=new Set();
+const teamOf=id=>TB_SET&&TB_SET.has(id)?TEAMS.find(x=>x.k==='bolts'):id===212?TEAMS.find(x=>x.k==='eclipse'):(id>=161&&id<=180)||(id>=187&&id<=211)?TEAMS[0]:id>=181&&id<=186?TEAMS[9]:id>=155&&id<=160?TEAMS[8]:id>=148&&id<=154?TEAMS[7]:id>=142&&id<=147?TEAMS[6]:id>=136&&id<=141?TEAMS[5]:TEAMS[(id*7+3)%5];
 const TEAM_DMG=[0,0,.05,.1,.15,.2];
 HEROES.forEach(h=>{const d=h.d,T=teamOf(h.id);if(!d.suit||h.name==='Silkweaver'||h.id>=136)return;d.accent=T.c;d.suit.pat=T.pat;d.belt=T.c;d.boot=T.c2;d.glove=T.c2;d.tallBoot=true;d.suit.team=T;
  if(Math.abs(lum(d.shirt)-lum(T.c))<.16)d.shirt=shade(d.shirt,lum(T.c)>.5?-.4:.4);if(d.sleeve!==d.skin)d.sleeve=d.shirt;
@@ -3926,6 +3927,23 @@ window.__BH6={RELICS,DUOS,ACH,ELITES,allyIntro,buildEditor,edParse,edCode,custom
 applyTips();refreshGems();requestAnimationFrame(loop);setTimeout(()=>{showLogin(false);setTimeout(checkAch,1500);},600);
 window.drawAvatar=drawAvatar;window.drawPedestal=drawPedestal;window.lmAnim=lmAnim;window.drawWeather=drawWeather;window.__BH={HEROES,startGame,go,get G(){return G},SV:()=>SV,useUlt,selHero:id=>{selHero=id;buildIndex();},setSummonMode,EVENTS,evData,CH,EVSTAGE,renderBg,buildMap,evStageCh,startChal:()=>{const c=dailyChallenges()[0];startGame(c.map,'chal',c);}};
 try{Object.assign(window.__BH,{showGalaxy,evolve,endGame,closeModal,heroName});}catch(e){}
+// ---- The Stormbolts: a new team of misfit heroes ----
+(function(){TEAMS.push({k:'bolts',n:'The Stormbolts',i:'⚡',c:'#ffd23f',c2:'#1f2329',pat:0,perk:'Members deal +12% extra damage',d:'A crew of ex-agents, rogues and one very quiet guy who got pulled together to save Brickvale.'});
+ const TB=TEAMS.find(x=>x.k==='bolts');
+ const L=[
+  {n:'Red Warden',ti:'the Old Soldier',el:'fire',cls:'melee',w:'fist',r:3,body:'bulky',outfit:'suit',skin:'#f1c27d',hair:'#6b5a48',beard:2,shirt:'#a3192b',sleeve:'#a3192b',accent:'#e9edf2',pants:'#7a1020',boot:'#3a1418',glove:'#3a1418',belt:'#2b2d36',pk:'stun',pn:"Old Soldier's Punch",ult:'Red Thunder',em:0,emC:'#ffffff',backC:'#7a1020',bio:'A retired super-soldier who squeezed back into his old red suit. Louder than he is fast, but he hits like a truck.'},
+  {n:'Iron Arm',ti:'the Winter Gunner',el:'ice',cls:'ranged',w:'gun',r:4,body:'lean',outfit:'jacket',skin:'#f1c27d',hair:'#2b2118',x:{longHair:true},coat:'#2f2622',shirt:'#1f2329',sleeve:'#2f2622',accent:'#c3cad4',pants:'#1f2329',boot:'#1b1b22',glove:'#c3cad4',belt:'#3a2a22',pk:'multi',pn:'Metal Arm Barrage',ult:'Winter Volley',em:1,emC:'#c3cad4',backC:'#1f2329',bio:'A quiet soldier with a silver metal arm. He never misses twice, and he never talks about the past.'},
+  {n:'Widow Blade',ti:'the Silent Sniper',el:'dark',cls:'sniper',w:'rifle',r:3,body:'lean',outfit:'tactical',skin:'#ffdbac',hair:'#e8d38a',shirt:'#2a2f2a',sleeve:'#2a2f2a',accent:'#4a5240',pants:'#2a2f2a',boot:'#1b1b1b',glove:'#1b1b1b',belt:'#1b1b1b',pk:'crit',pn:"Widow's Bite",ult:'Red Room Shot',em:1,emC:'#c1121f',backC:'#1b1b1b',bio:'A spy trained since she was little. Calm, sarcastic and terrifying with a long rifle.'},
+  {n:'Patriot Agent',ti:'the Second Shield',el:'light',cls:'slow',w:'shield',r:3,body:'hero',outfit:'suit',skin:'#f1c27d',hair:'#b08d57',shirt:'#1d2a4a',sleeve:'#1d2a4a',accent:'#7a1020',pants:'#1d2a4a',boot:'#2b2118',glove:'#2b2118',belt:'#2b2118',pk:'stun',pn:'Shield Slam',ult:'Patriot Stand',em:0,emC:'#e9edf2',backC:'#7a1020',x:{weapon:'towershield',starShield:true,shieldRed:'#5a1018',shieldMid:'#8d939e',shieldBlue:'#1b2033',stripe:'#7a1020'},bio:'A soldier who once carried a famous shield and wants to prove he deserves it. Tough, stubborn and loud.'},
+  {n:'Phase Ghost',ti:'the Flickering Thief',el:'dark',cls:'melee',w:'claws',r:2,body:'lean',outfit:'tactical',skin:'#ffdbac',hair:'#2b2d36',mask:7,shirt:'#4a4e57',sleeve:'#4a4e57',accent:'#e9edf2',pants:'#3a3e47',boot:'#2b2d36',glove:'#2b2d36',belt:'#2b2d36',pk:'hunter',pn:'Phase Strike',ult:'Quantum Flicker',em:1,emC:'#e9edf2',backC:'#3a3e47',x:{helmC:'#e9edf2',chin:'#e9edf2',eyeC:'#14161d',hood:'#4a4e57'},bio:'She phases in and out of reality, walking through walls and hitting enemies before they know she is there.'},
+  {n:'Sentinel',ti:'the Quiet Golden Guy',el:'light',cls:'chain',w:'orbhand',r:4,body:'hero',outfit:'jacket',skin:'#ffd7b5',hair:'#5a3a22',coat:'#5c6370',shirt:'#3a4a6b',sleeve:'#5c6370',accent:'#ffd23f',pants:'#3a4a6b',boot:'#2b2d36',glove:'#ffd7b5',belt:'#2b2d36',pk:'boss',pn:'Golden Glow',ult:'Sun Burst',em:1,emC:'#ffd23f',backC:'#3a4a6b',x:{orbC:'#ffd23f',orbC2:'#ff9f1c'},bio:'A shy, ordinary-looking guy with a hidden golden power stronger than anyone on the team. He just wants to be helpful.'}];
+ L.forEach((Q,j)=>{const id=HEROES.length,c=CLS[Q.cls],m=RAR[Q.r].m*1.12,rg=mulberry32(id*7919+13);
+  const d={skin:Q.skin,shirt:Q.shirt,sleeve:Q.sleeve,accent:Q.accent,pants:Q.pants,boot:Q.boot,glove:Q.glove,belt:Q.belt,hair:Q.hair,mask:Q.mask||0,hat:0,emblem:1,weapon:Q.w,acc:'',outfit:Q.outfit,coat:Q.coat||shade(Q.accent,-.4),cape:null,body:Q.body,beard:Q.beard||0,scar:false,tallBoot:true,longGlove:true,trunks:false,
+   suit:{pat:0,em:Q.em,back:1,backC:Q.backC,emC:Q.emC,fin:false,capeC:null,team:TB}};Object.assign(d,Q.x||{});
+  const pv=PAS[Q.pk].val(Q.r,rg);
+  HEROES.push({id,name:Q.n,title:Q.ti,legend:1,r:Q.r,el:Q.el,cls:Q.cls,d,dmg:+(c.dmg*m).toFixed(1),range:Math.round(c.range*(1+.06*Q.r)),rate:c.rate,cost:r25(c.cost*(1+.3*Q.r)),
+   splash:c.splash?c.splash+4*Q.r:0,chain:c.chain?c.chain+(Q.r>=3?1:0):0,slow:c.slow?+(c.slow-.04*Q.r).toFixed(2):0,income:0,buff:0,p:{k:Q.pk,n:Q.pn,v:pv,d:PAS[Q.pk].d(pv)},bio:Q.bio+' (Legend)',ult:{n:Q.ult,pow:1.25}});
+  TB_SET.add(id);});})();
 // ---- Tesseract Trials: evolve Mirage King ----
 const TES=[
  {n:'Space',c:'#3fb8ff',map:2,mods:['fast','ghosts'],diff:7.2,d:'Enemies blink through space. Fast and hidden.'},
