@@ -2518,7 +2518,7 @@ function gUpdate(dt){
  if(G.snowball){const sb=G.snowball;sb.d-=420*dt;const pp=posAt(G.map,Math.max(0,sb.d));sb.x=pp.x;sb.y=pp.y;G.foes.forEach(f=>{if(!f.dead&&!f.fly&&!sb.hit.has(f)&&Math.abs(f.d-sb.d)<22){sb.hit.add(f);hurt(f,f.boss?f.maxHp*.04:f.maxHp*.6+40,null);if(!f.dead)f.stunT=Math.max(f.stunT,.6);}});if(sb.d<=0)G.snowball=null;}
  if(G.walls)G.walls=G.walls.filter(w=>w.hp>0);
  if(G.minions&&G.minions.length){for(const m of G.minions){m.t+=dt;m.d-=70*dt;const pp=posAt(G.map,Math.max(0,m.d));m.fl=pp.x>m.x;m.x=pp.x;m.y=pp.y;
-   for(const f of G.foes){if(m.hits<=0)break;if(f.dead||f.fly||m.hit.has(f)||Math.abs(f.d-m.d)>18)continue;m.hit.add(f);m.hits--;f._mk=1;hurt(f,f.boss?m.dmg*3:m.dmg,m.src&&G.towers.includes(m.src)?m.src:null);if(!f.dead)f._mk=0;burst(f.x,f.y-14,'#39ff8a',6);}}
+   for(const f of G.foes){if(m.hits<=0)break;if(f.dead||f.fly||m.hit.has(f)||Math.abs(f.d-m.d)>18)continue;m.hit.add(f);m.hits--;f._mk=1;hurt(f,f.boss?m.dmg*3:m.dmg,m.src&&G.towers.includes(m.src)?m.src:null);if(!f.dead)f._mk=0;burst(f.x,f.y-14,'#39ff8a',3);}}
    G.minions=G.minions.filter(m=>m.hits>0&&m.d>0);}
  if(G.tideFx>0)G.tideFx-=dt;
  if(G.lants){for(const L of G.lants){L.x+=L.vx*dt;L.t+=dt;}G.lants=G.lants.filter(L=>L.x<W+30);}
@@ -2631,7 +2631,7 @@ function gDraw(){g.setTransform(HDK,0,0,HDK,0,0);
  if(G.walls)for(const w of G.walls){g.save();g.translate(w.x,w.y);for(let i=-2;i<=2;i++){g.beginPath();g.moveTo(i*5-2.6,10);g.quadraticCurveTo(i*5-3.4,-6,i*5+(i%2?1:-1)*1.5,-14-(i===0?4:Math.abs(i)%2*3));g.quadraticCurveTo(i*5+3.4,-6,i*5+2.6,10);g.closePath();g.fillStyle=lgrad(g,'#8d6e63',-16,10);g.fill();g.strokeStyle='#3e2723';g.lineWidth=1.2;g.stroke();}
   g.strokeStyle='#5cc96a';g.lineWidth=1.6;g.beginPath();g.moveTo(-13,-2);g.quadraticCurveTo(-4,-7,2,-1);g.quadraticCurveTo(7,4,13,-4);g.stroke();g.fillStyle='#7dff8a';for(const[lx,ly]of[[-8,-5],[5,1],[11,-4]]){g.beginPath();g.ellipse(lx,ly,2.4,1.3,.5,0,7);g.fill();}
   const fr=w.hp/w.max;g.fillStyle='rgba(0,0,0,.55)';g.fillRect(-14,-26,28,4);g.fillStyle=fr>.5?'#7dff8a':fr>.25?'#ffd23f':'#ff4d5e';g.fillRect(-13.5,-25.5,27*fr,3);g.restore();}
- if(G.minions)for(const m of G.minions){g.save();g.globalAlpha=.72;g.shadowColor='#39ff8a';g.shadowBlur=10;drawAvatar(g,HEROES[153],m.x,m.y+6,.55,{t:G.t*1.4+m.d*.01,walk:1,flip:!m.fl,noShadow:1});g.restore();}
+ if(G.minions&&G.minions.length){g.save();g.globalAlpha=.72;for(const m of G.minions){const fr=Math.floor((G.t*1.4+m.d*.01)/.12)&7,sp=mysSprite(fr,!m.fl);g.drawImage(sp,m.x-30,m.y+6-66,60,80);}g.restore();}
  for(const L of G.lants||[]){const ly=L.y+Math.sin(L.t*2)*8;g.save();g.shadowColor='#ffba08';g.shadowBlur=16;g.beginPath();g.ellipse(L.x,ly,9,12,0,0,7);g.fillStyle=lgrad(g,'#d00000',ly-12,ly+12);g.fill();g.restore();outline(g,1);g.fillStyle='#ffba08';g.fillRect(L.x-6,ly-13,12,2.4);g.fillRect(L.x-6,ly+11,12,2.4);}
  if(G.dropOn){g.save();g.globalAlpha=.25+.15*Math.sin(G.t*30);g.strokeStyle=['#f72585','#4cc9f0','#ffd60a'][Math.floor(G.t*8)%3];g.lineWidth=14;g.strokeRect(7,7,W-14,H-14);g.restore();}
  v7Light(g);
@@ -3788,7 +3788,8 @@ HEROES.forEach(h=>{if(h.cls!=='farm')return;let k=h.p.k;if(h.r>=1&&k!=='harvest'
 HEROES.forEach(h=>{if(h.name==='Doctor Mystic'){h.p={k:'mystic',n:'Mystic Army',v:{},d:'Every enemy he defeats rises as a Mystic Clone that walks back down the path, damaging every enemy it touches (like a necromancer).'};}});
 const MYS=[{k:'k',n:'Defeat 1,000 enemies with Doctor Mystic',v:1000},{k:'cl',n:'Raise 300 Mystic Clones',v:300},{k:'ck',n:'Mystic Clones defeat 150 enemies',v:150},{k:'u',n:'Use his Ultimate 30 times',v:30},{k:'gt',n:'Win a Galaxy Trial with him in your team',v:1},{k:'rr',n:'Clear the Rift Raid with him in your team',v:1}];
 const mysHave=k=>((SV.us[153]||{})[k]||0),mysDone=()=>MYS.every(q=>mysHave(q.k)>=q.v);
-function mysRaise(f,t){if(!G||f.boss||f.mini)return;G.minions=G.minions||[];if(G.minions.length>=24)return;const st=tStats(t);G.minions.push({d:Math.max(0,f.d),hits:t.h.evo?6:4,dmg:Math.max(st.dmg,8)*1.6,hit:new Set(),x:f.x,y:f.y,t:0,src:t});const u=SV.us[153]=SV.us[153]||{k:0,d:0};u.cl=(u.cl||0)+1;burst(f.x,f.y-14,'#39ff8a',12);}
+const MYS_SPR={};function mysSprite(fr,flip){const k=fr+'_'+(flip?1:0);if(MYS_SPR[k])return MYS_SPR[k];const c=document.createElement('canvas'),Rz=3;c.width=60*Rz;c.height=80*Rz;const x=c.getContext('2d');x.scale(Rz,Rz);x.shadowColor='#39ff8a';x.shadowBlur=6;drawAvatar(x,HEROES[153],30,66,.55,{t:fr*.12,walk:1,flip,noShadow:1});MYS_SPR[k]=c;return c;}
+function mysRaise(f,t){if(!G||f.boss||f.mini)return;G.minions=G.minions||[];if(G.minions.length>=16)return;const st=tStats(t);G.minions.push({d:Math.max(0,f.d),hits:t.h.evo?6:4,dmg:Math.max(st.dmg,8)*1.6,hit:new Set(),x:f.x,y:f.y,t:0,src:t});const u=SV.us[153]=SV.us[153]||{k:0,d:0};u.cl=(u.cl||0)+1;burst(f.x,f.y-14,'#39ff8a',12);}
 (function(){const B=[[7,'Daily Trumpet','The City Newspaper','trumpet','light',"Brickvale's loudest newspaper. Every headline about your heroes sells more copies."],
  [68,'Bureau Outpost','Field Office of the Bureau','bureau','tech','A small Bureau base. Agents pay rent and share their mission rewards.'],
  [86,'Mystic Sanctum','Home of the Arcane','sanctum','nature','An old townhouse full of magic books. Visitors pay to see the spinning green window.'],
