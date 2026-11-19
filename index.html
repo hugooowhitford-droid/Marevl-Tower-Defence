@@ -3791,6 +3791,72 @@ window.__BH6={RELICS,DUOS,ACH,ELITES,allyIntro,buildEditor,edParse,edCode,custom
 applyTips();refreshGems();requestAnimationFrame(loop);setTimeout(()=>{showLogin(false);setTimeout(checkAch,1500);},600);
 window.drawAvatar=drawAvatar;window.drawPedestal=drawPedestal;window.lmAnim=lmAnim;window.drawWeather=drawWeather;window.__BH={HEROES,startGame,go,get G(){return G},SV:()=>SV,useUlt,selHero:id=>{selHero=id;buildIndex();},setSummonMode,EVENTS,evData,CH,EVSTAGE,renderBg,buildMap,evStageCh,startChal:()=>{const c=dailyChallenges()[0];startGame(c.map,'chal',c);}};
 try{Object.assign(window.__BH,{showGalaxy,evolve,endGame,closeModal,heroName});}catch(e){}
+// ================= ONLINE: accounts + cloud saves (Firebase) =================
+const FB_CFG={apiKey:"AIzaSyCbr_IH8W41kyqYLOtcZfLqKZfvrgemwCI",authDomain:"marvel-tower-defence.firebaseapp.com",projectId:"marvel-tower-defence",storageBucket:"marvel-tower-defence.firebasestorage.app",messagingSenderId:"1051117246831",appId:"1:1051117246831:web:9f56328093cb99e690309a"};
+const FB_V='10.12.2',SYNC_KEY=SKEY+'_syncT';
+const ON={ready:false,user:null,name:null,auth:null,db:null,upT:null,busy:false,err:null};
+function fbScript(n){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=`https://www.gstatic.com/firebasejs/${FB_V}/firebase-${n}-compat.js`;s.onload=ok;s.onerror=()=>no(new Error('load '+n));document.head.appendChild(s);});}
+async function fbInit(){
+ try{await fbScript('app');await Promise.all([fbScript('auth'),fbScript('firestore')]);
+  firebase.initializeApp(FB_CFG);ON.auth=firebase.auth();ON.db=firebase.firestore();ON.ready=true;
+  ON.auth.getRedirectResult().catch(e=>{ON.err=e;});
+  ON.auth.onAuthStateChanged(u=>{ON.user=u;ON.name=null;if(u)onSignedIn(u);else refreshAcct();});
+ }catch(e){ON.err=e;}}
+const sizeOf=s=>{try{const o=JSON.parse(s);return{heroes:Object.keys(o.owned||{}).length,gems:o.gems||0,tier:Math.floor(((o.pass||{}).xp||0)/PASS_XP)};}catch(e){return{heroes:0,gems:0,tier:0};}};
+const isFresh=()=>Object.keys(SV.owned).length<=STARTERS.length&&!SV.st.summons&&!(SV.pass&&SV.pass.xp);
+async function onSignedIn(u){
+ try{const ref=ON.db.collection('users').doc(u.uid),snap=await ref.get(),d=snap.exists?snap.data():null;
+  if(!d||!d.name){refreshAcct();askUsername();return;}
+  ON.name=d.name;refreshAcct();
+  const syncT=+(localStorage.getItem(SYNC_KEY+'_'+u.uid)||0);
+  if(d.save&&d.t>syncT){
+   if(isFresh())return useCloud(d);
+   const c=sizeOf(d.save),l=sizeOf(JSON.stringify(SV));
+   modal(`<div class="mt">☁️ PICK YOUR SAVE</div><p style="font-weight:800">Your account <b>${esc(d.name)}</b> has a different save from this device.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0"><div style="background:rgba(0,0,0,.3);border-radius:12px;padding:8px"><div class="L">☁️ ACCOUNT</div>${c.heroes} heroes<br>💎 ${c.gems.toLocaleString()}<br>Pass tier ${c.tier}<br><button class="bb sm green" id="pkC" style="margin-top:6px">Use this</button></div>
+    <div style="background:rgba(0,0,0,.3);border-radius:12px;padding:8px"><div class="L">📱 THIS DEVICE</div>${l.heroes} heroes<br>💎 ${l.gems.toLocaleString()}<br>Pass tier ${l.tier}<br><button class="bb sm blue" id="pkL" style="margin-top:6px">Use this</button></div></div>
+    <div style="font-size:12px;opacity:.8;font-weight:800">The one you don't pick is replaced.</div>`,b=>{b.querySelector('#pkC').onclick=()=>useCloud(d);b.querySelector('#pkL').onclick=()=>{closeModal();cloudUp(true);};});
+  }else cloudUp(true);
+ }catch(e){ON.err=e;toast('☁️ Could not reach your account. Playing offline.');}}
+function useCloud(d){try{localStorage.setItem(SKEY,d.save);localStorage.setItem(SYNC_KEY+'_'+ON.user.uid,String(d.t));}catch(e){}location.reload();}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function askUsername(err){
+ modal(`<div class="mt">👤 PICK A USERNAME</div><p style="font-weight:800">This is how friends will find you. 3–16 letters, numbers or _</p>
+  <input id="unIn" maxlength="16" style="width:100%;font-size:20px;padding:8px;border-radius:10px;border:2px solid #556;margin:6px 0" placeholder="Username">
+  <div id="unErr" style="color:#ff6b6b;font-weight:900;min-height:20px">${err||''}</div><button class="bb green" id="unOk">Save</button>`,b=>{
+  const go=async()=>{const n=b.querySelector('#unIn').value.trim(),lo=n.toLowerCase();
+   if(!/^[a-zA-Z0-9_]{3,16}$/.test(n)){b.querySelector('#unErr').textContent='3–16 letters, numbers or _ only';return;}
+   b.querySelector('#unOk').disabled=true;
+   try{const uid=ON.user.uid,uref=ON.db.collection('usernames').doc(lo);
+    await ON.db.runTransaction(async tx=>{const s=await tx.get(uref);if(s.exists&&s.data().uid!==uid)throw new Error('taken');tx.set(uref,{uid});});
+    ON.name=n;closeModal();await cloudUp(true);refreshAcct();toast('☁️ Welcome, '+n+'! Your progress is now saved online.');
+   }catch(e){askUsername(e.message==='taken'?'That name is taken, try another':'Could not save, try again');}};
+  b.querySelector('#unOk').onclick=go;b.querySelector('#unIn').onkeydown=e=>{if(e.key==='Enter')go();};setTimeout(()=>b.querySelector('#unIn').focus(),50);});}
+async function cloudUp(now){
+ if(!ON.user||!ON.name)return;clearTimeout(ON.upT);
+ if(!now){ON.upT=setTimeout(()=>cloudUp(true),5000);return;}
+ try{ON.err=null;const t=Date.now(),s=JSON.stringify(SV),uid=ON.user.uid;
+  await ON.db.collection('users').doc(uid).set({name:ON.name,save:s,t});
+  await ON.db.collection('profiles').doc(uid).set({name:ON.name,nameLower:ON.name.toLowerCase(),heroes:Object.keys(SV.owned).length,t});
+  localStorage.setItem(SYNC_KEY+'_'+uid,String(t));
+ }catch(e){ON.err=e;}}
+{const _save=save;save=function(){_save();if(ON.user&&ON.name)cloudUp(false);};}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&ON.upT)cloudUp(true);});
+async function signIn(){
+ if(!ON.ready){toast('☁️ Online services are not available right now');return;}
+ const p=new firebase.auth.GoogleAuthProvider();
+ try{await ON.auth.signInWithPopup(p);}catch(e){
+  if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/cancelled-popup-request'].includes(e.code))ON.auth.signInWithRedirect(p);
+  else if(e.code!=='auth/popup-closed-by-user')toast('❌ Sign-in failed: '+(e.code||e.message));}}
+function refreshAcct(){const b=$('#acctBtn');if(b)b.innerHTML=ON.user&&ON.name?'👤 '+esc(ON.name):'👤 Sign in';}
+function showAccount(){
+ if(!ON.user){modal(`<div class="mt">☁️ ONLINE ACCOUNT</div><p style="font-weight:800">Sign in to save your progress online and play on any device. Friends, trading and playing together are coming soon!</p><button class="bb green" id="acIn">Sign in with Google</button> <button class="bb gray" id="acX">Close</button>`,b=>{b.querySelector('#acIn').onclick=()=>{closeModal();signIn();};b.querySelector('#acX').onclick=closeModal;});return;}
+ modal(`<div class="mt">☁️ ONLINE ACCOUNT</div><p style="font-weight:800">Signed in as <b style="color:#7df9ff">${esc(ON.name||'(no username yet)')}</b><br><span style="opacity:.7;font-size:13px">${esc(ON.user.email||'')}</span></p><p style="font-weight:800;font-size:13px;opacity:.85">Your progress saves online automatically.</p><button class="bb blue" id="acSync">☁️ Save now</button> <button class="bb red" id="acOut">Sign out</button> <button class="bb gray" id="acX">Close</button>`,b=>{
+  b.querySelector('#acSync').onclick=async()=>{await cloudUp(true);toast(ON.err?'❌ Could not save online':'☁️ Saved online!');};
+  b.querySelector('#acOut').onclick=async()=>{await cloudUp(true);await ON.auth.signOut();closeModal();toast('Signed out. Progress on this device stays.');};
+  b.querySelector('#acX').onclick=closeModal;});}
+{const _ss2=showSettings;showSettings=function(){_ss2();const st=$('#modal #stT');if(st&&!$('#modal #acctBtn')){const a=mk('button','bb sm green','👤 Sign in');a.id='acctBtn';a.onclick=()=>{closeModal();setTimeout(showAccount,60);};st.parentNode.insertBefore(a,st);refreshAcct();}};}
+fbInit();
 })();
 </script>
 </body>
