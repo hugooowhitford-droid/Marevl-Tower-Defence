@@ -332,7 +332,7 @@ canvas{display:block}
     <div class="title L out">HERO PASS</div>
     <div id="passHead" class="L out" style="position:absolute;left:0;right:0;top:66px;text-align:center;font-size:20px"></div>
     <div id="passList"></div>
-    <div style="position:absolute;left:0;right:0;bottom:30px;text-align:center;font-weight:800;opacity:.9">Earn Pass XP in every battle: +20 per wave, +100 for a win. Tiers 15 and 30 give a 🎟️ Mythic Ticket!</div>
+    <div style="position:absolute;left:0;right:0;bottom:30px;text-align:center;font-weight:800;opacity:.9">Earn Pass XP in every battle: +20 per wave, +100 for a win. Tiers 15, 30 and 45 give a 🎟️ Mythic Ticket. Tier 50 unlocks the EXCLUSIVE hero <b style="color:#ff4fd8">MIRAGE KING</b>!</div>
   </div>
   <div id="modal"><div class="box" id="mbox"></div></div>
 </div>
@@ -528,6 +528,7 @@ const RAR=[
  {n:'Legendary',c:'#ffb020',m:2.6,w:5},
  {n:'Mythic',c:'#ff3b6b',m:3.7,w:1},
  {n:'ULTRA',c:'#2ef2d0',m:5.2,w:0.2},
+ {n:'EXCLUSIVE',c:'#ff4fd8',m:7,w:0},
 ];
 const ELS={
  fire:{n:'Fire',i:'🔥',pal:['#ff5a36','#ff9f1c','#c81d25','#ffbe0b'],fx:'Burns enemies over time.'},
@@ -675,21 +676,23 @@ const LEGENDS=[
 ,{n:'Vexa',ti:'the Void Blade',el:'dark',cls:'melee',w:'sword',r:4,body:'lean',outfit:'tactical',hair:'#eef1f6',hat:0,mask:0,shirt:'#2a1f3d',accent:'#7df9ff',pants:'#1c1528',boot:'#1c1528',cape:null,pk:'execute',pn:'Silent Cut',bio:'A space ninja from a blue-skinned warrior clan. Her twin energy blades can cut through starship armour.'}
 ,{n:'Bolt Whiskers',ti:'the Robot Skunk Mechanic',el:'tech',cls:'splash',w:'wrench',r:2,body:'small',outfit:'armor',hair:'#c9d1dc',hat:0,mask:0,shirt:'#ff9f1c',accent:'#c9d1dc',pants:'#5c6370',boot:'#5c6370',cape:null,pk:'boom',pn:'Spare Parts',bio:'A tiny robot skunk who can fix any ship, and build a stink bomb out of anything.'}
 ,{n:'Nebulos',ti:'The One-Fist Warlord',el:'dark',cls:'chain',w:'staff',r:5,body:'bulky',outfit:'armor',hair:'#1b1b22',hat:0,mask:0,shirt:'#1b1b22',accent:'#c9d1dc',pants:'#14141a',boot:'#c9d1dc',cape:'#1b2b5a',pk:'boss',pn:'Crown of Stars',bio:'A purple warlord who is only strong in one arm. Beat the 6 Galaxy Trials to win the Galaxy Crystals for his glove, and he evolves into LORD NEBULOS.'}
+,{n:'Mirage King',ti:'Ruler of a Thousand Illusions',el:'light',cls:'chain',w:'staff',r:6,body:'hero',outfit:'robe',hair:'#f4e3b0',hat:0,mask:0,shirt:'#5a1f6e',accent:'#ffd23f',pants:'#3d1450',boot:'#ffd23f',cape:'#ff4fd8',pk:'crit',pn:'Shimmering Illusions',bio:'The king of a desert kingdom that only appears in the heat haze. Enemies never know which Mirage King is real. Only the bravest heroes who finish the Hero Pass can earn him.'}
 ];
 LEGENDS.forEach((L,j)=>{const id=HEROES.length,c=CLS[L.cls],m=RAR[L.r].m*1.12,rg=mulberry32(id*7919+13);
  const d={skin:pick(SKINS,rg),shirt:L.shirt,sleeve:L.shirt,accent:L.accent,pants:L.pants,boot:L.boot,glove:L.cls==='melee'?shade(L.boot,.1):shade(L.shirt,-.35),belt:'#5c3d1e',hair:L.hair,mask:L.mask,hat:L.hat,emblem:1+((j+12)%5),weapon:L.w,acc:L.acc||'',outfit:L.outfit,coat:L.coat||shade(L.accent,-.4),cape:L.cape||null,body:L.body,beard:L.beard||0,scar:!!L.scar};
  const pv=PAS[L.pk].val(L.r,rg);
  HEROES.push({id,name:L.n,title:L.ti,legend:1,r:L.r,el:L.el,cls:L.cls,d,dmg:+(c.dmg*m).toFixed(1),range:Math.round(c.range*(1+.06*L.r)),rate:c.rate,cost:r25(c.cost*(1+.3*L.r)),
   splash:c.splash?c.splash+4*L.r:0,chain:c.chain?c.chain+(L.r>=3?1:0):0,slow:c.slow?+(c.slow-.04*L.r).toFixed(2):0,income:c.income?Math.round(c.income*(1+.35*L.r)):0,buff:c.buff?+(c.buff*(1+.25*L.r)).toFixed(3):0,
-  p:{k:L.pk,n:L.pn,v:pv,d:PAS[L.pk].d(pv)},bio:L.bio+' (Legend)'});});
+  p:{k:L.pk,n:L.pn,v:pv,d:PAS[L.pk].d(pv)},bio:L.bio+(L.r===6?' (Exclusive)':' (Legend)')});});
 // ---- titles for everyone else ----
 (()=>{const TEL={fire:['Ember','Cinder','Blaze','Pyre','Scorch'],ice:['Frost','Glacier','Winter','Rime','Snow'],lightning:['Storm','Thunder','Spark','Volt','Tempest'],dark:['Shadow','Night','Dusk','Void','Gloom'],nature:['Wild','Thorn','Grove','Moss','Bramble'],light:['Dawn','Sun','Star','Radiant','Gleam'],tech:['Iron','Gear','Chrome','Circuit','Rivet']};
  const TCL={ranged:['Gunslinger','Sharpshooter','Ranger','Pistoleer'],sniper:['Marksman','Deadeye','Longshot','Watcher'],splash:['Bombardier','Demolisher','Blaster','Artillerist'],chain:['Arcanist','Conjurer','Sorcerer','Channeler'],melee:['Brawler','Duelist','Vanguard','Berserker','Champion'],slow:['Warden','Bulwark','Guardian','Shieldbearer'],farm:['Merchant','Tinker','Prospector','Trader'],support:['Bard','Medic','Herald','Muse']};
  const used=new Set();HEROES.forEach(h=>{if(h.title)return;const rg=mulberry32(h.id*313+11),A=TEL[h.el],N=TCL[h.cls];let t,k=0;do{t='the '+A[Math.floor(rg()*A.length)]+' '+N[Math.floor(rg()*N.length)];k++;}while(used.has(t)&&k<40);used.add(t);h.title=t;});})();
 // ---- placement caps ----
-const CAP=[6,5,4,3,2,1];
+const CAP=[6,5,4,3,2,1,1];
 function evStageCh(){const E=curEv(),S=EVSTAGE[E.k];return{n:S.n,theme:S.theme,waves:15,diff:2.6,seed:S.seed,map:S.map,rule:S.rule,boss:{n:S.boss.n,hp:16000,spd:16,col:S.boss.col,armor:4,ab:['summon','shield','dash'],cd:6,bi:S.boss.bi}};}
 const capOf=h=>CAP[h.r];
+const MIRAGE=()=>HEROES.find(h=>h.name==='Mirage King');
 // ---- event stages ----
 const EVSTAGE={
  frost:{n:'Snowball Siege',theme:'festive',seed:71,map:[[-1,7],[4,7],[4,3],[9,3],[9,11],[15,11],[15,4],[20,4],[20,9],[25,9]],rule:'snowball',rd:'Every 15s a giant snowball rolls back down the road, flattening enemies.',boss:{n:'GRUMBLESNOW',col:'#e0fbfc',bi:0}},
@@ -1475,7 +1478,7 @@ const TW=TRAITS.reduce((s,t)=>s+t.w,0);
 const getTrait=id=>SV&&SV.traits&&SV.traits[id]?TRAITS.find(t=>t.k===SV.traits[id]):null;
 const isEvo=id=>!!(SV&&SV.evo&&SV.evo[id]);
 const EVO_T={fire:'Phoenix',ice:'Absolute',lightning:'Overcharged',dark:'Eclipse',nature:'Ancient',light:'Radiant',tech:'Omega'};
-const EVO_REQ=r=>({kills:[0,0,250,500,800,1200][r],sh:[0,0,3,5,8,12][r],gems:[0,0,500,1000,2000,3000][r]});
+const EVO_REQ=r=>({kills:[0,0,250,500,800,1200,1600][r],sh:[0,0,3,5,8,12,15][r],gems:[0,0,500,1000,2000,3000,4000][r]});
 const heroName=id=>isEvo(id)&&HEROES[id].name==='Nebulos'?'Lord Nebulos':isEvo(id)?EVO_T[HEROES[id].el]+' '+HEROES[id].name:HEROES[id].name;
 const ULTS={ranged:{n:'Bullet Storm',d:'Fires 14 rapid shots.'},sniper:{n:'Final Shot',d:'One huge shot at the strongest enemy in range for 10× damage.'},splash:{n:'Meteor Strike',d:'Drops a meteor for 6× damage in a huge area.'},chain:{n:'Tempest',d:'Strikes every enemy in range for 3× damage.'},melee:{n:'Earthshatter',d:'Slams the ground: 5× damage to everything nearby and stuns them.'},slow:{n:'Time Lock',d:'Freezes every enemy in range for 3s.'},farm:{n:'Cash Out',d:'Instantly earns 1.5× this hero\'s wave income.'},support:{n:'Overdrive',d:'Nearby heroes attack 60% faster for 8s.'}};
 const MODS={
@@ -1574,7 +1577,7 @@ const REEL_X=[48,196,344],REEL_Y=128,REEL_W=132,REEL_H=250,CELL=120;
 const randId=()=>{const V=HEROES.filter(h=>!h.hidden);return V[Math.floor(Math.random()*V.length)].id;};
 let summonMode='std';
 const evRandId=()=>{const e=evHeroes(curEv()).filter(h=>!h.hidden);return e.length&&Math.random()<.6?e[Math.floor(Math.random()*e.length)].id:randId();};
-const EV_W=[0,55,30,12,3,0];
+const EV_W=[0,55,30,12,3,0,0];
 function rollEvR(){let x=Math.random()*100;for(let i=1;i<5;i++){x-=EV_W[i];if(x<0)return i;}return 1;}
 function setSummonMode(m){summonMode=m;const ev=curEv(),evm=m==='event';
  $('#summon').style.background=evm?`radial-gradient(circle at 30% 50%,${ev.bg[0]},${ev.bg[1]} 75%)`:'';
@@ -1690,7 +1693,7 @@ $('#slotCv').addEventListener('click',e=>{const r=e.target.getBoundingClientRect
 
 // ================= INDEX =================
 let fil='all',selHero=null;
-const FILTERS=[['all','All'],['owned','Owned'],['ev','Event'],[0,'Common'],[1,'Rare'],[2,'Epic'],[3,'Legendary'],[4,'Mythic']];
+const FILTERS=[['all','All'],['owned','Owned'],['ev','Event'],[0,'Common'],[1,'Rare'],[2,'Epic'],[3,'Legendary'],[4,'Mythic'],[5,'ULTRA'],[6,'Exclusive']];
 function buildIndex(){
  const tb=$('#teamBar');tb.innerHTML='<span class="L out" style="font-size:18px;margin-right:4px">TEAM</span>';
  for(let i=0;i<5;i++){const id=SV.team[i];const s=mk('div','slot'+(id!=null?' full':''));
@@ -1715,7 +1718,7 @@ function buildDetail(){
  const p=portrait(own?{...h,d:skinD(h0.d,SV.skin[h0.id])}:h,170,170,3.2,{sil:!own});p.style.borderRadius='14px';p.style.border='3px solid '+RAR[h.r].c;dv.appendChild(p);
  dv.appendChild(mk('div','L out',`<span style="font-size:24px">${own?(h.evo?'✦ ':'')+h.name:'??? '}</span>${own?`<div style="font-size:14px;color:#ffd23f">${h0.title}${h0.legend?' · ⚜ LEGEND':''}</div>`:''}`));
  dv.appendChild(mk('div','',`<span class="tag" style="color:${RAR[h.r].c}">${RAR[h.r].n}</span><span class="tag">${ELS[h.el].i} ${ELS[h.el].n}</span><span class="tag">${c.ic} ${c.n}</span>`));
- if(!own){const E=h.ev?EVENTS.find(e=>e.k===h.ev):null;dv.appendChild(mk('p','',E?`<b>${E.i} ${E.n} exclusive!</b><br>Pull the event slots with ${E.ci} ${E.cur} while ${E.n} is on. ${curEv().k===E.k?'<b style="color:#7dff8a">It\'s on right now!</b>':'Events rotate every hour.'}`:`<b>Not unlocked yet.</b><br>Pull the Hero Slots for a chance to get this ${RAR[h.r].n} hero!`));craftBtn(dv,h0);return;}
+ if(!own){const E=h.ev?EVENTS.find(e=>e.k===h.ev):null;dv.appendChild(mk('p','',E?`<b>${E.i} ${E.n} exclusive!</b><br>Pull the event slots with ${E.ci} ${E.cur} while ${E.n} is on. ${curEv().k===E.k?'<b style="color:#7dff8a">It\'s on right now!</b>':'Events rotate every hour.'}`:(h.r===6?`<b>EXCLUSIVE hero!</b><br>Reach Hero Pass tier 50 to unlock ${h.name}.`:`<b>Not unlocked yet.</b><br>Pull the Hero Slots for a chance to get this ${RAR[h.r].n} hero!`)));craftBtn(dv,h0);return;}
  dv.appendChild(mk('div','stars',`<span style="font-size:18px">${stars(own)}</span>`));
  const sg=mk('div','statgrid');
  const rows=h.cls==='farm'?[['Income/wave','$'+h.income],['Cost','$'+h.cost]]:h.cls==='support'?[['Boost','+'+Math.round(h.buff*100)+'%'],['Range',h.range],['Cost','$'+h.cost]]:[['Damage',(h.dmg*(1+.08*(own-1))).toFixed(1)],['Range',h.range],['Attack every',h.rate+'s'],['Cost','$'+h.cost]];
@@ -2768,11 +2771,11 @@ const ULT_NOUN={ranged:['Barrage','Volley','Salvo','Rapid Fire','Bullet Rain','S
 const TWIST={fire:'leaves the ground burning for 4s',ice:'freezes everything it hit',lightning:'lightning strikes 5 more enemies anywhere on the map',dark:'drags the enemies it hit back along the path',nature:'roots the enemies it hit and poisons them',light:'repairs 5 City HP and strips shields and stealth nearby',tech:'an orbital laser hits the strongest enemy on the map'};
 const ultDesc=h=>(h.oname||h.name)==='Mirage King'?'Pick any hero you have placed (not himself) and place an exact copy of it anywhere, with all the same upgrades. Even ULTRAs can be copied! Using it again makes the old copy vanish.':(h.oname||h.name)==='Bloomroot'?'Grow root walls on the path (2, or 3 evolved). Enemies have to stop and smash through each wall before they can pass. Flying enemies go over them.':(h.oname||h.name)==='Nebulos'?'Punches the ground with the Galaxy Glove. A crystal shockwave instantly wipes out every normal enemy in a huge area. Bosses and mini-bosses take massive damage (20% of their max HP, 30% when evolved) and get stunned.':ULTS[h.cls].d+' Then '+TWIST[h.el]+'.';
 // evolution challenges & perks
-const EVO_Q=[{k:'k',n:n=>`Defeat ${n} enemies with this hero`,v:r=>[0,0,250,500,800,1200][r]},{k:'d',n:n=>`Deal ${fmtN(n)} damage with this hero`,v:r=>[0,0,25000,80000,200000,300000][r]},{k:'u',n:n=>`Use this hero's Ultimate ${n} times`,v:r=>[0,0,10,25,50,75][r]},{k:'sc',n:n=>`Win ${n} battles in any mode with this hero on your team`,v:r=>[0,0,3,6,10,15][r]},{k:'cw',n:n=>`Win ${n} challenges, raids or Ally Assaults with this hero on your team`,v:r=>[0,0,1,3,6,9][r]},{k:'tf',n:n=>`Reach tower floor ${n} with this hero on your team`,v:r=>[0,0,5,10,20,30][r]}];
+const EVO_Q=[{k:'k',n:n=>`Defeat ${n} enemies with this hero`,v:r=>[0,0,250,500,800,1200,1600][r]},{k:'d',n:n=>`Deal ${fmtN(n)} damage with this hero`,v:r=>[0,0,25000,80000,200000,300000,400000][r]},{k:'u',n:n=>`Use this hero's Ultimate ${n} times`,v:r=>[0,0,10,25,50,75,100][r]},{k:'sc',n:n=>`Win ${n} battles in any mode with this hero on your team`,v:r=>[0,0,3,6,10,15,20][r]},{k:'cw',n:n=>`Win ${n} challenges, raids or Ally Assaults with this hero on your team`,v:r=>[0,0,1,3,6,9,12][r]},{k:'tf',n:n=>`Reach tower floor ${n} with this hero on your team`,v:r=>[0,0,5,10,20,30,40][r]}];
 const EVO_PERKS=[{k:'ultcd',n:'Quick Charge',d:'Ultimate recharges 35% faster'},{k:'aoe',n:'Wider Reach',d:'+30% splash, +2 chains, +20% melee and pulse range'},{k:'elem',n:'Elemental Overload',d:'Burn, chill, zap and poison effects are twice as strong'},{k:'range',n:'Long Arm',d:'+25% range'},{k:'crit3',n:'Triple Threat',d:'Every 3rd attack is a 2× critical hit'},{k:'ult2',n:'Encore',d:'Ultimate fires twice'},{k:'bounty',n:'Prize Hunter',d:'Kills give +$5'},{k:'unfreeze',n:'Unshakable',d:'Immune to boss freezes'},{k:'speed',n:'Hyperdrive',d:'+40% attack speed'},{k:'passive2',n:'Mastery',d:'Passive is doubled instead of ×1.5'}];
 function evoQuest(id){let q=EVO_Q[(id*7+3)%6];const h=HEROES[id];if((h.cls==='farm'||h.cls==='support')&&(q.k==='k'||q.k==='d'))q=EVO_Q[3];return q;}
 const evoPerk=id=>EVO_PERKS[(id*3+1)%10];
-const EVO_COST=r=>({sh:[0,0,3,5,8,12][r],gems:[0,0,500,1000,2000,3000][r]});
+const EVO_COST=r=>({sh:[0,0,3,5,8,12,15][r],gems:[0,0,500,1000,2000,3000,4000][r]});
 const evoHave=(id,k)=>((SV.us[id]||{})[k]||0);
 const fmtQ=n=>n>=10000?fmtN(n):n;
 // levels & skins
@@ -2839,14 +2842,16 @@ function showLogin(force){const day=loginCheck();if(!day&&!force)return;const cu
   b.querySelector('#lgB').onclick=()=>{if(day){const r=LOGIN_RW[day-1];giveRw(r);if(r.tk)SV.tickets++;SV.login={day,last:todayKey()};save();refreshGems();chime();}closeModal();};});}
 // ---- hero pass ----
 const PASS_XP=250;
-const passRw=i=>i===15||i===30?{gems:500,tk:1}:i%5===0?{gems:300,sh:2}:i%3===0?{cry:2}:{gems:100+i*10};
+const PASS_MAX=50;
+const passRw=i=>i===50?{gems:1000,hero:1}:i===15||i===30||i===45?{gems:500,tk:1}:i%5===0?{gems:300,sh:2}:i%3===0?{cry:2}:{gems:100+i*10};
 function buildPass(){const box=$('#passList');box.innerHTML='';const tier=Math.floor(SV.pass.xp/PASS_XP);
- $('#passHead').innerHTML=`Tier <b>${Math.min(30,tier)}</b>/30 · ${SV.pass.xp%PASS_XP}/${PASS_XP} XP to next tier<div class="qbar" style="width:420px;margin:6px auto"><i style="width:${tier>=30?100:(SV.pass.xp%PASS_XP)/PASS_XP*100}%"></i></div>`;
- for(let i=1;i<=30;i++){const r=passRw(i),got=SV.pass.cl[i],ok=tier>=i;const c=mk('div','pcard'+(ok&&!got?' ready':''),`<div class="L" style="font-size:18px">TIER ${i}</div><div style="font-size:38px;margin:8px 0">${r.tk?'🎟️':r.sh?'💠':r.cry?'🔮':'💎'}</div><div style="font-weight:900;font-size:14px">${rwTxt(r)}${r.tk?' + Mythic Ticket':''}</div>`);
+ $('#passHead').innerHTML=`Tier <b>${Math.min(PASS_MAX,tier)}</b>/${PASS_MAX} · ${SV.pass.xp%PASS_XP}/${PASS_XP} XP to next tier<div class="qbar" style="width:420px;margin:6px auto"><i style="width:${tier>=PASS_MAX?100:(SV.pass.xp%PASS_XP)/PASS_XP*100}%"></i></div>`;
+ for(let i=1;i<=PASS_MAX;i++){const r=passRw(i),got=SV.pass.cl[i],ok=tier>=i;const c=mk('div','pcard'+(ok&&!got?' ready':''),r.hero?`<div class="L" style="font-size:18px;color:#ff4fd8">TIER ${i}</div><div class="mkP" style="margin:4px auto"></div><div class="L" style="font-size:15px;color:#ff4fd8">MIRAGE KING</div><div style="font-weight:900;font-size:12px">EXCLUSIVE hero + ${rwTxt(r)}</div>`:`<div class="L" style="font-size:18px">TIER ${i}</div><div style="font-size:38px;margin:8px 0">${r.tk?'🎟️':r.sh?'💠':r.cry?'🔮':'💎'}</div><div style="font-weight:900;font-size:14px">${rwTxt(r)}${r.tk?' + Mythic Ticket':''}</div>`);
+  if(r.hero){c.style.borderColor='#ff4fd8';c.style.boxShadow='0 0 22px #ff4fd8';const pp=portrait(MIRAGE(),96,96,1.9,{foot:3});pp.style.borderRadius='12px';pp.style.border='3px solid #ff4fd8';c.querySelector('.mkP').appendChild(pp);}
   c.dataset.tip=`<b>Tier ${i}</b><br>${ok?(got?'Already claimed.':'Ready to claim!'):'Reach '+(i*PASS_XP)+' Pass XP to unlock.'}`;
-  const b=mk('button','bb sm '+(got?'gray':ok?'gold':'gray'),got?'✓':ok?'CLAIM':'🔒');b.disabled=got||!ok;b.style.marginTop='auto';b.onclick=()=>{giveRw(r);if(r.tk)SV.tickets++;SV.pass.cl[i]=1;save();refreshGems();chime();buildPass();};c.appendChild(b);box.appendChild(c);}
+  const b=mk('button','bb sm '+(got?'gray':ok?'gold':'gray'),got?'✓':ok?'CLAIM':'🔒');b.disabled=got||!ok;b.style.marginTop='auto';b.onclick=()=>{giveRw(r);if(r.tk)SV.tickets++;SV.pass.cl[i]=1;let hg=null;if(r.hero){hg=grantHero(MIRAGE());SV.st.summons--;}save();refreshGems();chime();buildPass();if(hg)reveal([hg]);};c.appendChild(b);box.appendChild(c);}
  const first=[...box.children].findIndex(c=>c.classList.contains('ready'));if(first>2)box.scrollLeft=(first-1)*150;}
-const passReady=()=>{const tier=Math.floor(SV.pass.xp/PASS_XP);let n=0;for(let i=1;i<=Math.min(30,tier);i++)if(!SV.pass.cl[i])n++;return n;};
+const passReady=()=>{const tier=Math.floor(SV.pass.xp/PASS_XP);let n=0;for(let i=1;i<=Math.min(PASS_MAX,tier);i++)if(!SV.pass.cl[i])n++;return n;};
 // ---- mythic ticket ----
 function useTicket(){if(SV.tickets<1||spinning)return;SV.tickets--;const pool=HEROES.filter(h=>h.r===4&&!h.ev&&!h.hidden);const got=[grantHero(pool[Math.floor(Math.random()*pool.length)])];save();reveal(got);setSummonMode(summonMode);}
 // ---- music ----
@@ -2872,7 +2877,7 @@ document.addEventListener('mousemove',e=>{let html=null;let el=e.target.closest&
  if(!html){tipEl.style.display='none';return;}
  if(html!==tipLast){tipEl.innerHTML=html;tipLast=html;}tipEl.style.display='block';
  const w=tipEl.offsetWidth,h=tipEl.offsetHeight;let x=e.clientX+16,y=e.clientY+16;if(x+w>innerWidth-6)x=e.clientX-w-12;if(y+h>innerHeight-6)y=e.clientY-h-12;tipEl.style.left=x+'px';tipEl.style.top=y+'px';});
-const STATIC_TIPS={goHeroes:'<b>Heroes</b><br>Pick your team of 5, roll traits, evolve, level up and buy skins.',goSummon:'<b>Summon</b><br>Pull the Hero Slots with gems 💎, or the event slots with event currency. Every pull is a hero!',goStory:'<b>Play</b><br>Story, Challenges, Rift Raid, Infinite Tower and Endless.',goQuests:'<b>Quests</b><br>Tiered goals with rewards. The red badge means something is ready to claim.',goPass:'<b>Hero Pass</b><br>Earn Pass XP in every battle to unlock 30 tiers of free rewards.',goDaily:'<b>Daily rewards</b><br>Log in every day for a 7-day streak. Day 7 gives a Mythic Ticket.',muteB:'Sound effects and music on/off.',spin1:'One pull on the slot machine.',spin10:'Ten pulls at once. On the standard slots, guarantees at least one Rare or better.',tabStd:'<b>Standard slots</b><br>Every standard hero.',tabEv:'<b>Event slots</b><br>This hour\'s 4 exclusive heroes. Mythic guaranteed within 40 pulls.',ticketB:'<b>Mythic Ticket</b><br>Guarantees a random standard Mythic hero.',skipB:'Start the next wave now for a little bonus cash.',spdB:'Game speed: 1×, 2× or 3×.',pauseB:'Pause, or quit to the lobby.',hEv:'Event currency earned this match.',evBanner:'<b>This hour\'s event</b><br>Tap to open the event slots.'};
+const STATIC_TIPS={goHeroes:'<b>Heroes</b><br>Pick your team of 5, roll traits, evolve, level up and buy skins.',goSummon:'<b>Summon</b><br>Pull the Hero Slots with gems 💎, or the event slots with event currency. Every pull is a hero!',goStory:'<b>Play</b><br>Story, Challenges, Rift Raid, Infinite Tower and Endless.',goQuests:'<b>Quests</b><br>Tiered goals with rewards. The red badge means something is ready to claim.',goPass:'<b>Hero Pass</b><br>Earn Pass XP in every battle to unlock 50 tiers of free rewards.',goDaily:'<b>Daily rewards</b><br>Log in every day for a 7-day streak. Day 7 gives a Mythic Ticket.',muteB:'Sound effects and music on/off.',spin1:'One pull on the slot machine.',spin10:'Ten pulls at once. On the standard slots, guarantees at least one Rare or better.',tabStd:'<b>Standard slots</b><br>Every standard hero.',tabEv:'<b>Event slots</b><br>This hour\'s 4 exclusive heroes. Mythic guaranteed within 40 pulls.',ticketB:'<b>Mythic Ticket</b><br>Guarantees a random standard Mythic hero.',skipB:'Start the next wave now for a little bonus cash.',spdB:'Game speed: 1×, 2× or 3×.',pauseB:'Pause, or quit to the lobby.',hEv:'Event currency earned this match.',evBanner:'<b>This hour\'s event</b><br>Tap to open the event slots.'};
 function applyTips(){for(const id in STATIC_TIPS){const e=document.getElementById(id);if(e)e.dataset.tip=STATIC_TIPS[id];}
  document.querySelectorAll('.gemTxt').forEach(e=>e.parentElement.dataset.tip='<b>Gems 💎</b><br>For summons, skins and evolutions. Earn them from battles, quests and daily rewards.');
  document.querySelectorAll('.cryTxt').forEach(e=>e.parentElement.dataset.tip='<b>Trait Crystals 🔮</b><br>Roll a trait on a hero. Earn them from challenges and quests.');
@@ -2964,7 +2969,7 @@ const affLv=id=>{const p=SV.aff[id]||0;return p>=30?3:p>=15?2:p>=5?1:0;};
 const AFF_POOL=[n=>`${n} still gets butterflies before every boss fight, but would never admit it.`,n=>`${n} keeps a lucky pebble from the very first battle in Brickvale.`,n=>`${n} once spent a whole night teaching a Gloomling to play cards. It lost every hand.`,n=>`${n} writes a letter home after every victory, even the small ones.`,n=>`${n} is secretly the best cook in the Watch and bakes for the whole team.`,n=>`${n} trains at dawn every morning, rain or shine.`,n=>`${n} names every weapon they own, and talks to them too.`,n=>`${n} dreams of opening a quiet tea shop once the Gloom is gone.`,n=>`${n} has a scar from saving Captain Pell, and never tells the story the same way twice.`,n=>`${n} hums the Brickvale anthem off-key during every wave.`,n=>`${n} counts every villain defeated, and is quietly competing with you.`,n=>`${n} trusts you completely now, Commander. That means a lot to them.`];
 function affLines(h){const rg=mulberry32(h.id*97+5),ix=new Set();while(ix.size<3)ix.add(Math.floor(rg()*AFF_POOL.length));return[...ix].map(i=>AFF_POOL[i](h.name.split(' ')[0]));}
 // ---------- CRAFTING ----------
-const DUST_GAIN=[5,10,25,60,150,300],DUST_COST=[60,120,300,800,2000,4000];
+const DUST_GAIN=[5,10,25,60,150,300,500],DUST_COST=[60,120,300,800,2000,4000,9999];
 function craftHero(id){const h=HEROES[id],c=DUST_COST[h.r]*(SV.owned[id]?.5:1);if(h.ev||SV.mats.dust<c||(SV.owned[id]||0)>=5)return;SV.mats.dust-=c;SV.st.crafts++;if(!SV.owned[id])SV.owned[id]=1;else SV.owned[id]++;save();refreshGems();chime();buildIndex();}
 // ---------- ACHIEVEMENTS ----------
 const STD_MYTHS=HEROES.filter(h=>h.r===4&&!h.ev).map(h=>h.id),LEG_IDS=HEROES.filter(h=>h.legend).map(h=>h.id);
@@ -3085,7 +3090,7 @@ function drawEd(){const cv=$('#edCv'),c=cv.getContext('2d'),th=THEMES[ED.theme];
 function edClick(e){const r=e.target.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)*1000/r.width/T),y=Math.floor((e.clientY-r.top)*520/r.height/T)+1;if(x<0||x>=COLS||y<1||y>13)return;
  const p=ED.pts;if(p.length){const l=p[p.length-1];if(Math.abs(x-l[0])>=Math.abs(y-l[1]))p.push([x,l[1]]);else p.push([l[0],y]);const n=p[p.length-1];if(n[0]===l[0]&&n[1]===l[1])p.pop();}else p.push([x,y]);if(p.length>40)p.pop();drawEd();sfx(700,.03);}
 
-function craftBtn(dv,h0){if(h0.ev)return;const own=SV.owned[h0.id]||0;if(own>=5)return;const c=DUST_COST[h0.r]*(own?.5:1);const b=mk('button','bb sm gold',own?`✨ +1★ for ${c} Hero Dust`:`✨ Craft for ${c} Hero Dust`);b.style.cssText='width:100%;margin:5px 0;font-size:13px';b.disabled=(SV.mats.dust||0)<c;b.dataset.tip=`<b>Hero Dust ✨</b><br>You have ${SV.mats.dust||0}. Duplicate summons give Dust (more for rarer heroes). Event heroes can't be crafted.`;b.onclick=()=>{craftHero(h0.id);checkAch();};dv.appendChild(b);}
+function craftBtn(dv,h0){if(h0.ev||h0.r===6)return;const own=SV.owned[h0.id]||0;if(own>=5)return;const c=DUST_COST[h0.r]*(own?.5:1);const b=mk('button','bb sm gold',own?`✨ +1★ for ${c} Hero Dust`:`✨ Craft for ${c} Hero Dust`);b.style.cssText='width:100%;margin:5px 0;font-size:13px';b.disabled=(SV.mats.dust||0)<c;b.dataset.tip=`<b>Hero Dust ✨</b><br>You have ${SV.mats.dust||0}. Duplicate summons give Dust (more for rarer heroes). Event heroes can't be crafted.`;b.onclick=()=>{craftHero(h0.id);checkAch();};dv.appendChild(b);}
 function affSect(dv,h0){const p=SV.aff[h0.id]||0,L=affLv(h0.id),nx=AFF_T[L],lines=affLines(h0);
  dv.appendChild(mk('div','sect',`<div class="L" style="font-size:15px;color:#ff8fab">💖 AFFINITY ${'💖'.repeat(L)}${'🤍'.repeat(3-L)}</div><div>+${L*3}% damage. ${nx?`${p}/${nx} points to the next heart (+1 per battle, +2 per win).`:'Max affinity!'}</div>${lines.map((s,i)=>`<div style="font-size:11.5px;font-style:italic;margin-top:2px;${i<L?'':'opacity:.55'}">${i<L?'“'+s+'”':'🔒 Story unlocks at '+(i+1)+' 💖'}</div>`).join('')}`));}
 function duoSect(dv,h0){duoOf(h0.id).forEach(D=>{const pid=D.a===h0.id?D.b:D.a;dv.appendChild(mk('div','sect',`<div class="L" style="font-size:15px;color:#7df9ff">🤝 DUO: ${D.n}</div><div>Place <b>${heroName(pid)}</b> within 5 tiles. Either hero's Ultimate then triggers: ${D.d}${SV.owned[pid]?'':' <span style="opacity:.7">(partner not owned yet)</span>'}</div>`));});}
@@ -3394,7 +3399,7 @@ const HUB=[
  {k:'arcade',x:204,y:388,w:108,h:112,n:'SUMMON',tip:'<b>Summon Arcade</b><br>Pull the Hero Slots with gems 💎, or the event slots with event currency.',fn:()=>go('summon')},
  {k:'board',x:236,y:612,w:92,h:92,n:'QUESTS',tip:'<b>Quest Board</b><br>Goals with rewards. A red badge means something is ready to claim.',fn:()=>go('quests'),badge:()=>claimable()},
  {k:'gate',x:500,y:392,w:170,h:176,n:'PLAY',tip:'<b>Battle Gate</b><br>Story, Events, Challenges, Rift Raid, Tower, Endless, Ally Assault and Map Maker.',fn:()=>go('modes')},
- {k:'station',x:764,y:612,w:92,h:96,n:'PASS',tip:'<b>Pass Station</b><br>Earn Pass XP in every battle to unlock 30 tiers of free rewards.',fn:()=>go('pass'),badge:()=>passReady()},
+ {k:'station',x:764,y:612,w:92,h:96,n:'PASS',tip:'<b>Pass Station</b><br>Earn Pass XP in every battle to unlock 50 tiers of free rewards.',fn:()=>go('pass'),badge:()=>passReady()},
  {k:'vault',x:796,y:388,w:104,h:92,n:'RELICS',tip:'<b>Relic Vault</b><br>Equip up to 3 relics that power up every battle.',fn:()=>showRelics()},
  {k:'trophy',x:928,y:388,w:108,h:118,n:'PROFILE',tip:'<b>Trophy Hall</b><br>Your stats, favourite hero and achievements.',fn:()=>showProfile()},
  {k:'tent',x:84,y:612,w:136,h:106,n:'EVENT',tip:'',fn:()=>$('#evBanner').onclick()},
@@ -3620,7 +3625,7 @@ HUB.push({k:'hq',x:872,y:190,w:104,h:74,n:'TEAMS',tip:'<b>Team HQ</b><br>See the
 HEROES.forEach(h=>{if((h.name==='Red Eye'||h.name==='Sir Stretch')&&h.rate&&h.r===4)h.dmg=+(h.rate*(h.name==='Red Eye'?89.5:88.2)).toFixed(1);});
 HEROES.forEach(h=>{if(h.name==='Doctor Mystic'){h.chain=6;h.rate=+(h.rate*.82).toFixed(2);h.range+=12;}});
 const SHEET_DMG={'Doctor Mystic':100,'Eclipse':30,'Black Fang':50};HEROES.forEach(h=>{if(SHEET_DMG[h.name]!=null)h.dmg=SHEET_DMG[h.name];});
-const TRAIT_LUCK=[1,1,1,2.4,4,6];
+const TRAIT_LUCK=[1,1,1,2.4,4,6,8];
 function traitW(i,r){const L=TRAIT_LUCK[r],w=TRAITS[i].w;return i>=4?w*L*(1+(i-4)*.2*(L-1)):(i<=2&&L>1?w/Math.sqrt(L):w);}
 function traitOdds(r){const ws=TRAITS.map((t,i)=>traitW(i,r)),tot=ws.reduce((a,b)=>a+b,0);return{ws,tot};}
 function traitTip(r){const{ws,tot}=traitOdds(r);return`<b>Trait odds for ${RAR[r].n} heroes</b><br>`+TRAITS.map((t,i)=>{const p=ws[i]/tot*100;return t.i+' '+t.n+' '+p.toFixed(p<3?1:0)+'%';}).join('<br>')+(r>=3?'<br><i>Legendary and Mythic heroes roll rare traits far more often.</i>':'<br><i>Legendary and Mythic heroes get better odds.</i>');}
@@ -3662,7 +3667,7 @@ setInterval(()=>{if(SV.tour||tourI>=0)return;if(SV.cleared[0]||Object.keys(SV.ow
 
 // money makers: passives climb with rarity, and only Commons get the non-money ones
 HEROES.forEach(h=>{if(h.cls!=='farm')return;let k=h.p.k;if(h.r>=1&&k!=='harvest'&&k!=='jackpot')k=h.r>=3?'harvest':'jackpot';if(k!=='harvest'&&k!=='jackpot')return;
- const v=k==='harvest'?{p:[8,10,12,15,20,30][h.r],max:[100,125,150,190,250,375][h.r]}:{c:[25,40,60,80,100,150][h.r]};h.p={...h.p,k,n:k===h.p.k?h.p.n:PAS[k].names[h.id%4],v,d:PAS[k].d(v)};});
+ const v=k==='harvest'?{p:[8,10,12,15,20,30,40][h.r],max:[100,125,150,190,250,375,500][h.r]}:{c:[25,40,60,80,100,150,200][h.r]};h.p={...h.p,k,n:k===h.p.k?h.p.n:PAS[k].names[h.id%4],v,d:PAS[k].d(v)};});
 
 // ---- Freedom Squad: hand-set designs ----
 (function(){const D={
