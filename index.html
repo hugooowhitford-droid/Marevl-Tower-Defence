@@ -4081,10 +4081,14 @@ async function showLeaderboard(k){k=k||'best';
   b.querySelector('#lbX').onclick=closeModal;LB.forEach(([kk,n])=>{const t=mk('button','bb sm '+(kk===k?'gold':'gray'),n);t.onclick=()=>showLeaderboard(kk);b.querySelector('#lbT').appendChild(t);});
   const L=b.querySelector('#lbL');if(!ON.ready){L.textContent='Online services are not available right now.';return;}
   if(ON.user&&ON.name)await cloudUp(true);
-  try{const q=await ON.db.collection('profiles').orderBy(k,'desc').limit(50).get();const lab=LB.find(x=>x[0]===k)[2];
-   if(q.empty){L.innerHTML='<p style="text-align:center">No players yet. Be the first!</p>';return;}
-   L.innerHTML='';let i=0;q.forEach(d=>{i++;const p=d.data(),me=ON.user&&d.id===ON.user.uid;const r=mk('div','',`<span class="L" style="display:inline-block;width:44px;color:${i===1?'#ffd23f':i===2?'#dfe4ec':i===3?'#e09f5a':'#fff'}">${i<=3?['🥇','🥈','🥉'][i-1]:'#'+i}</span><span style="flex:1">${esc(p.name)}${p.dev?' <span style="background:linear-gradient(90deg,#ff3b6b,#ffb020);color:#fff;border-radius:6px;padding:0 6px;font-size:11px;font-family:Lilita One">🛠️ DEV</span>':''}${me?' <b style="color:#7dff8a">(you)</b>':''}</span><span class="L">${(+p[k]||0).toLocaleString()} <span style="font-size:11px;opacity:.7">${lab}</span></span>`);
-    r.style.cssText=`display:flex;align-items:center;gap:6px;padding:6px 10px;margin:3px 0;border-radius:10px;background:${me?'rgba(56,201,90,.3)':'rgba(0,0,0,.3)'}`;L.appendChild(r);});
+  try{const q=await ON.db.collection('profiles').orderBy(k,'desc').limit(120).get();const lab=LB.find(x=>x[0]===k)[2];
+   const all=q.docs.map(d=>({id:d.id,p:d.data()})),players=all.filter(x=>!x.p.dev).slice(0,50),devs=all.filter(x=>x.p.dev).slice(0,20);
+   const row=(x,i,dev)=>{const p=x.p,me=ON.user&&x.id===ON.user.uid;const r=mk('div','',`<span class="L" style="display:inline-block;width:44px;color:${dev?'#ffb020':i===1?'#ffd23f':i===2?'#dfe4ec':i===3?'#e09f5a':'#fff'}">${!dev&&i<=3?['🥇','🥈','🥉'][i-1]:'#'+i}</span><span style="flex:1">${esc(p.name)}${dev?' <span style="background:linear-gradient(90deg,#ff3b6b,#ffb020);color:#fff;border-radius:6px;padding:0 6px;font-size:11px;font-family:Lilita One">🛠️ DEV</span>':''}${me?' <b style="color:#7dff8a">(you)</b>':''}</span><span class="L">${(+p[k]||0).toLocaleString()} <span style="font-size:11px;opacity:.7">${lab}</span></span>`);
+    r.style.cssText=`display:flex;align-items:center;gap:6px;padding:6px 10px;margin:3px 0;border-radius:10px;background:${me?'rgba(56,201,90,.3)':dev?'rgba(255,90,60,.16)':'rgba(0,0,0,.3)'}`;return r;};
+   L.innerHTML='';
+   if(!players.length)L.appendChild(mk('p','','<span style="display:block;text-align:center">No players yet. Be the first!</span>'));
+   players.forEach((x,n)=>L.appendChild(row(x,n+1,false)));
+   if(devs.length){const h=mk('div','L',`🛠️ DEVS <span style="font-size:12px;opacity:.75;font-family:Nunito;font-weight:800">(used dev codes, not ranked with players)</span>`);h.style.cssText='margin:12px 0 4px;padding-top:8px;border-top:2px dashed rgba(255,176,32,.5);color:#ffb020;font-size:17px';L.appendChild(h);devs.forEach((x,n)=>L.appendChild(row(x,n+1,true)));}
    if(!ON.user)L.appendChild(mk('p','','<span style="opacity:.8">Sign in to get on the leaderboard!</span>'));
   }catch(e){L.textContent='Could not load the leaderboard. Try again soon.';}});}
 
