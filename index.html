@@ -3964,6 +3964,8 @@ function illuUnit(king){const h=king.h;return Object.assign({},h,{name:'Mirage I
  'Thunder Lord':{d:{shirt:'#2f3238',sleeve:'#7d838f',pants:'#2a2d33',boot:'#2a2d33',glove:'#2f3238',belt:'#2f3238',accent:'#c3cad4',beard:1,hair:'#e9c46a',noCrest:true,cape:'#a3192b'},suit:{pat:17,capeC:'#a3192b'}},
  'Vinestrider':{d:{antLegs:false,goldLegs:true,vineWrap:false,sidePanels:true,bigEyes:true,eyeC:'#ffffff',stripe:null,shirt:'#c1121f',sleeve:'#c1121f',pants:'#18181c',boot:'#c1121f',glove:'#c1121f',belt:'#d4a017',accent:'#d4a017',chin:'#c1121f',noCrest:true},suit:{pat:13}}};
  HEROES.forEach(h=>{const X=RD[h.name];if(!X||!h.legend)return;Object.assign(h.d,X.d);h.d.suit=Object.assign(h.d.suit||{},X.suit);});})();
+// ---- rarity power gap: Mythics and ULTRAs clearly stronger ----
+HEROES.forEach(h=>{if(h.cls==='farm'||!h.dmg)return;if(h.r===4){h.dmg=+(h.dmg*1.6).toFixed(1);h.range=Math.round(h.range*1.08);}else if(h.r===5){h.dmg=+(h.dmg*2).toFixed(1);h.range=Math.round(h.range*1.1);}});
 // ---- Runesage is now the Supreme Wizard (oname keeps his effects) ----
 HEROES.forEach(h=>{if(h.name==='Runesage'){h.oname='Runesage';h.name='Supreme Wizard';h.title='Master of the Mystic Arts';h.bio='The greatest wizard in Brickvale. He studied every ancient tablet and now casts blazing orange spells that chain from enemy to enemy. (Legend)';}});
 // ================= ONLINE: accounts + cloud saves (Firebase) =================
