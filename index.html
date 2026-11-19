@@ -3343,6 +3343,10 @@ function suitPattern(g,h,b,tier,t){const d=h.d,S=d.suit,c2=lgrad(g,d.accent,-31,
   case 1:P([[-14,-33],[14,-33],[14,-27],[0,-19.5],[-14,-27]]);break;
   case 2:P([[-14,-33],[-7.5,-33],[-5,-12],[-14,-12]]);P([[14,-33],[7.5,-33],[5,-12],[14,-12]]);break;
   case 3:P([[-3,-33],[3,-33],[3,-12],[-3,-12]]);break;
+  case 11:{const SW=2.4;for(let i=0;i<5;i++){const x0=-6+i*SW;g.fillStyle=i%2?'#ece6d8':'#a3192b';g.fillRect(x0,-24.6+b,SW,10.4);}g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=.5;g.strokeRect(-6,-24.6+b,12,10.4);
+   g.fillStyle='#ece6d8';g.fillRect(-14,-25.4+b,28,1);
+   for(const sx of[-1,1]){g.beginPath();g.moveTo(sx*6.4,-33+b);g.lineTo(sx*8.6,-33+b);g.lineTo(sx*8.2,-12+b);g.lineTo(sx*6.6,-12+b);g.closePath();g.fillStyle='#6b4226';g.fill();g.stroke();g.fillStyle='#c9b48a';g.beginPath();g.arc(sx*7.5,-29.6+b,.6,0,7);g.fill();}
+   g.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?1.35:3.3;g.lineTo(Math.cos(a)*q,-29.2+b+Math.sin(a)*q);}g.closePath();g.fillStyle='#f4f6fa';g.fill();g.strokeStyle='rgba(0,0,0,.4)';g.lineWidth=.45;g.stroke();break;}
   case 4:P([[-14,-33],[6,-33],[-8,-12],[-14,-12]]);break;
   case 5:P([[-14,-26],[-8,-24],[-3,-26.5],[3,-23.5],[8,-26],[14,-24],[14,-20.5],[8,-22.5],[3,-20],[-3,-23],[-8,-20.5],[-14,-22.5]]);break;
   case 6:P([[-14,-33],[14,-33],[14,-27.4],[5,-26.2],[0,-27.6],[-5,-26.2],[-14,-27.4]]);break;
@@ -3678,7 +3682,7 @@ HEROES.forEach(h=>{if(h.cls!=='farm')return;let k=h.p.k;if(h.r>=1&&k!=='harvest'
 
 // ---- Freedom Squad: hand-set designs ----
 (function(){const D={
- 'Captain Freedom':{weapon:'towershield',starShield:true,wingHelm:true,helmC:'#2a4a9a',shieldRed:'#c8102e',silver:true,stripe:'#c8102e',eyeC:'#e0fbfc',chin:'#16244a',outfit:'suit',shirt:'#1f3a7a',accent:'#c8102e',pants:'#16244a',boot:'#a9b2bf',sleeve:'#1f3a7a',glove:'#c8102e',belt:'#c8102e',mask:6,hat:0,acc:'',cape:'#a9b2bf',path:0,tallBoot:true,longGlove:true,trunks:false,suit:{pat:6,em:15,back:3,backC:'#a9b2bf',emC:'#16244a',fin:false,capeC:'#a9b2bf'},ult:"Freedom's Stand"},
+ 'Captain Freedom':{weapon:'towershield',starShield:true,wingHelm:true,helmC:'#2a4a9a',noCrest:true,shieldRed:'#c8102e',silver:true,stripe:'#c8102e',eyeC:'#e0fbfc',chin:'#16244a',outfit:'suit',shirt:'#283c6e',accent:'#a3192b',pants:'#22325c',boot:'#3a2a1e',sleeve:'#283c6e',glove:'#6b4226',belt:'#5a3a22',mask:6,hat:0,acc:'',cape:null,path:0,tallBoot:true,longGlove:true,trunks:false,suit:{pat:11,em:15,back:0,backC:'#a9b2bf',emC:'#16244a',fin:false,capeC:null},ult:"Freedom's Stand"},
  'Tyrant':{skin:'#5e6e3b',outfit:'bare',shirt:'#5e6e3b',accent:'#8a9a3f',pants:'#2e2d38',boot:'#1c1b24',hat:1,glove:'#4a5a2c',belt:'#3a3a4a',mask:0,acc:'',cape:null,path:4,tallBoot:false,longGlove:false,trunks:false,beard:0,suit:{pat:4,em:21,back:5,backC:'#8a9a3f',emC:'#ffffff',fin:false,capeC:'#2b2d42'},ult:'Tyrant Rampage',bare:1},
  'Thunder Lord':{outfit:'suit',longHair:true,hair:'#f2cf63',beard:2,shirt:'#7d838f',accent:'#e9c46a',pants:'#5c626e',boot:'#3f444e',sleeve:'#7d838f',glove:'#3f444e',belt:'#e9c46a',mask:0,hat:0,acc:'',cape:'#b3192b',path:1,tallBoot:true,longGlove:false,trunks:false,suit:{pat:0,em:1,back:1,backC:'#e9c46a',emC:'#1d3557',fin:false,capeC:'#b3192b'},ult:'Thunder Judgement'},
  'Iron Guardian':{goldChest:true,body:'lean',fly:true,weapon:'rocketfist',outfit:'armor',eyeC:'#7df9ff',chin:'#c9d1dc',shirt:'#a4161a',accent:'#dfe5ee',pants:'#a4161a',boot:'#c9d1dc',sleeve:'#a4161a',glove:'#c9d1dc',belt:'#aeb6c4',veins:true,legVeins:true,veinC:'#ff3b3b',mask:7,hat:0,acc:'mechwings',cape:null,path:1,tallBoot:true,longGlove:true,trunks:false,suit:{pat:0,em:9,back:0,backC:'#1c2030',emC:'#7df9ff',fin:false,capeC:'#2b2d42'},ult:'Iron Barrage'},
