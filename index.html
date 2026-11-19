@@ -279,7 +279,7 @@ canvas{display:block}
   <div class="scr" id="index">
     <button class="bb sm gray back" data-go="lobby">◀ Lobby</button>
     <div class="L out" style="position:absolute;left:150px;top:12px;font-size:34px"><span class="title" style="position:static;font-size:38px;display:inline">HEROES</span> <span style="font-size:20px" id="collTxt2"></span></div>
-    <div style="position:absolute;left:520px;top:16px;display:flex;gap:6px"><span class="pill" style="font-size:16px">🔮 <b class="cryTxt">0</b></span><span class="pill" style="font-size:16px">💠 <b class="shTxt">0</b></span><span class="pill" style="font-size:16px" data-tip="<b>Hero Dust ✨</b><br>From duplicate summons. Spend it to craft heroes you don't have yet.">✨ <b class="dustTxt">0</b></span></div>
+    <div style="position:absolute;left:520px;top:16px;display:flex;gap:6px"><span class="pill" style="font-size:16px">🔮 <b class="cryTxt">0</b></span><span class="pill" style="font-size:16px">💠 <b class="shTxt">0</b></span><span class="pill" style="font-size:16px" data-tip="<b>Hero Dust ✨</b><br>From duplicate summons. Spend it to add ★ stars to heroes you own.">✨ <b class="dustTxt">0</b></span></div>
     <div class="team" id="teamBar"></div>
     <div class="filters" id="filters"></div>
     <div id="grid"></div>
@@ -2977,7 +2977,7 @@ const AFF_POOL=[n=>`${n} still gets butterflies before every boss fight, but wou
 function affLines(h){const rg=mulberry32(h.id*97+5),ix=new Set();while(ix.size<3)ix.add(Math.floor(rg()*AFF_POOL.length));return[...ix].map(i=>AFF_POOL[i](h.name.split(' ')[0]));}
 // ---------- CRAFTING ----------
 const DUST_GAIN=[5,10,25,60,150,300,500],DUST_COST=[60,120,300,800,2000,4000,9999];
-function craftHero(id){const h=HEROES[id],c=DUST_COST[h.r]*(SV.owned[id]?.5:1);if(h.ev||SV.mats.dust<c||(SV.owned[id]||0)>=5)return;SV.mats.dust-=c;SV.st.crafts++;if(!SV.owned[id])SV.owned[id]=1;else SV.owned[id]++;save();refreshGems();chime();buildIndex();}
+function craftHero(id){const h=HEROES[id],c=DUST_COST[h.r]*(SV.owned[id]?.5:1);if(h.ev||!SV.owned[id]||SV.mats.dust<c||(SV.owned[id]||0)>=5)return;SV.mats.dust-=c;SV.st.crafts++;if(!SV.owned[id])SV.owned[id]=1;else SV.owned[id]++;save();refreshGems();chime();buildIndex();}
 // ---------- ACHIEVEMENTS ----------
 const STD_MYTHS=HEROES.filter(h=>h.r===4&&!h.ev).map(h=>h.id),LEG_IDS=HEROES.filter(h=>h.legend).map(h=>h.id);
 const ACH=[
@@ -3003,7 +3003,7 @@ const ACH=[
  {k:'flaw',i:'🛡️',n:'Untouchable',d:'Win a story chapter without losing any City HP.',f:()=>SV.st.flawless>=1},
  {k:'ally',i:'🤖',n:'Team Player',d:'Win an Ally Assault.',f:()=>SV.st.ally>=1},
  {k:'relic6',i:'🎒',n:'Treasure Hunter',d:'Find 6 relics.',f:()=>SV.relics.length>=6},
- {k:'craft',i:'✨',n:'Dust to Glory',d:'Craft a hero with Hero Dust.',f:()=>SV.st.crafts>=1},
+ {k:'craft',i:'✨',n:'Dust to Glory',d:'Add a ★ star to a hero with Hero Dust.',f:()=>SV.st.crafts>=1},
  {k:'aff3',i:'💖',n:'Best Friends',d:'Reach max affinity with a hero.',f:()=>Object.values(SV.aff).some(p=>p>=30)},
 ];
 let achQ=[];
@@ -3097,7 +3097,7 @@ function drawEd(){const cv=$('#edCv'),c=cv.getContext('2d'),th=THEMES[ED.theme];
 function edClick(e){const r=e.target.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)*1000/r.width/T),y=Math.floor((e.clientY-r.top)*520/r.height/T)+1;if(x<0||x>=COLS||y<1||y>13)return;
  const p=ED.pts;if(p.length){const l=p[p.length-1];if(Math.abs(x-l[0])>=Math.abs(y-l[1]))p.push([x,l[1]]);else p.push([l[0],y]);const n=p[p.length-1];if(n[0]===l[0]&&n[1]===l[1])p.pop();}else p.push([x,y]);if(p.length>40)p.pop();drawEd();sfx(700,.03);}
 
-function craftBtn(dv,h0){if(h0.ev||h0.r===6)return;const own=SV.owned[h0.id]||0;if(own>=5)return;const c=DUST_COST[h0.r]*(own?.5:1);const b=mk('button','bb sm gold',own?`✨ +1★ for ${c} Hero Dust`:`✨ Craft for ${c} Hero Dust`);b.style.cssText='width:100%;margin:5px 0;font-size:13px';b.disabled=(SV.mats.dust||0)<c;b.dataset.tip=`<b>Hero Dust ✨</b><br>You have ${SV.mats.dust||0}. Duplicate summons give Dust (more for rarer heroes). Event heroes can't be crafted.`;b.onclick=()=>{craftHero(h0.id);checkAch();};dv.appendChild(b);}
+function craftBtn(dv,h0){if(h0.ev||h0.r===6)return;const own=SV.owned[h0.id]||0;if(!own||own>=5)return;const c=DUST_COST[h0.r]*(own?.5:1);const b=mk('button','bb sm gold',own?`✨ +1★ for ${c} Hero Dust`:`✨ Craft for ${c} Hero Dust`);b.style.cssText='width:100%;margin:5px 0;font-size:13px';b.disabled=(SV.mats.dust||0)<c;b.dataset.tip=`<b>Hero Dust ✨</b><br>You have ${SV.mats.dust||0}. Duplicate summons give Dust (more for rarer heroes). Dust can only add stars to heroes you already own.`;b.onclick=()=>{craftHero(h0.id);checkAch();};dv.appendChild(b);}
 function affSect(dv,h0){const p=SV.aff[h0.id]||0,L=affLv(h0.id),nx=AFF_T[L],lines=affLines(h0);
  dv.appendChild(mk('div','sect',`<div class="L" style="font-size:15px;color:#ff8fab">💖 AFFINITY ${'💖'.repeat(L)}${'🤍'.repeat(3-L)}</div><div>+${L*3}% damage. ${nx?`${p}/${nx} points to the next heart (+1 per battle, +2 per win).`:'Max affinity!'}</div>${lines.map((s,i)=>`<div style="font-size:11.5px;font-style:italic;margin-top:2px;${i<L?'':'opacity:.55'}">${i<L?'“'+s+'”':'🔒 Story unlocks at '+(i+1)+' 💖'}</div>`).join('')}`));}
 function duoSect(dv,h0){duoOf(h0.id).forEach(D=>{const pid=D.a===h0.id?D.b:D.a;dv.appendChild(mk('div','sect',`<div class="L" style="font-size:15px;color:#7df9ff">🤝 DUO: ${D.n}</div><div>Place <b>${heroName(pid)}</b> within 5 tiles. Either hero's Ultimate then triggers: ${D.d}${SV.owned[pid]?'':' <span style="opacity:.7">(partner not owned yet)</span>'}</div>`));});}
@@ -3389,7 +3389,7 @@ function armBand(g,w,tier){const p=CUR.path,ec=ELS_GLOW;
 const SHOP=[
  {i:'🔮',n:'Trait Crystal',d:'Roll a trait on a hero.',c:150,f:()=>{SV.mats.cry++;}},
  {i:'💠',n:'Evo Shard',d:'Needed to evolve heroes.',c:300,f:()=>{SV.mats.sh++;}},
- {i:'✨',n:'Hero Dust ×60',d:'Craft heroes you are missing.',c:250,f:()=>{SV.mats.dust=(SV.mats.dust||0)+60;}},
+ {i:'✨',n:'Hero Dust ×60',d:'Add ★ stars to heroes you own.',c:250,f:()=>{SV.mats.dust=(SV.mats.dust||0)+60;}},
  {i:'🎒',n:'Relic Chest',d:'A random relic you don\'t own yet.',c:1200,ok:()=>SV.relics.length<RELICS.length,f:()=>{const r=grantRelic();if(r)setTimeout(()=>toast(r.i+' '+r.n+'!'),200);}},
  {i:'🎟️',n:'Mythic Ticket',d:'One guaranteed Mythic hero.',c:10000,f:()=>{SV.tickets=(SV.tickets||0)+1;}},
 ];
@@ -3401,7 +3401,7 @@ function showShop(){const day=Math.floor(Date.now()/864e5),deal=day%SHOP.length;
    const bt=mk('button','bb sm '+(can?'green':'gray'),price.toLocaleString()+' 💎');bt.disabled=!can;bt.style.marginTop='4px';bt.onclick=()=>{if(SV.gems<price)return;SV.gems-=price;it.f();save();refreshGems();chime();showShop();};c.appendChild(bt);b.querySelector('#shg').appendChild(c);});
   b.querySelector('#shx').onclick=closeModal;});}
 const HUB=[
- {k:'hall',x:72,y:388,w:112,h:118,n:'HEROES',tip:'<b>Hero Hall</b><br>Pick your team of 5, roll traits, evolve, level up and craft heroes.',fn:()=>go('index')},
+ {k:'hall',x:72,y:388,w:112,h:118,n:'HEROES',tip:'<b>Hero Hall</b><br>Pick your team of 5, roll traits, evolve, level up and star up heroes.',fn:()=>go('index')},
  {k:'arcade',x:204,y:388,w:108,h:112,n:'SUMMON',tip:'<b>Summon Arcade</b><br>Pull the Hero Slots with gems 💎.',fn:()=>go('summon')},
  {k:'board',x:236,y:612,w:92,h:92,n:'QUESTS',tip:'<b>Quest Board</b><br>Goals with rewards. A red badge means something is ready to claim.',fn:()=>go('quests'),badge:()=>claimable()},
  {k:'gate',x:500,y:392,w:170,h:176,n:'PLAY',tip:'<b>Battle Gate</b><br>Story, Challenges, Rift Raid, Tower, Endless, Ally Assault and Map Maker.',fn:()=>go('modes')},
