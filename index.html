@@ -1373,7 +1373,8 @@ case 'bare':{const sk=d.skin,ln='rgba(25,5,45,.5)';
   const sg=g.createRadialGradient(-3,-43+b,1,0,-39+b,12);sg.addColorStop(0,shade(d.skin,.18));sg.addColorStop(1,shade(d.skin,-.14));g.fillStyle=sg;g.fill();outline(g);
   g.save();g.clip();g.fillStyle='rgba(30,10,40,.14)';g.beginPath();g.moveTo(2,-49+b);g.lineTo(10,-49+b);g.lineTo(10,-29+b);g.lineTo(2.6,-29.5+b);g.quadraticCurveTo(7,-36+b,2,-49+b);g.fill();
   g.fillStyle='rgba(0,0,0,.08)';g.beginPath();g.ellipse(0,-30.4+b,5,1.6,0,0,7);g.fill();g.restore();
-  drawFace(g,h,b,t,atk);if(!d.midHair)drawHair(g,h,b);if(d.cap){const C=d.cap;g.save();g.beginPath();g.moveTo(-10,-43.8+b);g.quadraticCurveTo(-10.6,-55+b,0,-55.6+b);g.quadraticCurveTo(10.6,-55+b,10,-43.8+b);g.closePath();g.fillStyle=lgrad(g,C,-56,-43);g.fill();outline(g,.9);
+  drawFace(g,h,b,t,atk);if(!d.midHair)drawHair(g,h,b);if(d.hexCrown){g.save();g.beginPath();g.moveTo(-9,-45.6+b);g.lineTo(-7.4,-53.6+b);g.lineTo(-4.6,-48.4+b);g.lineTo(0,-56.6+b);g.lineTo(4.6,-48.4+b);g.lineTo(7.4,-53.6+b);g.lineTo(9,-45.6+b);g.quadraticCurveTo(0,-48.8+b,-9,-45.6+b);g.closePath();g.fillStyle=lgrad(g,'#d1123f',-57,-45);g.fill();outline(g,.8);g.shadowColor='#ff2a55';g.shadowBlur=6;g.fillStyle='#ff6b8a';g.beginPath();g.arc(0,-49.6+b,1.1,0,7);g.fill();g.restore();}
+  if(d.mindGem){g.save();g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=.5;for(const sx of[-1,1]){g.beginPath();g.moveTo(sx*2.6,-52+b);g.quadraticCurveTo(sx*6.6,-48+b,sx*7.4,-40+b);g.stroke();}g.shadowColor='#ffd23f';g.shadowBlur=9;g.beginPath();g.moveTo(0,-50.4+b);g.lineTo(2,-48+b);g.lineTo(0,-45.6+b);g.lineTo(-2,-48+b);g.closePath();g.fillStyle='#ffe066';g.fill();g.restore();}if(d.cap){const C=d.cap;g.save();g.beginPath();g.moveTo(-10,-43.8+b);g.quadraticCurveTo(-10.6,-55+b,0,-55.6+b);g.quadraticCurveTo(10.6,-55+b,10,-43.8+b);g.closePath();g.fillStyle=lgrad(g,C,-56,-43);g.fill();outline(g,.9);
    g.strokeStyle='rgba(0,0,0,.3)';g.lineWidth=.45;g.beginPath();g.moveTo(0,-55.4+b);g.lineTo(0,-44+b);g.moveTo(-5.6,-54+b);g.quadraticCurveTo(-6.4,-49+b,-6,-44+b);g.moveTo(5.6,-54+b);g.quadraticCurveTo(6.4,-49+b,6,-44+b);g.stroke();g.fillStyle=shade(C,-.2);g.beginPath();g.arc(0,-55.4+b,.9,0,7);g.fill();
    g.beginPath();g.moveTo(-10.6,-44.4+b);g.quadraticCurveTo(0,-46.4+b,10.6,-44.4+b);g.quadraticCurveTo(11.4,-41.6+b,0,-40.8+b);g.quadraticCurveTo(-11.4,-41.6+b,-10.6,-44.4+b);g.closePath();g.fillStyle=lgrad(g,shade(C,-.15),-46,-40);g.fill();outline(g,.8);g.strokeStyle='rgba(255,255,255,.2)';g.lineWidth=.5;g.beginPath();g.moveTo(-8,-43.6+b);g.quadraticCurveTo(0,-45+b,8,-43.6+b);g.stroke();
    g.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?.95:2.3;g.lineTo(Math.cos(a)*q,-49.4+b+Math.sin(a)*q);}g.closePath();g.fillStyle='#f4f6fa';g.fill();g.restore();}if(d.midHair&&!d.muzzleOnly){const c=d.hair;g.save();g.lineJoin='round';
@@ -2238,7 +2239,7 @@ function spawnFoe(e,d=0){
 function tStats(t){const s=tStats0(t),h=t.h,pk=h.perk;
  if(G&&G.syn){s.dmg*=1+(G.syn[h.el]||0);if(h.ev)s.rate/=1+(G.synEv[h.ev]||0);}
  if(G&&G.dropOn)s.rate/=1.6;if(G&&G.bloom&&G.bloom.has(t.cx+','+t.cy))s.dmg*=1.25;
- if(!t.ally&&G){if(G.rel&&G.rel.size){if(hasRel('lens'))s.range*=1.06;if(hasRel('coin'))s.income*=1.15;if(hasRel('powder'))s.splash*=1.15;if(hasRel('feather'))s.rate/=1.06;if(hasRel('lamp')&&t.lvl>=2)s.det=true;}s.dmg*=1+.03*affLv(h.id);const tm=teamOf(h.id).k,tc=(G.tn&&G.tn[tm])||0;if(tc>=2)s.dmg*=1+TEAM_DMG[Math.min(tc,5)];if(tc>=3){if(tm==='circle')s.range*=1.08;if(tm==='zsquad'){s.range*=1.12;s.det=true;}if(tm==='bureau')s.rate/=1.08;if(tm==='eclipse')s.rate/=1.1;if(tm==='bolts')s.dmg*=1.12;}}
+ if(!t.ally&&G){if(G.rel&&G.rel.size){if(hasRel('lens'))s.range*=1.06;if(hasRel('coin'))s.income*=1.15;if(hasRel('powder'))s.splash*=1.15;if(hasRel('feather'))s.rate/=1.06;if(hasRel('lamp')&&t.lvl>=2)s.det=true;}s.dmg*=1+.03*affLv(h.id);const tm=teamOf(h.id).k,tc=(G.tn&&G.tn[tm])||0;if(tc>=2)s.dmg*=1+TEAM_DMG[Math.min(tc,5)];if(tc>=3){if(tm==='circle')s.range*=1.08;if(tm==='zsquad'){s.range*=1.12;s.det=true;}if(tm==='bureau')s.rate/=1.08;if(tm==='eclipse')s.rate/=1.1;if(tm==='bolts')s.dmg*=1.12;}if(tm==='hexpair'&&tc>=2){s.dmg*=1.15;s.range*=1.08;}}
  if(pk==='range')s.range*=1.25;if(pk==='speed')s.rate/=1.4;if(pk==='aoe'){s.splash*=1.3;s.chain+=2;if(h.cls==='melee'||h.cls==='slow')s.range*=1.2;}
  return s;}
 function tStats0(t){
@@ -3751,8 +3752,8 @@ TEAMS.push({k:'eclipse',n:'The Eclipse Order',i:'🌗',c:'#e9c46a',c2:'#1b1f3a',
 const ECL_IDS=HEROES.filter(h=>h.id>=155&&h.id<=160).map(h=>h.id);
 TEAMS.push({k:'cosmic',n:'The Cosmic Crew',i:'🚀',c:'#ff7a1a',c2:'#141b3a',pat:0,perk:'Members deal +15% damage to flying enemies',d:'A ragtag starship crew who crash-landed in Brickvale and stayed to protect it.'});
 const COS_IDS=HEROES.filter(h=>h.id>=181&&h.id<=186).map(h=>h.id);
-var TB_SET=new Set();
-const teamOf=id=>TB_SET&&TB_SET.has(id)?TEAMS.find(x=>x.k==='bolts'):id===212?TEAMS.find(x=>x.k==='eclipse'):(id>=161&&id<=180)||(id>=187&&id<=211)?TEAMS[0]:id>=181&&id<=186?TEAMS[9]:id>=155&&id<=160?TEAMS[8]:id>=148&&id<=154?TEAMS[7]:id>=142&&id<=147?TEAMS[6]:id>=136&&id<=141?TEAMS[5]:TEAMS[(id*7+3)%5];
+var TB_SET=new Set(),HX_SET=new Set();
+const teamOf=id=>HX_SET&&HX_SET.has(id)?TEAMS.find(x=>x.k==='hexpair'):TB_SET&&TB_SET.has(id)?TEAMS.find(x=>x.k==='bolts'):id===212?TEAMS.find(x=>x.k==='eclipse'):(id>=161&&id<=180)||(id>=187&&id<=211)?TEAMS[0]:id>=181&&id<=186?TEAMS[9]:id>=155&&id<=160?TEAMS[8]:id>=148&&id<=154?TEAMS[7]:id>=142&&id<=147?TEAMS[6]:id>=136&&id<=141?TEAMS[5]:TEAMS[(id*7+3)%5];
 const TEAM_DMG=[0,0,.05,.1,.15,.2];
 HEROES.forEach(h=>{const d=h.d,T=teamOf(h.id);if(!d.suit||h.name==='Silkweaver'||h.id>=136)return;d.accent=T.c;d.suit.pat=T.pat;d.belt=T.c;d.boot=T.c2;d.glove=T.c2;d.tallBoot=true;d.suit.team=T;
  if(Math.abs(lum(d.shirt)-lum(T.c))<.16)d.shirt=shade(d.shirt,lum(T.c)>.5?-.4:.4);if(d.sleeve!==d.skin)d.sleeve=d.shirt;
@@ -3966,6 +3967,19 @@ try{Object.assign(window.__BH,{showGalaxy,evolve,endGame,closeModal,heroName});}
   HEROES.push({id,name:Q.n,title:Q.ti,legend:1,r:Q.r,el:Q.el,cls:Q.cls,d,dmg:+(c.dmg*m).toFixed(1),range:Math.round(c.range*(1+.06*Q.r)),rate:c.rate,cost:r25(c.cost*(1+.3*Q.r)),
    splash:c.splash?c.splash+4*Q.r:0,chain:c.chain?c.chain+(Q.r>=3?1:0):0,slow:c.slow?+(c.slow-.04*Q.r).toFixed(2):0,income:0,buff:0,p:{k:Q.pk,n:Q.pn,v:pv,d:PAS[Q.pk].d(pv)},bio:Q.bio+' (Legend)',ult:{n:Q.ult,pow:1.25}});
   if(Q.n==='Sentinel'){HEROES[id].cost=400;HEROES[id].d.suit.pat=18;HEROES[id].d.voidD={shirt:'#050505',sleeve:'#050505',pants:'#050505',glove:'#050505',boot:'#050505',belt:'#050505',accent:'#050505',hair:'#050505',cape:'#050505',skin:'#0a0a0a',orbC:'#1a1a1a',orbC2:'#000000',noCrest:true};}TB_SET.add(id);});})();
+// ---- Scarlet Hex and Synthon ----
+(function(){TEAMS.push({k:'hexpair',n:'The Hexhaven Pair',i:'💞',c:'#d1123f',c2:'#2f6b3a',pat:0,perk:'With both placed: +15% damage and +8% range',d:'A chaos witch and the android who loves her. Together they bend reality.'});
+ const TB=TEAMS.find(x=>x.k==='hexpair');
+ const L=[
+  {n:'Scarlet Hex',ti:'the Chaos Witch',el:'fire',cls:'chain',w:'orbhand',r:4,body:'lean',outfit:'jacket',skin:'#f1d2b4',hair:'#9b1b30',coat:'#8a0f24',shirt:'#5a0a18',sleeve:'#8a0f24',accent:'#d1123f',pants:'#3a0710',boot:'#5a0a18',glove:'#8a0f24',belt:'#3a0710',pk:'crit',pn:'Chaos Hex',ult:'Reality Unravels',x:{longHair:true,hairTip:'#c0283f',hexCrown:true,orbC:'#ff2a55',orbC2:'#8a0f24',noCrest:true,cape:'#6e0b1c'},bio:'A young witch with wild red chaos magic. When she gets upset, reality itself starts to bend.'},
+  {n:'Synthon',ti:'the Gem Android',el:'tech',cls:'sniper',w:'eyebeam',r:4,body:'hero',outfit:'suit',skin:'#c4304a',hair:'#c4304a',shirt:'#2f6b3a',sleeve:'#2f6b3a',accent:'#ffd23f',pants:'#2f6b3a',boot:'#2f6b3a',glove:'#2f6b3a',belt:'#ffd23f',pk:'pierce',pn:'Gem Beam',ult:'Solar Gem Blast',x:{mindGem:true,cape:'#f2c400',noCrest:true,longGlove:true,tallBoot:true},bio:'An android built around a glowing golden gem. He can float through walls and fire beams from his forehead.'}];
+ L.forEach(Q=>{const id=HEROES.length,c=CLS[Q.cls],m=RAR[Q.r].m*1.12,rg=mulberry32(id*7919+13);
+  const d={skin:Q.skin,shirt:Q.shirt,sleeve:Q.sleeve,accent:Q.accent,pants:Q.pants,boot:Q.boot,glove:Q.glove,belt:Q.belt,hair:Q.hair,mask:0,hat:0,emblem:1,weapon:Q.w,acc:'',outfit:Q.outfit,coat:Q.coat||shade(Q.accent,-.4),cape:null,body:Q.body,beard:0,scar:false,tallBoot:true,longGlove:true,trunks:false,
+   suit:{pat:0,em:1,back:0,backC:'#000',emC:'#fff',fin:false,capeC:null,team:TB}};Object.assign(d,Q.x);
+  const pv=PAS[Q.pk].val(Q.r,rg);
+  HEROES.push({id,name:Q.n,title:Q.ti,legend:1,r:Q.r,el:Q.el,cls:Q.cls,d,dmg:+(c.dmg*m).toFixed(1),range:Math.round(c.range*(1+.06*Q.r)),rate:c.rate,cost:r25(c.cost*(1+.3*Q.r)),
+   splash:c.splash?c.splash+4*Q.r:0,chain:c.chain?c.chain+1:0,slow:0,income:0,buff:0,p:{k:Q.pk,n:Q.pn,v:pv,d:PAS[Q.pk].d(pv)},bio:Q.bio+' (Legend)',ult:{n:Q.ult,pow:1.25}});
+  HX_SET.add(id);});})();
 // ---- Tesseract Trials: evolve Mirage King ----
 const TES=[
  {n:'Space',c:'#3fb8ff',map:2,mods:['fast','ghosts'],diff:7.2,d:'Enemies blink through space. Fast and hidden.'},
