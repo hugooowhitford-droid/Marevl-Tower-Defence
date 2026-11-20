@@ -3965,7 +3965,7 @@ try{Object.assign(window.__BH,{showGalaxy,evolve,endGame,closeModal,heroName});}
   const pv=PAS[Q.pk].val(Q.r,rg);
   HEROES.push({id,name:Q.n,title:Q.ti,legend:1,r:Q.r,el:Q.el,cls:Q.cls,d,dmg:+(c.dmg*m).toFixed(1),range:Math.round(c.range*(1+.06*Q.r)),rate:c.rate,cost:r25(c.cost*(1+.3*Q.r)),
    splash:c.splash?c.splash+4*Q.r:0,chain:c.chain?c.chain+(Q.r>=3?1:0):0,slow:c.slow?+(c.slow-.04*Q.r).toFixed(2):0,income:0,buff:0,p:{k:Q.pk,n:Q.pn,v:pv,d:PAS[Q.pk].d(pv)},bio:Q.bio+' (Legend)',ult:{n:Q.ult,pow:1.25}});
-  if(Q.n==='Sentinel'){HEROES[id].d.suit.pat=18;HEROES[id].d.voidD={shirt:'#050505',sleeve:'#050505',pants:'#050505',glove:'#050505',boot:'#050505',belt:'#050505',accent:'#050505',hair:'#050505',cape:'#050505',skin:'#0a0a0a',orbC:'#1a1a1a',orbC2:'#000000',noCrest:true};}TB_SET.add(id);});})();
+  if(Q.n==='Sentinel'){HEROES[id].cost=400;HEROES[id].d.suit.pat=18;HEROES[id].d.voidD={shirt:'#050505',sleeve:'#050505',pants:'#050505',glove:'#050505',boot:'#050505',belt:'#050505',accent:'#050505',hair:'#050505',cape:'#050505',skin:'#0a0a0a',orbC:'#1a1a1a',orbC2:'#000000',noCrest:true};}TB_SET.add(id);});})();
 // ---- Tesseract Trials: evolve Mirage King ----
 const TES=[
  {n:'Space',c:'#3fb8ff',map:2,mods:['fast','ghosts'],diff:7.2,d:'Enemies blink through space. Fast and hidden.'},
