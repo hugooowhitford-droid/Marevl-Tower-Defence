@@ -1955,7 +1955,7 @@ $('#slotCv').addEventListener('click',e=>{const r=e.target.getBoundingClientRect
 // ================= INDEX =================
 let fil='all',selHero=null;
 const RRANK=[0,1,2,3,4,6,7,5],rk=r=>RRANK[r]??r;
-const FILTERS=[['all','All'],['owned','Owned'],['ev','Event'],[0,'Common'],[1,'Rare'],[2,'Epic'],[3,'Legendary'],[4,'Mythic'],[7,'Limited'],[5,'ULTRA'],[6,'Exclusive']];
+const FILTERS=[['all','All'],['owned','Owned'],['spare','📦 Spares'],['ev','Event'],[0,'Common'],[1,'Rare'],[2,'Epic'],[3,'Legendary'],[4,'Mythic'],[7,'Limited'],[5,'ULTRA'],[6,'Exclusive']];
 function buildIndex(){
  const tb=$('#teamBar');tb.innerHTML='<span class="L out" style="font-size:18px;margin-right:4px">TEAM</span>';
  for(let i=0;i<5;i++){const id=SV.team[i];const s=mk('div','slot'+(id!=null?' full':''));
@@ -1964,8 +1964,8 @@ function buildIndex(){
  const fs=$('#filters');fs.innerHTML='';
  FILTERS.forEach(([k,n])=>{const c=mk('div','fchip'+(fil===k?' on':''),n);if(typeof k==='number')c.style.color=RAR[k].c;c.onclick=()=>{fil=k;buildIndex();};fs.appendChild(c);});
  const gr=$('#grid');gr.innerHTML='';
- HEROES.filter(h=>!h.hidden&&(fil==='all'||(fil==='owned'?SV.owned[h.id]:fil==='ev'?h.ev:h.r===fil))).sort((a,b)=>(!!SV.owned[b.id]-!!SV.owned[a.id])||(rk(b.r)-rk(a.r))||(a.id-b.id)).forEach(h=>{
-  const own=SV.owned[h.id];const c=mk('div','hc'+(selHero===h.id?' sel':''));c.style.borderColor=own?RAR[h.r].c:'#3b4560';
+ HEROES.filter(h=>!h.hidden&&(fil==='all'||(fil==='owned'?SV.owned[h.id]:fil==='spare'?(SV.spare&&SV.spare[h.id]>0):fil==='ev'?h.ev:h.r===fil))).sort((a,b)=>(!!SV.owned[b.id]-!!SV.owned[a.id])||(rk(b.r)-rk(a.r))||(a.id-b.id)).forEach(h=>{
+  const own=SV.owned[h.id];const c=mk('div','hc'+(selHero===h.id?' sel':''));c.style.borderColor=own?RAR[h.r].c:'#3b4560';{const sp=(SV.spare&&SV.spare[h.id])||0;if(sp&&own){const bd=mk('div','',`📦 ×${sp}`);bd.style.cssText='position:absolute;right:6px;top:30px;z-index:3;background:#0b3d5a;color:#7df9ff;border:2px solid #7df9ff;border-radius:8px;padding:0 5px;font:900 12px Nunito';c.style.position='relative';c.appendChild(bd);c.dataset.spare=sp;}}
   c.appendChild(portrait(own?viewOf(h.id):h,78,80,1.6,{sil:!own}));if(own){const L=getLv(h.id);c.appendChild(mk('div','',`<span style="position:absolute;top:3px;left:4px;font:11px 'Lilita One';background:rgba(0,0,0,.55);border-radius:6px;padding:0 4px">Lv${L.lv}</span>`));}c.dataset.tip=own?`<b>${heroName(h.id)}</b><br>${RAR[h.r].n} ${CLS[h.cls].n} · ${ELS[h.el].i} ${ELS[h.el].n}<br>⚡ ${h.ult.n}<br>★ ${h.p.n}`:`<b>???</b><br>${RAR[h.r].n} hero${h.ev?' · event exclusive':''}. Not unlocked yet.`;const pc=c.lastChild;pc.style.margin='0 auto';pc.style.borderRadius='8px';
   c.appendChild(mk('div','nm',own?(isEvo(h.id)?'<span style="color:#ffd23f">✦</span> ':'')+heroName(h.id):'???'));
   c.appendChild(mk('div','stars',own?stars(own):'<span style="color:'+RAR[h.r].c+';font-weight:900">'+RAR[h.r].n+'</span>'));
