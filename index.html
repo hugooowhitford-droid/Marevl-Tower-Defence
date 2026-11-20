@@ -1264,8 +1264,7 @@ function drawMech(g,h,x,y,s,o){s*=.76;const T=o.still?0:(o.t||0),atk=o.atk||0,bo
  seg(tx+16,-56+b,ex,ey,5,RD);seg(ex,ey,hx2,hy2,4,RD2);g.beginPath();g.arc(ex,ey,2.2,0,7);g.fillStyle=GD(ex-2,ey-2,ex+2,ey+2);g.fill();outline(g,.5);
  for(let k=-1;k<=1;k++){const a=ang-.5+k*.45;g.save();g.translate(hx2,hy2);g.rotate(a);P([[0,-1.2],[5.6,-1.6],[8.4,.6],[5,.8],[0,1.2]],'#2b2d36',.5);g.restore();}
  g.restore();
- // pilot standing in front
- const pil={...h,d:{...KIKO_D},cls:'support'};drawAvatar(g,pil,x-15*s*(o.flip?-1:1),y+1*s,s*.62,{...o,atk:0,noShadow:0,evo:false,tier:0,_mech:1});}
+}
 const KIKO_D={skin:'#f1d2b4',shirt:'#dfe4ec',sleeve:'#dfe4ec',pants:'#cfd5de',boot:'#2b2d36',glove:'#2b2d36',belt:'#c0141f',accent:'#c0141f',hair:'#6b3d22',mask:0,hat:0,emblem:1,weapon:'none',acc:'goggles',outfit:'suit',coat:'#c0141f',cape:null,body:'small',beard:0,scar:false,tallBoot:true,longGlove:true,trunks:false,noCrest:true,midHair:false,cute:true,suit:{pat:0,em:1,back:0,backC:'#000',emC:'#fff',fin:false,capeC:null}};
 
 let VOIDC=null;
