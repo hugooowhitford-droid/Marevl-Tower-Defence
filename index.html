@@ -337,7 +337,7 @@ canvas{display:block}
   <div id="modal"><div class="box" id="mbox"></div></div>
 </div>
 
-<style>#evBanner,#tabEv,#evPill{display:none!important}</style>
+<style>#evBanner{display:none!important}</style>
 <script>
 // ================= ICONS: the game's own symbols instead of Apple emojis =================
 const ICO=(()=>{const O='#1b1f33';
@@ -613,7 +613,7 @@ const EVENTS=[
 ];
 EVENTS.forEach(ev=>{ev.heroes=[];ev.bio=[];});
 const evIndex=()=>Math.floor(Date.now()/3600000)%EVENTS.length;
-const curEv=()=>EVENTS[evIndex()];
+const curEv=()=>EVENTS.find(e=>e.k==='web')||EVENTS[evIndex()];
 const evMsLeft=()=>3600000-Date.now()%3600000;
 const evHeroes=ev=>HEROES.filter(h=>h.ev===ev.k&&!h.hidden);
 const fmtT=ms=>{const t=Math.floor(ms/1000);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0');};
@@ -1373,7 +1373,8 @@ case 'bare':{const sk=d.skin,ln='rgba(25,5,45,.5)';
   const sg=g.createRadialGradient(-3,-43+b,1,0,-39+b,12);sg.addColorStop(0,shade(d.skin,.18));sg.addColorStop(1,shade(d.skin,-.14));g.fillStyle=sg;g.fill();outline(g);
   g.save();g.clip();g.fillStyle='rgba(30,10,40,.14)';g.beginPath();g.moveTo(2,-49+b);g.lineTo(10,-49+b);g.lineTo(10,-29+b);g.lineTo(2.6,-29.5+b);g.quadraticCurveTo(7,-36+b,2,-49+b);g.fill();
   g.fillStyle='rgba(0,0,0,.08)';g.beginPath();g.ellipse(0,-30.4+b,5,1.6,0,0,7);g.fill();g.restore();
-  drawFace(g,h,b,t,atk);if(!d.midHair&&!d.mindGem)drawHair(g,h,b);if(d.hexCrown){g.save();g.beginPath();g.moveTo(-9.4,-44.6+b);g.quadraticCurveTo(-11.6,-50+b,-12.4,-57.4+b);g.quadraticCurveTo(-9.4,-52+b,-6.6,-48.6+b);g.quadraticCurveTo(-3,-49.6+b,0,-47.6+b);g.quadraticCurveTo(3,-49.6+b,6.6,-48.6+b);g.quadraticCurveTo(9.4,-52+b,12.4,-57.4+b);g.quadraticCurveTo(11.6,-50+b,9.4,-44.6+b);g.quadraticCurveTo(5,-46.6+b,1.2,-45.2+b);g.lineTo(0,-42.6+b);g.lineTo(-1.2,-45.2+b);g.quadraticCurveTo(-5,-46.6+b,-9.4,-44.6+b);g.closePath();g.fillStyle=lgrad(g,'#a8142e',-57,-42);g.fill();outline(g,.8);g.strokeStyle='rgba(255,140,160,.45)';g.lineWidth=.5;g.beginPath();g.moveTo(-10.6,-52+b);g.quadraticCurveTo(-8,-48.6+b,-3,-48.4+b);g.moveTo(10.6,-52+b);g.quadraticCurveTo(8,-48.6+b,3,-48.4+b);g.stroke();g.restore();}
+  drawFace(g,h,b,t,atk);if(!d.midHair&&!d.mindGem)drawHair(g,h,b);if(d.mohawk){g.save();g.beginPath();g.moveTo(-2.6,-48+b);for(let i=0;i<6;i++){const x=-2.4+i*1;g.lineTo(x-.4,-50+b-(6+Math.sin(i*1.7)*1.6)*(1-Math.abs(i-2.5)/4));g.lineTo(x+.5,-48.6+b);}g.lineTo(2.8,-48+b);g.closePath();g.fillStyle=lgrad(g,d.mohawk,-58,-48);g.fill();outline(g,.6);g.restore();}
+  if(d.hexCrown){g.save();g.beginPath();g.moveTo(-9.4,-44.6+b);g.quadraticCurveTo(-11.6,-50+b,-12.4,-57.4+b);g.quadraticCurveTo(-9.4,-52+b,-6.6,-48.6+b);g.quadraticCurveTo(-3,-49.6+b,0,-47.6+b);g.quadraticCurveTo(3,-49.6+b,6.6,-48.6+b);g.quadraticCurveTo(9.4,-52+b,12.4,-57.4+b);g.quadraticCurveTo(11.6,-50+b,9.4,-44.6+b);g.quadraticCurveTo(5,-46.6+b,1.2,-45.2+b);g.lineTo(0,-42.6+b);g.lineTo(-1.2,-45.2+b);g.quadraticCurveTo(-5,-46.6+b,-9.4,-44.6+b);g.closePath();g.fillStyle=lgrad(g,'#a8142e',-57,-42);g.fill();outline(g,.8);g.strokeStyle='rgba(255,140,160,.45)';g.lineWidth=.5;g.beginPath();g.moveTo(-10.6,-52+b);g.quadraticCurveTo(-8,-48.6+b,-3,-48.4+b);g.moveTo(10.6,-52+b);g.quadraticCurveTo(8,-48.6+b,3,-48.4+b);g.stroke();g.restore();}
   if(d.mindGem){g.save();g.beginPath();g.moveTo(-2.2,-42.4+b);g.quadraticCurveTo(-2.8,-45.6+b,-2.4,-47.6+b);g.quadraticCurveTo(0,-48.4+b,2.4,-47.6+b);g.quadraticCurveTo(2.8,-45.6+b,2.2,-42.4+b);g.quadraticCurveTo(0,-43+b,-2.2,-42.4+b);g.closePath();g.fillStyle=metal(g,-3,-48+b,3,-42+b,'#c3cad4');g.fill();g.strokeStyle='rgba(0,0,0,.3)';g.lineWidth=.4;g.stroke();g.strokeStyle='rgba(60,10,40,.35)';g.lineWidth=.5;for(const sx of[-1,1]){g.beginPath();g.moveTo(sx*3,-47+b);g.quadraticCurveTo(sx*6,-45+b,sx*7,-40.6+b);g.stroke();}g.shadowColor='#ffd23f';g.shadowBlur=9;g.beginPath();g.moveTo(0,-45.6+b);g.lineTo(1.5,-43.8+b);g.lineTo(0,-42+b);g.lineTo(-1.5,-43.8+b);g.closePath();g.fillStyle='#ffe066';g.fill();g.restore();}if(d.cap){const C=d.cap;g.save();g.beginPath();g.moveTo(-10,-43.8+b);g.quadraticCurveTo(-10.6,-55+b,0,-55.6+b);g.quadraticCurveTo(10.6,-55+b,10,-43.8+b);g.closePath();g.fillStyle=lgrad(g,C,-56,-43);g.fill();outline(g,.9);
    g.strokeStyle='rgba(0,0,0,.3)';g.lineWidth=.45;g.beginPath();g.moveTo(0,-55.4+b);g.lineTo(0,-44+b);g.moveTo(-5.6,-54+b);g.quadraticCurveTo(-6.4,-49+b,-6,-44+b);g.moveTo(5.6,-54+b);g.quadraticCurveTo(6.4,-49+b,6,-44+b);g.stroke();g.fillStyle=shade(C,-.2);g.beginPath();g.arc(0,-55.4+b,.9,0,7);g.fill();
    g.beginPath();g.moveTo(-10.6,-44.4+b);g.quadraticCurveTo(0,-46.4+b,10.6,-44.4+b);g.quadraticCurveTo(11.4,-41.6+b,0,-40.8+b);g.quadraticCurveTo(-11.4,-41.6+b,-10.6,-44.4+b);g.closePath();g.fillStyle=lgrad(g,shade(C,-.15),-46,-40);g.fill();outline(g,.8);g.strokeStyle='rgba(255,255,255,.2)';g.lineWidth=.5;g.beginPath();g.moveTo(-8,-43.6+b);g.quadraticCurveTo(0,-45+b,8,-43.6+b);g.stroke();
@@ -1680,7 +1681,7 @@ function setSummonMode(m){summonMode=m;const ev=curEv(),evm=m==='event';
  $('#summon').style.background=evm?`radial-gradient(circle at 30% 50%,${ev.bg[0]},${ev.bg[1]} 75%)`:'';
  $('#spin1').innerHTML=evm?`SPIN ×1 &nbsp;${ev.ci}50`:'SPIN ×1 &nbsp;💎100';$('#spin10').innerHTML=evm?`SPIN ×10 &nbsp;${ev.ci}450`:'SPIN ×10 &nbsp;💎900';
  $('#tabStd').style.outline=evm?'none':'3px solid #fff';$('#tabEv').style.outline=evm?'3px solid #fff':'none';$('#tabEv').textContent=ev.i+' '+ev.n;
- if(evm){const E=evData(ev.k);$('#oddsBox').innerHTML=`<div style="opacity:.85;font-size:13px">${ev.i} ${ev.n.toUpperCase()} · ends in <b class="evT">${fmtT(evMsLeft())}</b></div><div style="font-size:12px;opacity:.8;margin-bottom:4px">Event heroes only! Earn ${ev.ci} ${ev.cur} by playing any mode while this event is on.</div><div id="evRow" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div><div style="font-size:13px;margin-top:6px">🎯 Mythic guaranteed in <b>${40-(E.pity||0)}</b> pulls · You have <b>${E.c} ${ev.ci}</b></div>`;
+ if(evm){const E=evData(ev.k);$('#oddsBox').innerHTML=`<div style="opacity:.85;font-size:13px">${ev.i} ${ev.n.toUpperCase()} · <b>LIMITED EVENT</b></div><div style="font-size:12px;opacity:.8;margin-bottom:4px">Event heroes only! Earn ${ev.ci} ${ev.cur} by playing any mode while this event is on.</div><div id="evRow" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"></div><div style="font-size:13px;margin-top:6px">🎯 Mythic guaranteed in <b>${40-(E.pity||0)}</b> pulls · You have <b>${E.c} ${ev.ci}</b></div>`;
   evHeroes(ev).forEach(h=>{const c=mk('div','',`<div style="font-size:11px;font-weight:900;color:${RAR[h.r].c}">${RAR[h.r].n} ${EV_W[h.r]}%</div>`);c.style.textAlign='center';const pp=portrait(h,62,62,1.25,{foot:3});pp.style.margin='0 auto';pp.style.borderRadius='8px';pp.style.border='2px solid '+RAR[h.r].c;c.prepend(pp);c.appendChild(mk('div','',`<div style="font-size:10px;font-weight:900;line-height:1.05">${h.name}${SV.owned[h.id]?' ✓':''}</div>`));$('#evRow').appendChild(c);});
   reels.forEach(R=>{R.strip=Array.from({length:6},evRandId);R.pos=2;});}
  else $('#oddsBox').innerHTML='<div style="opacity:.75;font-size:13px">EVERY PULL = 1 HERO GUARANTEED</div>'+RAR.filter(r=>r.w).map(r=>`<div><span><i class="chip" style="background:${r.c}"></i>${r.n}</span><span>${r.w}%</span></div>`).join('');
@@ -1749,7 +1750,7 @@ function spin(n){
  if((evm?E.c:SV.gems)<cost){modal(`<div class="L out" style="font-size:28px">Not enough ${evm?ev.cur+' '+ev.ci:'gems 💎'}</div><p style="font-weight:800">${evm?'Play any mode while '+ev.n+' is on to earn '+ev.cur+'.':'Win story battles and survive waves to earn more.'}</p><button class="bb sm blue" id="ok">OK</button>`,b=>b.querySelector('#ok').onclick=closeModal);return;}
  if(evm)E.c-=cost;else SV.gems-=cost;refreshGems();
  let got;
- if(evm){got=[];const pool=evHeroes(ev);for(let i=0;i<n;i++){E.pity=(E.pity||0)+1;let r=rollEvR();if(E.pity>=40)r=4;if(r===4)E.pity=0;got.push(grantHero(pool.find(h=>h.r===r)));}}
+ if(evm){got=[];const pool=evHeroes(ev);for(let i=0;i<n;i++){E.pity=(E.pity||0)+1;let r=rollEvR();if(E.pity>=40)r=4;if(r===4)E.pity=0;{const pr=pool.filter(h=>h.r===r);got.push(grantHero(pr[Math.floor(Math.random()*pr.length)]||pool[0]));}}}
  else{const rs=[];for(let i=0;i<n;i++)rs.push(rollR());if(n===10&&Math.max(...rs)<1)rs[9]=1;got=rs.map(grant);}
  save();const rid=evm?evRandId:randId;
  const best=got.reduce((a,b)=>b.h.r>a.h.r?b:a).h;
@@ -1815,7 +1816,7 @@ function buildDetail(){
  const p=portrait(own?{...h,d:skinD(h0.d,SV.skin[h0.id])}:h,170,170,3.2,{sil:!own});p.style.borderRadius='14px';p.style.border='3px solid '+RAR[h.r].c;dv.appendChild(p);
  dv.appendChild(mk('div','L out',`<span style="font-size:24px">${own?(h.evo?'✦ ':'')+h.name:'??? '}</span>${own?`<div style="font-size:14px;color:#ffd23f">${h0.title}${h0.legend?' · ⚜ LEGEND':''}</div>`:''}`));
  dv.appendChild(mk('div','',`<span class="tag" style="color:${RAR[h.r].c}">${RAR[h.r].n}</span><span class="tag">${ELS[h.el].i} ${ELS[h.el].n}</span><span class="tag">${c.ic} ${c.n}</span>`));
- if(!own){const E=h.ev?EVENTS.find(e=>e.k===h.ev):null;dv.appendChild(mk('p','',E?`<b>${E.i} ${E.n} exclusive!</b><br>This event has ended, so this hero can no longer be unlocked.`:(h.r===6?`<b>EXCLUSIVE hero!</b><br>Reach Hero Pass tier 50 to unlock ${h.name}.`:`<b>Not unlocked yet.</b><br>Pull the Hero Slots for a chance to get this ${RAR[h.r].n} hero!`)));craftBtn(dv,h0);return;}
+ if(!own){const E=h.ev?EVENTS.find(e=>e.k===h.ev):null;dv.appendChild(mk('p','',E?(E.k==='web'?`<b>${E.i} ${E.n} exclusive!</b><br>Pull the Web-Verse slots (Summon → Event tab) with ${E.ci} ${E.cur}. Earn them in every battle.`:`<b>${E.i} ${E.n} exclusive!</b><br>This event has ended, so this hero can no longer be unlocked.`):(h.r===6?`<b>EXCLUSIVE hero!</b><br>Reach Hero Pass tier 50 to unlock ${h.name}.`:`<b>Not unlocked yet.</b><br>Pull the Hero Slots for a chance to get this ${RAR[h.r].n} hero!`)));craftBtn(dv,h0);return;}
  dv.appendChild(mk('div','stars',`<span style="font-size:18px">${stars(own)}</span>`));
  const sg=mk('div','statgrid');
  const rows=h.cls==='farm'?[['Income/wave','$'+h.income],['Cost','$'+h.cost]]:h.cls==='support'?[['Boost','+'+Math.round(h.buff*100)+'%'],['Range',h.range],['Cost','$'+h.cost]]:[['Damage',(h.dmg*(1+.08*(own-1))).toFixed(1)],['Range',h.range],['Attack every',h.rate+'s'],['Cost','$'+h.cost]];
@@ -2239,7 +2240,7 @@ function spawnFoe(e,d=0){
 function tStats(t){const s=tStats0(t),h=t.h,pk=h.perk;
  if(G&&G.syn){s.dmg*=1+(G.syn[h.el]||0);if(h.ev)s.rate/=1+(G.synEv[h.ev]||0);}
  if(G&&G.dropOn)s.rate/=1.6;if(G&&G.bloom&&G.bloom.has(t.cx+','+t.cy))s.dmg*=1.25;
- if(!t.ally&&G){if(G.rel&&G.rel.size){if(hasRel('lens'))s.range*=1.06;if(hasRel('coin'))s.income*=1.15;if(hasRel('powder'))s.splash*=1.15;if(hasRel('feather'))s.rate/=1.06;if(hasRel('lamp')&&t.lvl>=2)s.det=true;}s.dmg*=1+.03*affLv(h.id);const tm=teamOf(h.id).k,tc=(G.tn&&G.tn[tm])||0;if(tc>=2)s.dmg*=1+TEAM_DMG[Math.min(tc,5)];if(tc>=3){if(tm==='circle')s.range*=1.08;if(tm==='zsquad'){s.range*=1.12;s.det=true;}if(tm==='bureau')s.rate/=1.08;if(tm==='eclipse')s.rate/=1.1;if(tm==='bolts')s.dmg*=1.12;}if(tm==='hexpair'&&tc>=2){s.dmg*=1.15;s.range*=1.08;}}
+ if(!t.ally&&G){if(G.rel&&G.rel.size){if(hasRel('lens'))s.range*=1.06;if(hasRel('coin'))s.income*=1.15;if(hasRel('powder'))s.splash*=1.15;if(hasRel('feather'))s.rate/=1.06;if(hasRel('lamp')&&t.lvl>=2)s.det=true;}s.dmg*=1+.03*affLv(h.id);const tm=teamOf(h.id).k,tc=(G.tn&&G.tn[tm])||0;if(tc>=2)s.dmg*=1+TEAM_DMG[Math.min(tc,5)];if(tc>=3){if(tm==='circle')s.range*=1.08;if(tm==='zsquad'){s.range*=1.12;s.det=true;}if(tm==='bureau')s.rate/=1.08;if(tm==='eclipse')s.rate/=1.1;if(tm==='bolts')s.dmg*=1.12;}if(tm==='webs')s.det=true;if(tm==='hexpair'&&tc>=2){s.dmg*=1.15;s.range*=1.08;}}
  if(pk==='range')s.range*=1.25;if(pk==='speed')s.rate/=1.4;if(pk==='aoe'){s.splash*=1.3;s.chain+=2;if(h.cls==='melee'||h.cls==='slow')s.range*=1.2;}
  return s;}
 function tStats0(t){
@@ -3490,6 +3491,9 @@ function suitPattern(g,h,b,tier,t){const d=h.d,S=d.suit,c2=lgrad(g,d.accent,-31,
    g.fillStyle='#1a0408';g.beginPath();g.roundRect(-4.2,-33.6+b,8.4,1.6,.6);g.fill();g.fillStyle='#ff4d6d';g.beginPath();g.arc(0,-32.8+b,.6,0,7);g.fill();break;}
   case 20:{g.strokeStyle='rgba(130,40,110,.65)';g.lineWidth=.7;g.lineCap='round';for(const P of[[[-12,-28],[-7,-24],[-9,-18],[-5,-14]],[[12,-28],[7,-24],[9,-18],[5,-14]],[[-3,-22],[0,-19],[3,-22]]]){g.beginPath();P.forEach(([x,y],i)=>i?g.lineTo(x,y+b):g.moveTo(x,y+b));g.stroke();}
    g.beginPath();g.moveTo(-12,-33.4+b);g.lineTo(12,-33.4+b);g.lineTo(9.6,-30+b);g.lineTo(2.2,-28.6+b);g.lineTo(0,-24.6+b);g.lineTo(-2.2,-28.6+b);g.lineTo(-9.6,-30+b);g.closePath();g.fillStyle=gold(g,-12,-34+b,12,-25+b);g.fill();g.strokeStyle='rgba(80,50,0,.6)';g.lineWidth=.5;g.stroke();g.strokeStyle='rgba(80,50,0,.45)';g.beginPath();g.moveTo(0,-33.2+b);g.lineTo(0,-25.4+b);g.stroke();break;}
+  case 21:{const WC=d.webC||'rgba(0,0,0,.55)';g.strokeStyle=WC;g.lineWidth=.45;const cx=0,cy=-26+b;for(let i=0;i<10;i++){const a=i*Math.PI/5;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.cos(a)*22,cy+Math.sin(a)*22);g.stroke();}for(const r of[4,8,12,16]){g.beginPath();for(let i=0;i<=10;i++){const a=i*Math.PI/5,a2=a-Math.PI/10,px=cx+Math.cos(a)*r,py=cy+Math.sin(a)*r;if(i===0)g.moveTo(px,py);else g.quadraticCurveTo(cx+Math.cos(a2)*r*.82,cy+Math.sin(a2)*r*.82,px,py);}g.stroke();}
+   const SC=d.spiderC||'#111';g.fillStyle=SC;g.strokeStyle=SC;g.lineWidth=.7;g.lineCap='round';g.beginPath();g.ellipse(0,-27.6+b,1.3,1.6,0,0,7);g.fill();g.beginPath();g.ellipse(0,-24.4+b,1.8,2.6,0,0,7);g.fill();for(const sx of[-1,1])for(let i=0;i<4;i++){const y=-27.8+b+i*1.2;g.beginPath();g.moveTo(sx*1,y);g.lineTo(sx*(3.4+i*.3),y-2+i*1.1);g.lineTo(sx*(4.6+i*.2),y+(i<2?-1.2:2.6));g.stroke();}
+   if(d.redLegs){g.fillStyle='rgba(0,0,0,0)';}break;}
   case 11:{const SW=2.4;for(let i=0;i<5;i++){const x0=-6+i*SW;g.fillStyle=i%2?'#ece6d8':'#a3192b';g.fillRect(x0,-24.6+b,SW,10.4);}g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=.5;g.strokeRect(-6,-24.6+b,12,10.4);
    g.fillStyle='#ece6d8';g.fillRect(-14,-25.4+b,28,1);
    for(const sx of[-1,1]){g.beginPath();g.moveTo(sx*6.4,-33+b);g.lineTo(sx*8.6,-33+b);g.lineTo(sx*8.2,-12+b);g.lineTo(sx*6.6,-12+b);g.closePath();g.fillStyle='#6b4226';g.fill();g.stroke();g.fillStyle='#c9b48a';g.beginPath();g.arc(sx*7.5,-29.6+b,.6,0,7);g.fill();}
@@ -3616,7 +3620,7 @@ $('#lobbyCv').addEventListener('mousemove',e=>{const B=lobbyHeroAt(e)!=null?null
 $('#lobbyCv').addEventListener('mouseleave',()=>{hubHover=null;});
 $('#lobbyCv').addEventListener('click',e=>{if(lobbyHeroAt(e)!=null)return;const B=hubAt(e);if(B){sfx(660,.08,'triangle',.05);hubHover=null;B.fn();}});
 const _lobbyTip=lobbyTip;lobbyTip=function(e){const a=_lobbyTip(e);if(a)return a;const B=hubAt(e);if(!B)return null;if(B.k==='tent'){const ev=curEv();return`<b>${ev.i} ${ev.n}</b><br>You have ${evData(ev.k).c} ${ev.ci} ${ev.cur}.<br>Ends in ${fmtT(evMsLeft())}. Click for the event slots and the event stage.`;}return B.tip;};
-const _evTick=evTick;evTick=function(){_evTick();const ev=curEv(),p=$('#evPill');if(p){p.innerHTML=ev.ci+' <b>'+evData(ev.k).c+'</b>';p.dataset.tip=`<b>${ev.cur} ${ev.ci}</b><br>${ev.n} currency. Spend it on the event slots.<br>Earn more in the Event Stage or buy it in the Shop.<br>This event ends in ${fmtT(evMsLeft())}.`;}};
+const _evTick=evTick;evTick=function(){_evTick();const ev=curEv(),p=$('#evPill');if(p){p.innerHTML=ev.ci+' <b>'+evData(ev.k).c+'</b>';p.dataset.tip=`<b>${ev.cur} ${ev.ci}</b><br>${ev.n} currency. Spend it on the event slots.<br>Earn more in every battle.`;}};
 
 // ================= V10: PAINTED TOWN SCENE =================
 function pCloud(g,cx,cy,sc,R,n){const bl=[];for(let i=0;i<(n||10);i++){const u=i/((n||10)-1)-.5;bl.push([cx+u*190*sc+(R()-.5)*30*sc,cy-(1-Math.abs(u)*1.7)*38*sc*(.6+R()*.6),(24+R()*26)*sc*(1-Math.abs(u)*.5)]);}
@@ -3756,8 +3760,8 @@ TEAMS.push({k:'eclipse',n:'The Eclipse Order',i:'🌗',c:'#e9c46a',c2:'#1b1f3a',
 const ECL_IDS=HEROES.filter(h=>h.id>=155&&h.id<=160).map(h=>h.id);
 TEAMS.push({k:'cosmic',n:'The Cosmic Crew',i:'🚀',c:'#ff7a1a',c2:'#141b3a',pat:0,perk:'Members deal +15% damage to flying enemies',d:'A ragtag starship crew who crash-landed in Brickvale and stayed to protect it.'});
 const COS_IDS=HEROES.filter(h=>h.id>=181&&h.id<=186).map(h=>h.id);
-var TB_SET=new Set(),HX_SET=new Set();
-const teamOf=id=>HX_SET&&HX_SET.has(id)?TEAMS.find(x=>x.k==='hexpair'):TB_SET&&TB_SET.has(id)?TEAMS.find(x=>x.k==='bolts'):id===212?TEAMS.find(x=>x.k==='eclipse'):(id>=161&&id<=180)||(id>=187&&id<=211)?TEAMS[0]:id>=181&&id<=186?TEAMS[9]:id>=155&&id<=160?TEAMS[8]:id>=148&&id<=154?TEAMS[7]:id>=142&&id<=147?TEAMS[6]:id>=136&&id<=141?TEAMS[5]:TEAMS[(id*7+3)%5];
+var TB_SET=new Set(),HX_SET=new Set(),WEB_SET=new Set();
+const teamOf=id=>WEB_SET&&WEB_SET.has(id)?TEAMS.find(x=>x.k==='webs'):HX_SET&&HX_SET.has(id)?TEAMS.find(x=>x.k==='hexpair'):TB_SET&&TB_SET.has(id)?TEAMS.find(x=>x.k==='bolts'):id===212?TEAMS.find(x=>x.k==='eclipse'):(id>=161&&id<=180)||(id>=187&&id<=211)?TEAMS[0]:id>=181&&id<=186?TEAMS[9]:id>=155&&id<=160?TEAMS[8]:id>=148&&id<=154?TEAMS[7]:id>=142&&id<=147?TEAMS[6]:id>=136&&id<=141?TEAMS[5]:TEAMS[(id*7+3)%5];
 const TEAM_DMG=[0,0,.05,.1,.15,.2];
 HEROES.forEach(h=>{const d=h.d,T=teamOf(h.id);if(!d.suit||h.name==='Silkweaver'||h.id>=136)return;d.accent=T.c;d.suit.pat=T.pat;d.belt=T.c;d.boot=T.c2;d.glove=T.c2;d.tallBoot=true;d.suit.team=T;
  if(Math.abs(lum(d.shirt)-lum(T.c))<.16)d.shirt=shade(d.shirt,lum(T.c)>.5?-.4:.4);if(d.sleeve!==d.skin)d.sleeve=d.shirt;
@@ -3984,6 +3988,25 @@ try{Object.assign(window.__BH,{showGalaxy,evolve,endGame,closeModal,heroName});}
   HEROES.push({id,name:Q.n,title:Q.ti,legend:1,r:Q.r,el:Q.el,cls:Q.cls,d,dmg:+(c.dmg*m).toFixed(1),range:Math.round(c.range*(1+.06*Q.r)),rate:c.rate,cost:r25(c.cost*(1+.3*Q.r)),
    splash:c.splash?c.splash+4*Q.r:0,chain:c.chain?c.chain+1:0,slow:0,income:0,buff:0,p:{k:Q.pk,n:Q.pn,v:pv,d:PAS[Q.pk].d(pv)},bio:Q.bio+' (Legend)',ult:{n:Q.ult,pow:1.25}});
   if(Q.n==='Scarlet Hex')HEROES[id].d.suit.pat=19;if(Q.n==='Synthon')HEROES[id].d.suit.pat=20;HX_SET.add(id);});})();
+// ---- Web-Verse event: web-slinging heroes from across the multiverse ----
+(function(){EVENTS.push({k:'web',n:'Web-Verse',i:'🕸️',cur:'Web Tokens',ci:'🕸️',bg:['#ff4d9d','#1b1340'],cab:['#e63946','#1d2a6b'],pal:['#e63946','#1d3557','#ff4d9d']});EVENTS[EVENTS.length-1].heroes=[];EVENTS[EVENTS.length-1].bio=[];
+ EVSTAGE.web=Object.assign({},EVSTAGE.neon,{n:'Multiverse Mayhem',boss:{n:'THE SPOT',col:'#f4f6fa',bi:3}});
+ TEAMS.push({k:'webs',n:'The Web Warriors',i:'🕸️',c:'#e63946',c2:'#1d2a6b',pat:0,perk:'Members see hidden enemies (with 3 placed)',d:'Web-slingers from different worlds who teamed up to protect every universe.'});
+ const TB=TEAMS.find(x=>x.k==='webs');
+ const L=[
+  {n:'Punk Spinner',ti:'the Riff Rebel',r:1,cls:'ranged',el:'lightning',outfit:'jacket',coat:'#2f5aa8',shirt:'#c1121f',sleeve:'#2f5aa8',pants:'#1b1b22',boot:'#c1121f',glove:'#1b1b22',belt:'#1b1b22',helm:'#c1121f',eye:'#f4f6fa',webC:'rgba(0,0,0,.45)',spider:'#111',x:{mohawk:'#e9ecef'},pk:'multi',pn:'Power Chord',ult:'Feedback Blast',bio:'A spider-hero who plays guitar loud enough to knock villains over. Rules are just suggestions.'},
+  {n:'Ghost Weaver',ti:'the Hooded Drummer',r:2,cls:'melee',el:'light',outfit:'suit',shirt:'#f4f6fa',sleeve:'#121216',pants:'#121216',boot:'#2ec4b6',glove:'#f4f6fa',belt:'#121216',helm:'#f4f6fa',eye:'#121216',webC:'rgba(255,77,157,.55)',spider:'#121216',x:{hood:'#f4f6fa'},pk:'first',pn:'Ballet Kick',ult:'Drop the Beat',bio:'A graceful web-slinger in a white hood. Fast, acrobatic and always one step ahead.'},
+  {n:'Night Web',ti:'the Detective in Black',r:2,cls:'sniper',el:'dark',outfit:'jacket',coat:'#141418',shirt:'#1b1b22',sleeve:'#141418',pants:'#141418',boot:'#0c0c10',glove:'#0c0c10',belt:'#2b2b33',helm:'#1b1b22',eye:'#c3cad4',webC:'rgba(255,255,255,.12)',spider:'#c3cad4',x:{fedora:'#121216'},pk:'hunter',pn:'Shadow Case',ult:'Midnight Verdict',bio:'A spider-detective from a black-and-white world. Never takes off his hat, never misses a clue.'},
+  {n:'Web Walker',ti:'the Original Spider',r:3,cls:'ranged',el:'tech',outfit:'suit',shirt:'#c8102e',sleeve:'#c8102e',pants:'#1f4fa8',boot:'#c8102e',glove:'#c8102e',belt:'#c8102e',helm:'#c8102e',eye:'#f4f6fa',webC:'rgba(0,0,0,.5)',spider:'#111',x:{},pk:'crit',pn:'Spider-Sense',ult:'Web Barrage',bio:'The friendly neighbourhood web-slinger who started it all. Tired, funny and still saving the day.'},
+  {n:'Midtown Shadow',ti:'the New Spider',r:3,cls:'melee',el:'lightning',outfit:'suit',shirt:'#121216',sleeve:'#121216',pants:'#121216',boot:'#c8102e',glove:'#121216',belt:'#121216',helm:'#121216',eye:'#f4f6fa',webC:'rgba(230,57,70,.7)',spider:'#e63946',x:{},pk:'stun',pn:'Venom Strike',ult:'Invisible Ambush',bio:'A teenage web-slinger in a black and red suit. He can turn invisible and zap enemies with a shocking punch.'},
+  {n:'Web Warrior 2099',ti:'the Future Spider',r:4,cls:'chain',el:'dark',outfit:'suit',shirt:'#1d2a6b',sleeve:'#1d2a6b',pants:'#1d2a6b',boot:'#1d2a6b',glove:'#1d2a6b',belt:'#1d2a6b',helm:'#1d2a6b',eye:'#ff2a3a',webC:'rgba(255,42,58,0)',spider:'#e01e2e',big:true,x:{orbC:'#ff2a3a',orbC2:'#5a0a14'},pk:'boss',pn:'Future Claws',ult:'Time Rip',bio:'A web-slinger from the year 2099 with sharp claws and a grumpy attitude. Leader of the Spider Society.'}];
+ L.forEach(Q=>{const id=HEROES.length,c=CLS[Q.cls],m=RAR[Q.r].m*1.12,rg=mulberry32(id*7919+13);
+  const d={skin:Q.helm,shirt:Q.shirt,sleeve:Q.sleeve,accent:Q.helm,pants:Q.pants,boot:Q.boot,glove:Q.glove,belt:Q.belt,hair:'#1b1b22',mask:7,helmC:Q.helm,chin:Q.helm,eyeC:Q.eye,hat:0,emblem:1,weapon:'none',acc:'',outfit:Q.outfit,coat:Q.coat||shade(Q.helm,-.4),cape:null,body:'lean',beard:0,scar:false,tallBoot:true,longGlove:true,trunks:false,noCrest:true,webC:Q.webC,spiderC:Q.spider,
+   suit:{pat:21,em:1,back:0,backC:'#000',emC:'#fff',fin:false,capeC:null,team:TB}};Object.assign(d,Q.x);
+  const pv=PAS[Q.pk].val(Q.r,rg);
+  HEROES.push({id,name:Q.n,title:Q.ti,legend:1,ev:'web',r:Q.r,el:Q.el,cls:Q.cls,d,dmg:+(c.dmg*m).toFixed(1),range:Math.round(c.range*(1+.06*Q.r)),rate:c.rate,cost:r25(c.cost*(1+.3*Q.r)),
+   splash:c.splash?c.splash+4*Q.r:0,chain:c.chain?c.chain+(Q.r>=3?1:0):0,slow:0,income:0,buff:0,p:{k:Q.pk,n:Q.pn,v:pv,d:PAS[Q.pk].d(pv)},bio:Q.bio+' (Web-Verse)',ult:{n:Q.ult,pow:1.25}});
+  WEB_SET.add(id);});})();
 // ---- Tesseract Trials: evolve Mirage King ----
 const TES=[
  {n:'Space',c:'#3fb8ff',map:2,mods:['fast','ghosts'],diff:7.2,d:'Enemies blink through space. Fast and hidden.'},
