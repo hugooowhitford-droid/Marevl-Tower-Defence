@@ -1832,7 +1832,7 @@ function spin(n){
  if(evm){got=[];const pool=evHeroes(ev);for(let i=0;i<n;i++){E.pity=(E.pity||0)+1;let r=rollEvR();if(E.pity>=400)r=4;if(r===4)E.pity=0;{const pr=pool.filter(h=>(h.baseR!=null?h.baseR:h.r)===r);got.push(grantHero(pr[Math.floor(Math.random()*pr.length)]||pool[0]));}}}
  else{const rs=[];for(let i=0;i<n;i++)rs.push(rollR());if(n===10&&Math.max(...rs)<1)rs[9]=1;got=rs.map(grant);}
  save();const rid=evm?evRandId:randId;
- const best=got.reduce((a,b)=>b.h.r>a.h.r?b:a).h;
+ const best=got.reduce((a,b)=>rk(b.h.r)>rk(a.h.r)?b:a).h;
  spinning=true;winGlow=null;slotMsg=n===1?'SPINNING...':'×10 SPINNING...';leverT=performance.now();sfx(200,.15,'sawtooth',.04);
  $('#spin1').disabled=$('#spin10').disabled=true;
  const now=performance.now()+250,tease=best.r>=2;
@@ -1870,7 +1870,8 @@ $('#slotCv').addEventListener('click',e=>{const r=e.target.getBoundingClientRect
 
 // ================= INDEX =================
 let fil='all',selHero=null;
-const FILTERS=[['all','All'],['owned','Owned'],['ev','Event'],[0,'Common'],[1,'Rare'],[2,'Epic'],[3,'Legendary'],[4,'Mythic'],[5,'ULTRA'],[6,'Exclusive'],[7,'Limited']];
+const RRANK=[0,1,2,3,4,6,7,5],rk=r=>RRANK[r]??r;
+const FILTERS=[['all','All'],['owned','Owned'],['ev','Event'],[0,'Common'],[1,'Rare'],[2,'Epic'],[3,'Legendary'],[4,'Mythic'],[7,'Limited'],[5,'ULTRA'],[6,'Exclusive']];
 function buildIndex(){
  const tb=$('#teamBar');tb.innerHTML='<span class="L out" style="font-size:18px;margin-right:4px">TEAM</span>';
  for(let i=0;i<5;i++){const id=SV.team[i];const s=mk('div','slot'+(id!=null?' full':''));
@@ -1879,7 +1880,7 @@ function buildIndex(){
  const fs=$('#filters');fs.innerHTML='';
  FILTERS.forEach(([k,n])=>{const c=mk('div','fchip'+(fil===k?' on':''),n);if(typeof k==='number')c.style.color=RAR[k].c;c.onclick=()=>{fil=k;buildIndex();};fs.appendChild(c);});
  const gr=$('#grid');gr.innerHTML='';
- HEROES.filter(h=>!h.hidden&&(fil==='all'||(fil==='owned'?SV.owned[h.id]:fil==='ev'?h.ev:h.r===fil))).sort((a,b)=>(!!SV.owned[b.id]-!!SV.owned[a.id])||(b.r-a.r)||(a.id-b.id)).forEach(h=>{
+ HEROES.filter(h=>!h.hidden&&(fil==='all'||(fil==='owned'?SV.owned[h.id]:fil==='ev'?h.ev:h.r===fil))).sort((a,b)=>(!!SV.owned[b.id]-!!SV.owned[a.id])||(rk(b.r)-rk(a.r))||(a.id-b.id)).forEach(h=>{
   const own=SV.owned[h.id];const c=mk('div','hc'+(selHero===h.id?' sel':''));c.style.borderColor=own?RAR[h.r].c:'#3b4560';
   c.appendChild(portrait(own?viewOf(h.id):h,78,80,1.6,{sil:!own}));if(own){const L=getLv(h.id);c.appendChild(mk('div','',`<span style="position:absolute;top:3px;left:4px;font:11px 'Lilita One';background:rgba(0,0,0,.55);border-radius:6px;padding:0 4px">Lv${L.lv}</span>`));}c.dataset.tip=own?`<b>${heroName(h.id)}</b><br>${RAR[h.r].n} ${CLS[h.cls].n} · ${ELS[h.el].i} ${ELS[h.el].n}<br>⚡ ${h.ult.n}<br>★ ${h.p.n}`:`<b>???</b><br>${RAR[h.r].n} hero${h.ev?' · event exclusive':''}. Not unlocked yet.`;const pc=c.lastChild;pc.style.margin='0 auto';pc.style.borderRadius='8px';
   c.appendChild(mk('div','nm',own?(isEvo(h.id)?'<span style="color:#ffd23f">✦</span> ':'')+heroName(h.id):'???'));
@@ -4033,7 +4034,7 @@ function mysRaise(f,t){if(!G||f.boss||f.mini)return;G.minions=G.minions||[];if(G
   if(n){floatTxt(t.x,t.y-60,'ILLUSION! '+n+' confused','#3fb8ff');sfx(660,.12,'triangle',.04);}};
  const T=TEAMS.find(x=>x.k==='eclipse');if(T){const old=teamOf;}
 })();
-migrate6();try{applyDesignEdits();}catch(e){}setTimeout(()=>{try{const before=(SV.team||[]).length;SV.team=(SV.team||[]).filter(id=>HEROES[id]&&!HEROES[id].hidden);if(SV.team.length<before){const own=Object.keys(SV.owned).map(Number).filter(id=>HEROES[id]&&!HEROES[id].hidden&&!SV.team.includes(id)).sort((a,b)=>((HEROES[a].cls==='farm')-(HEROES[b].cls==='farm'))||(HEROES[b].r-HEROES[a].r));while(SV.team.length<5&&own.length)SV.team.push(own.shift());save();}if(!SV.team.length){STARTERS.forEach(id=>{SV.owned[id]=SV.owned[id]||1;});SV.team=STARTERS.slice();save();}}catch(e){}},0);if(!SV.cos)SV.cos=1;if(!SV.ecl)SV.ecl=1;if(!SV.w7)SV.w7=1;if(!SV.zsq)SV.zsq=1;if(!SV.fsq)SV.fsq=1;save();setHD();
+migrate6();try{applyDesignEdits();}catch(e){}setTimeout(()=>{try{const before=(SV.team||[]).length;SV.team=(SV.team||[]).filter(id=>HEROES[id]&&!HEROES[id].hidden);if(SV.team.length<before){const own=Object.keys(SV.owned).map(Number).filter(id=>HEROES[id]&&!HEROES[id].hidden&&!SV.team.includes(id)).sort((a,b)=>((HEROES[a].cls==='farm')-(HEROES[b].cls==='farm'))||(rk(HEROES[b].r)-rk(HEROES[a].r)));while(SV.team.length<5&&own.length)SV.team.push(own.shift());save();}if(!SV.team.length){STARTERS.forEach(id=>{SV.owned[id]=SV.owned[id]||1;});SV.team=STARTERS.slice();save();}}catch(e){}},0);if(!SV.cos)SV.cos=1;if(!SV.ecl)SV.ecl=1;if(!SV.w7)SV.w7=1;if(!SV.zsq)SV.zsq=1;if(!SV.fsq)SV.fsq=1;save();setHD();
 $('#goSet').onclick=showSettings;$('#goProf').onclick=showProfile;$('#goRelic').onclick=showRelics;
 $('#goSet').dataset.tip='<b>Settings</b><br>Volume, damage numbers, screen shake, cutscenes, tutorial and save reset.';$('#goProf').dataset.tip='<b>Profile</b><br>Your stats, favourite hero and achievements.';$('#goRelic').dataset.tip='<b>Relics</b><br>Equip up to 3 relics that power up every battle.';
 $('#coachX').onclick=()=>{if(G&&G.tut)G.tut.i=TUT.length;$('#coach').style.display='none';SV.tut=1;save();};
@@ -4290,7 +4291,7 @@ function tradeForm(R,uid,p){const give=new Set(),want=new Set();
   <div class="L" style="margin-top:10px">3. Pick what you want from ${esc(p.name)}</div><div id="ntW"></div><div>Gems: <input id="ntWg" type="number" min="0" value="0" style="width:110px;font-size:16px;padding:4px;border-radius:8px"></div>
   <p style="font-size:12px;opacity:.8">Starter heroes can't be traded. What you give is held until they answer.</p><button class="bb green" id="ntGo">📤 Send offer</button>`;
  const draw=(box,ids,set)=>{box.innerHTML='';if(!ids.length){box.innerHTML='<i style="opacity:.7">No tradeable heroes</i>';return;}ids.forEach(id=>{if(!HEROES[id])return;const c=heroChip(id,set.has(id),1);c.onclick=()=>{set.has(id)?set.delete(id):set.add(id);draw(box,ids,set);};box.appendChild(c);});};
- const mine=Object.keys(SV.owned).map(Number).filter(canTrade).sort((a,b)=>HEROES[b].r-HEROES[a].r),theirs=(p.tradeable||[]).filter(id=>HEROES[id]).sort((a,b)=>HEROES[b].r-HEROES[a].r);
+ const mine=Object.keys(SV.owned).map(Number).filter(canTrade).sort((a,b)=>rk(HEROES[b].r)-rk(HEROES[a].r)),theirs=(p.tradeable||[]).filter(id=>HEROES[id]).sort((a,b)=>rk(HEROES[b].r)-rk(HEROES[a].r));
  draw(R.querySelector('#ntG'),mine,give);draw(R.querySelector('#ntW'),theirs,want);
  R.querySelector('#ntGo').onclick=async()=>{const gg=Math.max(0,Math.floor(+R.querySelector('#ntGg').value||0)),wg=Math.max(0,Math.floor(+R.querySelector('#ntWg').value||0));
   if(!give.size&&!gg){toast('Pick something to give');return;}if(!want.size&&!wg){toast('Pick something you want');return;}
