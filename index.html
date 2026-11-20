@@ -3336,7 +3336,7 @@ function showSettings(){const S=SV.set;
   b.querySelectorAll('[data-r]').forEach(e=>e.oninput=()=>{S[e.dataset.r]=+e.value;save();sfx(600,.05);});
   b.querySelectorAll('[data-k]').forEach(e=>e.onchange=()=>{S[e.dataset.k]=e.checked;save();setHD();});
   b.querySelector('#stT').onclick=()=>{SV.tut=0;save();closeModal();if(!SV.team.length)SV.team=STARTERS.slice();startGame(0,'story');};
-  b.querySelector('#stR').onclick=()=>{modal(`<div class="L out" style="font-size:28px;color:#ff4d5e">Reset ALL progress?</div><p style="font-weight:800">This deletes every hero, gem and unlock on this device. It can't be undone.</p><div style="display:flex;gap:10px;justify-content:center"><button class="bb sm gray" id="n">Keep my save</button><button class="bb sm red" id="y">Yes, reset everything</button></div>`,bb=>{bb.querySelector('#n').onclick=showSettings;bb.querySelector('#y').onclick=()=>{try{localStorage.removeItem(SKEY);}catch(e){}location.reload();};});};
+  b.querySelector('#stR').onclick=()=>{modal(`<div class="L out" style="font-size:28px;color:#ff4d5e">Reset ALL progress?</div><p style="font-weight:800">This deletes every hero, gem and unlock on this device. It can't be undone.</p><div style="display:flex;gap:10px;justify-content:center"><button class="bb sm gray" id="n">Keep my save</button><button class="bb sm red" id="y">Yes, reset everything</button></div>`,bb=>{bb.querySelector('#n').onclick=()=>showSettings();bb.querySelector('#y').onclick=()=>{try{localStorage.removeItem(SKEY);}catch(e){}location.reload();};});};
   b.querySelector('#stX').onclick=closeModal;});}
 // ---------- TUTORIAL ----------
 const TUT=[
@@ -4125,7 +4125,7 @@ function mysRaise(f,t){if(!G||f.boss||f.mini)return;G.minions=G.minions||[];if(G
  const T=TEAMS.find(x=>x.k==='eclipse');if(T){const old=teamOf;}
 })();
 migrate6();try{applyDesignEdits();}catch(e){}setTimeout(()=>{try{const before=(SV.team||[]).length;SV.team=(SV.team||[]).filter(id=>HEROES[id]&&!HEROES[id].hidden);if(SV.team.length<before){const own=Object.keys(SV.owned).map(Number).filter(id=>HEROES[id]&&!HEROES[id].hidden&&!SV.team.includes(id)).sort((a,b)=>((HEROES[a].cls==='farm')-(HEROES[b].cls==='farm'))||(rk(HEROES[b].r)-rk(HEROES[a].r)));while(SV.team.length<5&&own.length)SV.team.push(own.shift());save();}if(!SV.team.length){STARTERS.forEach(id=>{SV.owned[id]=SV.owned[id]||1;});SV.team=STARTERS.slice();save();}}catch(e){}},0);if(!SV.cos)SV.cos=1;if(!SV.ecl)SV.ecl=1;if(!SV.w7)SV.w7=1;if(!SV.zsq)SV.zsq=1;if(!SV.fsq)SV.fsq=1;save();setHD();
-$('#goSet').onclick=showSettings;$('#goProf').onclick=showProfile;$('#goRelic').onclick=showRelics;
+$('#goSet').onclick=()=>showSettings();$('#goProf').onclick=showProfile;$('#goRelic').onclick=showRelics;
 $('#goSet').dataset.tip='<b>Settings</b><br>Volume, damage numbers, screen shake, cutscenes, tutorial and save reset.';$('#goProf').dataset.tip='<b>Profile</b><br>Your stats, favourite hero and achievements.';$('#goRelic').dataset.tip='<b>Relics</b><br>Equip up to 3 relics that power up every battle.';
 $('#coachX').onclick=()=>{if(G&&G.tut)G.tut.i=TUT.length;$('#coach').style.display='none';SV.tut=1;save();};
 $('#edCv').addEventListener('click',edClick);
