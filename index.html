@@ -1218,6 +1218,10 @@ function drawPedestal(g,x,y,tier,rc,ec,t){
  g.restore();}
 // x,y = feet ; s = scale ; o: {t,still,flip,atk,ac,walk,evo,noShadow,tier}
 function drawAvatar(g,h,x,y,s,o={}){if(h.d&&h.d.building){drawBuilding(g,h,x,y,s,o);return;}
+ if(o.evo&&h.d&&h.d.voidD&&!o._v){const T=o.still?0:(o.t||0);g.save();g.translate(x,y);g.scale(s,s);
+  const ag=g.createRadialGradient(0,-28,4,0,-28,34);ag.addColorStop(0,'rgba(60,20,90,.55)');ag.addColorStop(1,'rgba(10,5,20,0)');g.fillStyle=ag;g.beginPath();g.arc(0,-28,34,0,7);g.fill();
+  for(let i=0;i<7;i++){const a=-Math.PI*.95+i*Math.PI*.95/6,w=Math.sin(T*2.2+i*1.7)*3,L=22+((i*13)%9);g.beginPath();g.moveTo(Math.cos(a)*6,-30+Math.sin(a)*6);g.bezierCurveTo(Math.cos(a)*14+w,-30+Math.sin(a)*14,Math.cos(a)*(L-6)-w,-30+Math.sin(a)*(L-6),Math.cos(a)*L+w*1.5,-30+Math.sin(a)*L);g.strokeStyle='rgba(8,4,14,.8)';g.lineWidth=3.2-i%3*.6;g.lineCap='round';g.stroke();g.strokeStyle='rgba(120,70,190,.35)';g.lineWidth=.8;g.stroke();}
+  g.restore();drawAvatar(g,{...h,d:{...h.d,...h.d.voidD,voidD:null}},x,y,s,{...o,_v:1});return;}
  const d=h.d,t=o.t||0,atk=o.atk||0,ec=ELS[h.el].pal[0],pose=POSE[h.cls],B=BODY[d.body||'hero'],tier=o.tier!=null?o.tier:(o.evo?4:0);ELS_GLOW=ec;CUR=d;d._gall=!!o.evo;
  if(d.spirit&&!o._sp){const fl=(o.flip?-1:1),sx=x-9*s*fl,sy=y-15*s+Math.sin(t*2.2)*2*s;g.save();const ga=g.globalAlpha;const sg=g.createRadialGradient(sx,sy-26*s,2,sx,sy-26*s,34*s);sg.addColorStop(0,'rgba(255,150,40,.5)');sg.addColorStop(1,'rgba(255,90,20,0)');g.fillStyle=sg;g.beginPath();g.arc(sx,sy-26*s,34*s,0,7);g.fill();g.globalAlpha=ga*.58;drawAvatar(g,d.spirit,sx,sy,s*.96,{...o,_sp:1,noShadow:true,tier:0,atk:atk*.5,evo:false});g.restore();CUR=d;ELS_GLOW=ec;
   if(!o.still){g.save();for(let i=0;i<5;i++){const k=((t*.6+i/5)%1);g.globalAlpha=(1-k)*.6;g.fillStyle='#eef4ff';g.beginPath();g.arc(sx+Math.sin(i*2.3+t)*10*s,sy-6*s-k*30*s,(1.6-k)*s,0,7);g.fill();}g.restore();}}
@@ -1568,7 +1572,7 @@ const getTrait=id=>SV&&SV.traits&&SV.traits[id]?TRAITS.find(t=>t.k===SV.traits[i
 const isEvo=id=>!!(SV&&SV.evo&&SV.evo[id]);
 const EVO_T={fire:'Phoenix',ice:'Absolute',lightning:'Overcharged',dark:'Eclipse',nature:'Ancient',light:'Radiant',tech:'Omega'};
 const EVO_REQ=r=>({kills:[0,0,250,500,800,1200,1600][r],sh:[0,0,3,5,8,12,15][r],gems:[0,0,500,1000,2000,3000,4000][r]});
-const heroName=id=>isEvo(id)&&HEROES[id].name==='Nebulos'?'Lord Nebulos':isEvo(id)?EVO_T[HEROES[id].el]+' '+HEROES[id].name:HEROES[id].name;
+const heroName=id=>isEvo(id)&&HEROES[id].name==='Sentinel'?'The Void':isEvo(id)&&HEROES[id].name==='Nebulos'?'Lord Nebulos':isEvo(id)?EVO_T[HEROES[id].el]+' '+HEROES[id].name:HEROES[id].name;
 const ULTS={ranged:{n:'Bullet Storm',d:'Fires 14 rapid shots.'},sniper:{n:'Final Shot',d:'One huge shot at the strongest enemy in range for 10× damage.'},splash:{n:'Meteor Strike',d:'Drops a meteor for 6× damage in a huge area.'},chain:{n:'Tempest',d:'Strikes every enemy in range for 3× damage.'},melee:{n:'Earthshatter',d:'Slams the ground: 5× damage to everything nearby and stuns them.'},slow:{n:'Time Lock',d:'Freezes every enemy in range for 3s.'},farm:{n:'Cash Out',d:'Instantly earns 1.5× this hero\'s wave income.'},support:{n:'Overdrive',d:'Nearby heroes attack 60% faster for 8s.'}};
 const MODS={
  fast:{n:'Speed Demons',i:'💨',d:'Enemies move 40% faster'},
@@ -1841,7 +1845,7 @@ function detailExtras(dv,h0,h){
  else if(h0.r>=2){const q=evoQuest(id),need=q.v(h0.r),have=evoHave(id,q.k),pk=evoPerk(id),cost=EVO_COST(h0.r);
   if(isEvo(id))dv.appendChild(mk('div','sect',`<div class="L" style="font-size:15px;color:#ffd23f">🧬 EVOLVED: ${h.name}</div><div>+60% damage, +10% range, faster attacks, stronger passive, faster Ultimate, max level 5.</div><div style="color:#ffd23f">✦ ${pk.n}: ${pk.d}</div>`));
   else{const ok=have>=need&&SV.mats.sh>=cost.sh&&SV.gems>=cost.gems;
-   const es=mk('div','sect',`<div class="L" style="font-size:15px;color:#ffd23f">🧬 EVOLUTION → ${EVO_T[h0.el]} ${h0.name}</div>
+   const es=mk('div','sect',`<div class="L" style="font-size:15px;color:#ffd23f">🧬 EVOLUTION → ${h0.name==='Sentinel'?'THE VOID':EVO_T[h0.el]+' '+h0.name}</div>
     <div>${have>=need?'✅':'⬜'} ${q.n(need)} (${fmtQ(Math.min(have,need))}/${fmtQ(need)})</div><div class="qbar"><i style="width:${Math.min(100,have/need*100)}%"></i></div>
     <div>${SV.mats.sh>=cost.sh?'✅':'⬜'} ${cost.sh} 💠 · ${SV.gems>=cost.gems?'✅':'⬜'} ${cost.gems} 💎</div><div style="color:#ffd23f">✦ Unlocks perk: <b>${pk.n}</b>: ${pk.d}</div>`);
    const eb=mk('button','bb sm gold','🧬 EVOLVE');eb.style.cssText='width:100%;margin-top:5px';eb.disabled=!ok;eb.onclick=()=>evolve(id);eb.dataset.tip=ok?'Ready to evolve!':'Finish the challenge and gather the materials first.';es.appendChild(eb);dv.appendChild(es);}}
@@ -3958,7 +3962,7 @@ try{Object.assign(window.__BH,{showGalaxy,evolve,endGame,closeModal,heroName});}
   const pv=PAS[Q.pk].val(Q.r,rg);
   HEROES.push({id,name:Q.n,title:Q.ti,legend:1,r:Q.r,el:Q.el,cls:Q.cls,d,dmg:+(c.dmg*m).toFixed(1),range:Math.round(c.range*(1+.06*Q.r)),rate:c.rate,cost:r25(c.cost*(1+.3*Q.r)),
    splash:c.splash?c.splash+4*Q.r:0,chain:c.chain?c.chain+(Q.r>=3?1:0):0,slow:c.slow?+(c.slow-.04*Q.r).toFixed(2):0,income:0,buff:0,p:{k:Q.pk,n:Q.pn,v:pv,d:PAS[Q.pk].d(pv)},bio:Q.bio+' (Legend)',ult:{n:Q.ult,pow:1.25}});
-  if(Q.n==='Sentinel')HEROES[id].d.suit.pat=18;TB_SET.add(id);});})();
+  if(Q.n==='Sentinel'){HEROES[id].d.suit.pat=18;HEROES[id].d.voidD={shirt:'#121218',sleeve:'#121218',pants:'#101016',glove:'#1d1a26',boot:'#1d1a26',belt:'#1d1a26',accent:'#3a2a55',hair:'#0b0b10',cape:'#06060a',skin:'#d9d2de',orbC:'#7b3fc4',orbC2:'#14081f',eyeC:'#ffffff',noCrest:true};}TB_SET.add(id);});})();
 // ---- Tesseract Trials: evolve Mirage King ----
 const TES=[
  {n:'Space',c:'#3fb8ff',map:2,mods:['fast','ghosts'],diff:7.2,d:'Enemies blink through space. Fast and hidden.'},
