@@ -4006,6 +4006,7 @@ function illuUnit(king){const h=king.h;return Object.assign({},h,{name:'Mirage I
  HEROES.forEach(h=>{const X=RD[h.name];if(!X||!h.legend)return;Object.assign(h.d,X.d);h.d.suit=Object.assign(h.d.suit||{},X.suit);});})();
 // ---- rarity power gap: Mythics and ULTRAs clearly stronger ----
 HEROES.forEach(h=>{if(h.cls==='farm'||!h.dmg)return;if(h.r===5){h.dmg=+(h.dmg*2).toFixed(1);h.range=Math.round(h.range*1.1);}});
+{const sn=HEROES.find(h=>h.name==='Sentinel');if(sn){sn.dmg=+(sn.dmg*.78).toFixed(1);sn.range=Math.round(sn.range*.92);}}
 // ---- Runesage is now the Supreme Wizard (oname keeps his effects) ----
 HEROES.forEach(h=>{if(h.name==='Runesage'){h.oname='Runesage';h.name='Supreme Wizard';h.title='Master of the Mystic Arts';h.bio='The greatest wizard in Brickvale. He studied every ancient tablet and now casts blazing orange spells that chain from enemy to enemy. (Legend)';}});
 // ================= ONLINE: accounts + cloud saves (Firebase) =================
