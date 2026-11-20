@@ -2223,7 +2223,7 @@ function startWave(){
    farm+=inc;floatTxt(t.x,t.y-30,'+$'+Math.round(inc),'#7dff8a');t.waves=(t.waves||0)+1;});
   G.towers.filter(t=>t.h.p.k==='heal').forEach(t=>{G.hp=Math.min(G.maxHp,G.hp+t.h.p.v.h);floatTxt(t.x,t.y-30,'+'+t.h.p.v.h+' ❤','#ff8fa3');});
   {let it=0;for(const o of G.towers)if(o.pa&&o.h.cls==='farm'&&o.pa[2])it+=Math.min(150*o.pa[2],G.cash*.02*o.pa[2]);if(it>=1){G.cash+=Math.round(it);setTimeout(()=>G&&floatTxt(W/2,90,'🏦 Interest +$'+Math.round(it),'#7dff8a'),600);}}
-  if(G.ally)G.ally.cash+=bonus+40;G.cash+=bonus+farm;G.gems+=G.endless?50:25;}
+  if(G.ally)G.ally.cash+=bonus+40;G.cash+=bonus+farm;G.gems+=(G.endless||G.mode==='tower')?100:25;}
  G.wave++;G.queue=makeWave(G.wave);G.spawnT=.3;G.timer=Math.max(14,22-G.wave*.3);
  const boss=G.queue.find(q=>q.type==='boss');toast(boss?'⚠ BOSS WAVE ⚠':'WAVE '+G.wave);sfx(330,.25,'sawtooth',.04);
 }
