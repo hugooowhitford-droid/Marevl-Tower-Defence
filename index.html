@@ -1507,13 +1507,15 @@ HD.human=function(g,h,o,T,atk){const d=h.d,C=d.hdc||{};if(C.scale&&!o._sc){g.sav
   hdMus(g,kx,ky,fx,fy-1.2,2.8*tw,3.4*tw,2.4*tw,C.shin||BO,sx*.6);
   if(C.shin)hdMus(g,kx+(fx-kx)*.55,ky+(fy-ky)*.55,fx,fy-1.2,2.6*tw,3*tw,2.4*tw,BO,0,.6);
   hdPath(g,()=>{g.moveTo(fx-sx*2.6,fy-2.8);g.lineTo(fx+sx*2.4,fy-2.8);g.quadraticCurveTo(fx+sx*4.6,fy-1.4,fx+sx*4.8,fy+.6);g.lineTo(fx-sx*2.8,fy+.6);g.quadraticCurveTo(fx-sx*3.2,fy-1,fx-sx*2.6,fy-2.8);},shade(BO,-.1),.8,fx-3,fy-3,fx+4,fy+1);
-  g.beginPath();g.ellipse(kx,ky,3*tw,2.4,0,0,7);g.fillStyle=hdCyl(g,kx-3,ky,kx+3,ky,C.kneeC||PA,3);g.fill();g.strokeStyle=OLN;g.lineWidth=.55;g.stroke();}
+  g.beginPath();g.ellipse(kx,ky,3*tw,2.4,0,0,7);g.fillStyle=hdCyl(g,kx-3,ky,kx+3,ky,C.kneeC||PA,3);g.fill();g.strokeStyle=OLN;g.lineWidth=.55;g.stroke();hdSpec(g,kx-.9,ky-.9,1.1,.5,0,.4);
+  g.beginPath();g.ellipse(fx,fy-2.9,2.3*tw,1.3,0,0,7);g.fillStyle=hdCyl(g,fx-2.4,fy,fx+2.4,fy,shade(C.shin||BO,-.15),2.4);g.fill();g.strokeStyle=OLN;g.lineWidth=.5;g.stroke();}
  hdPath(g,()=>{g.moveTo(-WA-.8,HIP-3.2);g.lineTo(WA+.8,HIP-3.2);g.quadraticCurveTo(BLD.hp+.8,HIP+1.4,BLD.hp+.2,HIP+3.2);g.quadraticCurveTo(3,HIP+3.6,0,HIP+4.6);g.quadraticCurveTo(-3,HIP+3.6,-BLD.hp-.2,HIP+3.2);g.quadraticCurveTo(-BLD.hp-.8,HIP+1.4,-WA-.8,HIP-3.2);},C.trunks||PA,.9,-7,HIP-3,7,HIP+6);
  // arms
  const AR=BLD.ar,AL=9*(C.longArm||1)*(C.build==='kid'?.8:1);
  const arm=(sx,tx,ty)=>{const shx=sx*(SW+.6),shy=SH+2.6,[ex,ey,hx,hy]=hdIK(shx,shy,tx,ty,AL,AL*.96,sx>0?1:-1),SLc=C.sleeveL&&sx<0?C.sleeveL:C.sleeveR&&sx>0?C.sleeveR:SL;
   hdMus(g,shx,shy,ex,ey,3.6*AR,3.9*AR,2.6*AR,SLc,sx*.6);hdMus(g,ex,ey,hx,hy,2.7*AR,3.1*AR,2.1*AR,(sx>0?C.foreR:C.foreL)||GL||C.forearm||SLc,sx*.4);
   if(GL&&!C.noCuff)hdBand(g,ex,ey,hx,hy,.38,3.3*AR,shade(GL,.15),1.3);
+  {const ec=C.elbowC||shade((sx>0?C.foreR:C.foreL)||GL||C.forearm||SLc,-.08);g.beginPath();g.ellipse(ex,ey,2.9*AR,2.6*AR,Math.atan2(hy-ey,hx-ex),0,7);g.fillStyle=hdCyl(g,ex-3,ey,ex+3,ey,ec,3);g.fill();g.strokeStyle=OLN;g.lineWidth=.55;g.stroke();hdSpec(g,ex-.8,ey-1,1,.5,0,.4);}
   g.beginPath();g.ellipse(hx+(hx-ex)*.08,hy+(hy-ey)*.08,2.5*AR,2.7*AR,0,0,7);g.fillStyle=hdCyl(g,hx-2.5,hy,hx+2.5,hy,(sx>0?C.handR:C.handL)||GL||SK,2.5);g.fill();g.strokeStyle=OLN;g.lineWidth=.7;g.stroke();
   g.beginPath();g.ellipse(shx,shy-.4,4.4*AR,4*AR,0,0,7);g.fillStyle=hdCyl(g,shx-4,shy,shx+4,shy,C.padC||SLc,4.4);g.fill();g.strokeStyle=OLN;g.lineWidth=.9;g.stroke();hdSpec(g,shx-sx*1.2,shy-1.8,1.6,.7,0,.35);
   return[hx,hy,ex,ey];};
