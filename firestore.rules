@@ -15,6 +15,44 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
+    match /live/{id} {
+      function signed() { return request.auth != null; }
+      function isA() { return request.auth.uid == resource.data.a; }
+      function isB() { return request.auth.uid == resource.data.b; }
+      function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+      function nd() { return request.resource.data; }
+      allow read: if signed() && (request.auth.uid == resource.data.a || request.auth.uid == resource.data.b);
+      allow create: if signed()
+        && nd().a == request.auth.uid && nd().b != request.auth.uid
+        && nd().status == 'request'
+        && nd().ar == false && nd().br == false && nd().ac == false && nd().bc == false
+        && nd().aDone == false && nd().bDone == false
+        && nd().ao.h.size() == 0 && nd().bo.h.size() == 0;
+      allow update: if signed() && (isA() || isB())
+        && nd().a == resource.data.a && nd().b == resource.data.b
+        && (
+          // after the trade is done, each side may only mark itself as settled
+          (resource.data.status == 'done'
+            && ((isA() && changed().hasOnly(['aDone']) && nd().aDone == true)
+             || (isB() && changed().hasOnly(['bDone']) && nd().bDone == true)))
+          // answering / cancelling a request
+          || (resource.data.status == 'request' && changed().hasOnly(['status', 'u'])
+            && ((isB() && nd().status in ['open', 'declined']) || (isA() && nd().status == 'cancelled')))
+          // inside the open trade window
+          || (resource.data.status == 'open'
+            && (nd().status in ['open', 'cancelled', 'done'])
+            && (isA() ? !changed().hasAny(['bo', 'aDone', 'bDone']) : !changed().hasAny(['ao', 'aDone', 'bDone']))
+            // changing an offer clears every accept and confirm
+            && (!changed().hasAny(['ao', 'bo'])
+              || (nd().ar == false && nd().br == false && nd().ac == false && nd().bc == false))
+            // you can only accept / confirm for yourself; the other side's flags can only be cleared
+            && (isA() ? ((nd().br == resource.data.br || nd().br == false) && (nd().bc == resource.data.bc || nd().bc == false))
+                      : ((nd().ar == resource.data.ar || nd().ar == false) && (nd().ac == resource.data.ac || nd().ac == false)))
+            // confirming needs both accepts, and finishing needs both confirms with no offer change
+            && (!(nd().ac || nd().bc) || (nd().ar && nd().br))
+            && (nd().status != 'done' || (nd().ac && nd().bc && !changed().hasAny(['ao', 'bo']))))
+        );
+    }
     match /trades/{id} {
       allow read: if request.auth != null
         && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);

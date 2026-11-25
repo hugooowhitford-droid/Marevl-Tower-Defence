@@ -5011,6 +5011,118 @@ function tradeForm(R,uid,p){const give=new Set(),want=new Set();
 {const _ra=refreshAcct;refreshAcct=function(){_ra();if(!ON.user&&tradeSubs.length)tradeListen();};}
 cloudUp=(orig=>async function(now){if(!ON.user||!ON.name)return;if(!now)return orig(false);await orig(true);try{await ON.db.collection('profiles').doc(ON.user.uid).set(pubProfile());}catch(e){}})(cloudUp);
 {const bar=$('#goAcct');if(bar){const t=mk('button','bb sm gold','🤝 Trade');t.id='goTrade';t.onclick=()=>showTrade();const l=mk('button','bb sm purple','🏆');l.id='goLB';l.title='Leaderboard';l.onclick=()=>showLeaderboard();bar.parentNode.insertBefore(l,bar.nextSibling);bar.parentNode.insertBefore(t,bar.nextSibling);}}
+// ---------- LIVE TRADING (request -> shared window -> accept -> confirm) ----------
+const LT={subs:[],doc:null,id:null,unsub:null,me:null,lastOther:0,outReq:null,banner:null,settling:{}};
+const ltRef=id=>ON.db.collection('live').doc(id);
+const ltSide=d=>d&&ON.user&&d.a===ON.user.uid?'a':'b';
+const ltOther=s=>s==='a'?'b':'a';
+// presence heartbeat so the "online now" list is fresh
+setInterval(()=>{try{if(ON.user&&ON.name&&!document.hidden)ON.db.collection('profiles').doc(ON.user.uid).set({t:Date.now(),tradeable:Object.keys(SV.owned).map(Number).filter(canTrade)},{merge:true});}catch(e){}},60000);
+function ltListen(){LT.subs.forEach(u=>u());LT.subs=[];if(!ON.user)return;const uid=ON.user.uid,C=ON.db.collection('live');
+ LT.subs.push(C.where('b','==',uid).onSnapshot(s=>ltSeen(s),()=>{}));
+ LT.subs.push(C.where('a','==',uid).onSnapshot(s=>ltSeen(s),()=>{}));}
+function ltSeen(s){const now=Date.now();
+ s.docs.forEach(x=>{const d={id:x.id,...x.data()},me=ltSide(d);
+  if(d.status==='done'&&!d[me+'Done'])return ltSettle(d);
+  if(d.status==='request'&&me==='b'&&now-(d.t||0)<30000)return ltIncoming(d);
+  if(d.status==='request'&&me==='b')ltHideBanner(d.id);
+  if(d.status==='open'&&now-(d.u||d.t||0)<10*60000&&LT.id!==d.id&&(me==='b'?LT.accepting===d.id:LT.outReq===d.id)){LT.outReq=null;ltHideBanner();ltOpen(d.id);}
+  if(d.status==='declined'&&me==='a'&&LT.outReq===d.id){LT.outReq=null;ltHideBanner();toast('❌ '+d.bName+' declined your trade request');}});}
+function ltBanner(html,btns,key){ltHideBanner();const e=mk('div','');e.dataset.k=key||'';e.style.cssText='position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#1c2a5a,#3a1c5a);border:3px solid #ffd23f;border-radius:16px;padding:10px 14px;color:#fff;font-weight:900;box-shadow:0 8px 30px rgba(0,0,0,.6);display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:94vw';
+ e.innerHTML=`<span>${html}</span>`;btns.forEach(([t,c,f])=>{const b=mk('button','bb sm '+c,t);b.onclick=f;e.appendChild(b);});document.body.appendChild(e);LT.banner=e;}
+function ltHideBanner(key){if(LT.banner&&(!key||LT.banner.dataset.k===key)){LT.banner.remove();LT.banner=null;}}
+function ltIncoming(d){if(LT.id||(LT.banner&&LT.banner.dataset.k===d.id))return;chime();
+ ltBanner(`🤝 <b style="color:#ffd23f">${esc(d.aName)}</b> wants to trade!`,[['Accept','green',async()=>{ltHideBanner();LT.accepting=d.id;
+   try{await ON.db.runTransaction(async tx=>{const s=await tx.get(ltRef(d.id));if(!s.exists||s.data().status!=='request')throw 0;tx.update(ltRef(d.id),{status:'open',u:Date.now()});});ltOpen(d.id);}catch(e){toast('That request expired');}}],
+  ['Decline','red',async()=>{ltHideBanner();try{await ltRef(d.id).update({status:'declined',u:Date.now()});}catch(e){}}]],d.id);
+ setTimeout(()=>ltHideBanner(d.id),30000);}
+async function ltRequest(uid,name){if(needSign())return;if(uid===ON.user.uid)return toast("That's you!");if(LT.id)return toast('Finish your current trade first');
+ try{const r=await ON.db.collection('live').add({a:ON.user.uid,aName:ON.name,b:uid,bName:name,status:'request',ao:{h:[],g:0},bo:{h:[],g:0},ar:false,br:false,ac:false,bc:false,aDone:false,bDone:false,t:Date.now(),u:Date.now()});
+  LT.outReq=r.id;closeModal();
+  ltBanner(`⏳ Waiting for <b style="color:#ffd23f">${esc(name)}</b> to accept…`,[['Cancel','red',()=>{ltHideBanner();LT.outReq=null;ltRef(r.id).update({status:'cancelled',u:Date.now()}).catch(()=>{});}]],'out');
+  setTimeout(()=>{if(LT.outReq===r.id){LT.outReq=null;ltHideBanner('out');ltRef(r.id).update({status:'cancelled',u:Date.now()}).catch(()=>{});toast('⌛ '+name+' did not answer');}},30000);
+ }catch(e){toast('❌ Could not send the request');}}
+// ---- the shared trade window ----
+function ltOpen(id){LT.id=id;LT.lastOther=0;LT.doc=null;
+ modal(`<div class="L out" style="font-size:26px">🤝 LIVE TRADE</div><div id="ltWho" style="font-weight:900;opacity:.9;margin-bottom:6px"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;text-align:left">
+   <div style="flex:1;min-width:250px;background:rgba(56,201,90,.15);border:2px solid #38c95a;border-radius:12px;padding:6px"><div class="L">YOUR OFFER <span id="ltMeS"></span></div><div id="ltMe" style="min-height:70px"></div><div style="font-weight:800">💎 <input id="ltG" type="number" min="0" value="0" style="width:110px;font-size:16px;padding:3px;border-radius:8px"> <span style="opacity:.7;font-size:12px">of ${SV.gems.toLocaleString()}</span></div></div>
+   <div style="flex:1;min-width:250px;background:rgba(80,140,255,.15);border:2px solid #5a8cff;border-radius:12px;padding:6px"><div class="L">THEIR OFFER <span id="ltThS"></span></div><div id="ltTh" style="min-height:70px"></div><div id="ltThG" style="font-weight:800"></div></div>
+  </div>
+  <div id="ltMsg" style="font-weight:900;margin:6px 0;min-height:22px"></div>
+  <div style="display:flex;gap:8px;justify-content:center"><button class="bb green" id="ltOk">✅ Accept</button><button class="bb red" id="ltX">Cancel trade</button></div>
+  <div class="L" style="margin-top:8px;text-align:left">Tap your heroes to add or remove them:</div><div id="ltInv" style="max-height:26vh;overflow:auto;text-align:left"></div>`,b=>{
+  b.querySelector('#ltX').onclick=()=>ltCancel();
+  b.querySelector('#ltOk').onclick=()=>ltPress();
+  const gi=b.querySelector('#ltG');gi.onchange=()=>{let v=Math.max(0,Math.min(SV.gems,1e6,Math.floor(+gi.value||0)));gi.value=v;ltSetOffer(null,v);};
+  ltInv();});
+ if(LT.unsub)LT.unsub();
+ LT.unsub=ltRef(id).onSnapshot(s=>{if(!s.exists)return;const d={id:s.id,...s.data()},prev=LT.doc;LT.doc=d;const me=ltSide(d),o=ltOther(me);
+  if(prev&&JSON.stringify(prev[o+'o'])!==JSON.stringify(d[o+'o']))LT.lastOther=Date.now();
+  if(d.status==='cancelled'){ltClose();toast('🚫 Trade cancelled');return;}
+  if(d.status==='done'){ltClose(true);ltSettle(d);return;}
+  ltDraw();},()=>{});
+ LT.tick=setInterval(()=>LT.doc&&ltDraw(),500);}
+function ltInv(){const box=$('#ltInv');if(!box)return;const d=LT.doc,mine=d?d[ltSide(d)+'o'].h:[];box.innerHTML='';
+ const ids=Object.keys(SV.owned).map(Number).filter(canTrade).sort((a,b)=>rk(HEROES[b].r)-rk(HEROES[a].r));
+ if(!ids.length)box.innerHTML='<i style="opacity:.7">No tradeable heroes (starters can\'t be traded)</i>';
+ ids.forEach(id=>{const on=mine.includes(id),c=heroChip(id,on,1);c.onclick=()=>{const cur=LT.doc?LT.doc[ltSide(LT.doc)+'o'].h.slice():[];const i=cur.indexOf(id);if(i>=0)cur.splice(i,1);else{if(cur.length>=9)return toast('Max 9 heroes per trade');cur.push(id);}ltSetOffer(cur,null);};box.appendChild(c);});}
+async function ltSetOffer(h,g){const d=LT.doc;if(!d||d.status!=='open')return;const me=ltSide(d),cur=d[me+'o'];
+ const o={h:h||cur.h,g:g==null?cur.g:g};
+ try{await ltRef(d.id).update({[me+'o']:o,ar:false,br:false,ac:false,bc:false,u:Date.now()});}catch(e){toast('❌ Connection problem');}}
+function ltDraw(){const d=LT.doc;if(!d||!$('#ltMe'))return;const me=ltSide(d),o=ltOther(me),myO=d[me+'o'],thO=d[o+'o'];
+ $('#ltWho').innerHTML=`Trading with <b style="color:#ffd23f">${esc(d[o+'Name'])}</b>`;
+ const fill=(box,ids)=>{const key=ids.join(',');if(box.dataset.k===key)return;box.dataset.k=key;box.innerHTML=ids.length?'':'<i style="opacity:.6">Nothing yet</i>';ids.forEach(id=>{if(HEROES[id])box.appendChild(heroChip(id,false,1));});};
+ fill($('#ltMe'),myO.h);fill($('#ltTh'),thO.h);
+ const gi=$('#ltG');if(gi&&document.activeElement!==gi)gi.value=myO.g||0;
+ $('#ltThG').innerHTML=thO.g?`💎 ${(+thO.g).toLocaleString()}`:'';
+ const both=d.ar&&d.br,mine=both?d[me+'c']:d[me+'r'],theirs=both?d[o+'c']:d[o+'r'];
+ $('#ltMeS').innerHTML=mine?'<span style="color:#7dff8a">✅</span>':'';$('#ltThS').innerHTML=theirs?'<span style="color:#7dff8a">✅</span>':'';
+ const wait=Math.max(0,3-Math.floor((Date.now()-LT.lastOther)/1000)),ok=$('#ltOk');
+ const k=$('#ltInv');if(k&&k.dataset.k!==myO.h.join(',')){k.dataset.k=myO.h.join(',');ltInv();$('#ltInv').dataset.k=myO.h.join(',');}
+ if(!myO.h.length&&!myO.g&&!thO.h.length&&!thO.g){ok.disabled=true;ok.textContent='✅ Accept';$('#ltMsg').textContent='Add heroes or gems to start';return;}
+ if(both){ok.textContent=mine?'⏳ Waiting…':'🔒 CONFIRM TRADE';ok.className='bb '+(mine?'gray':'gold');ok.disabled=!!mine;
+  $('#ltMsg').innerHTML='⚠️ Last check! Make sure the trade is what you want, then confirm.';}
+ else{ok.className='bb '+(mine?'gray':'green');
+  if(wait>0&&!mine){ok.disabled=true;ok.textContent=`✅ Accept (${wait})`;$('#ltMsg').innerHTML='<span style="color:#ffd23f">⚠️ Their offer just changed!</span>';}
+  else{ok.disabled=!!mine;ok.textContent=mine?'⏳ Waiting…':'✅ Accept';$('#ltMsg').innerHTML=theirs?`<span style="color:#7dff8a">${esc(d[o+'Name'])} accepted!</span>`:'';}}}
+async function ltPress(){const d=LT.doc;if(!d||d.status!=='open')return;const me=ltSide(d),o=ltOther(me),myO=d[me+'o'];
+ if(myO.h.some(id=>!SV.owned[id]))return toast('❌ You no longer have one of those heroes');
+ if((+myO.g||0)>SV.gems)return toast('❌ Not enough gems');
+ try{if(d.ar&&d.br){await ON.db.runTransaction(async tx=>{const s=await tx.get(ltRef(d.id)),x=s.data();if(!x||x.status!=='open'||!x.ar||!x.br)throw 0;
+    const up={[me+'c']:true,u:Date.now()};if(x[o+'c'])up.status='done';tx.update(ltRef(d.id),up);});}
+  else await ltRef(d.id).update({[me+'r']:true,u:Date.now()});}catch(e){toast('Offer changed, check again');}}
+async function ltCancel(){const d=LT.doc;ltClose();if(d&&d.status==='open'){try{await ltRef(d.id).update({status:'cancelled',u:Date.now()});}catch(e){}}}
+function ltClose(keep){if(LT.unsub)LT.unsub();LT.unsub=null;clearInterval(LT.tick);LT.id=null;LT.accepting=null;if($('#ltMe'))closeModal();}
+async function ltSettle(d){const me=ltSide(d),o=ltOther(me);if(LT.settling[d.id])return;LT.settling[d.id]=1;
+ try{let ok=false;await ON.db.runTransaction(async tx=>{const s=await tx.get(ltRef(d.id));if(!s.exists||s.data()[me+'Done'])return;tx.update(ltRef(d.id),{[me+'Done']:true});ok=true;});
+  if(!ok)return;const give=d[me+'o'],get=d[o+'o'];
+  (give.h||[]).forEach(takeHero);SV.gems=Math.max(0,SV.gems-(+give.g||0));(get.h||[]).forEach(addHeroCopy);SV.gems+=(+get.g||0);
+  save();refreshGems();await cloudUp(true);chime();
+  const got=(get.h||[]).map(id=>({h:HEROES[id],res:'TRADED!'})).filter(x=>x.h);if(got.length)reveal(got);toast('🤝 Trade with '+d[o+'Name']+' complete!'+(get.g?' +💎'+(+get.g).toLocaleString():''));
+ }catch(e){LT.settling[d.id]=0;}}
+// ---- online players list in the trade menu ----
+async function ltOnlineList(B){B.innerHTML=`<div class="L">🟢 Players online now</div><div id="ltOn" style="margin:4px 0 10px">Loading…</div>
+  <div class="L">🔎 Or find by username</div><div style="display:flex;gap:6px;margin:4px 0"><input id="ltU" placeholder="Their username" style="flex:1;font-size:18px;padding:6px;border-radius:10px;border:2px solid #556"><button class="bb sm green" id="ltF">🤝 Request</button></div>
+  <p style="font-size:12px;opacity:.8">They get a pop-up to accept. Then you both add heroes and gems in a live window, press Accept, and Confirm.</p>`;
+ const go=async()=>{const n=B.querySelector('#ltU').value.trim().toLowerCase();if(!n)return;try{const u=await ON.db.collection('usernames').doc(n).get();if(!u.exists)return toast('No player with that name');const p=(await ON.db.collection('profiles').doc(u.data().uid).get()).data()||{};ltRequest(u.data().uid,p.name||n);}catch(e){toast('Could not search');}};
+ B.querySelector('#ltF').onclick=go;B.querySelector('#ltU').onkeydown=e=>{if(e.key==='Enter')go();};
+ const L=B.querySelector('#ltOn');
+ try{const q=await ON.db.collection('profiles').where('t','>',Date.now()-5*60000).orderBy('t','desc').limit(40).get();
+  const ps=q.docs.filter(x=>x.id!==ON.user.uid);L.innerHTML=ps.length?'':'<i style="opacity:.7">Nobody else is online right now. Try the username search.</i>';
+  ps.forEach(x=>{const p=x.data(),r=mk('div','');r.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 10px;margin:3px 0;border-radius:10px;background:rgba(0,0,0,.3)';
+   r.innerHTML=`<span style="color:#38c95a">●</span><span style="flex:1">${esc(p.name||'?')}${p.dev?' <span style="color:#ffb020;font-size:11px">🛠️ DEV</span>':''} <span style="opacity:.6;font-size:12px">· ${p.heroes||0} heroes</span></span>`;
+   const b=mk('button','bb sm green','🤝 Trade');b.onclick=()=>ltRequest(x.id,p.name);r.appendChild(b);L.appendChild(r);});
+ }catch(e){L.innerHTML='<i style="opacity:.7">Could not load the online list.</i>';}}
+// put live trading first in the trade menu
+showTrade=(orig=>function(tab){if(needSign())return;tab=tab||'live';if(tab!=='live')return orig(tab);
+ orig('in');const b=$('#mbox');const T=b.querySelector('#trT');if(!T)return;
+ [...T.children].forEach(x=>x.className='bb sm gray');const lv=mk('button','bb sm gold','🟢 Live trade');lv.onclick=()=>showTrade('live');T.insertBefore(lv,T.firstChild);
+ ltOnlineList(b.querySelector('#trB'));})(showTrade);
+{const _o=showTrade;const fix=()=>{const T=$('#mbox #trT');if(T&&!T.querySelector('.ltTab')){const lv=mk('button','bb sm gray ltTab','🟢 Live trade');lv.onclick=()=>showTrade('live');T.insertBefore(lv,T.firstChild);}};
+ showTrade=function(tab){_o(tab);if(tab&&tab!=='live')fix();};}
+{const _osi=onSignedIn;onSignedIn=async function(u){await _osi(u);ltListen();};}
+addEventListener('beforeunload',()=>{try{if(LT.doc&&LT.doc.status==='open'&&LT.id)ltRef(LT.id).update({status:'cancelled',u:Date.now()});}catch(e){}});
 fbInit();
 })();
 </script>
